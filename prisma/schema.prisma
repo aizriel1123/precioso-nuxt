@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id           Int         @id @default(autoincrement())
+  username     String      @db.VarChar(50)
+  password     String      @db.VarChar(50)
+  therapist_id Int
+  type_id      Int
+  Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
+  AccountType  AccountType @relation(fields: [type_id], references: [id], onUpdate: Restrict)
+}
+
+model AccountType {
+  id      Int       @id @default(autoincrement())
+  type    String    @unique @db.VarChar(50)
+  Account Account[]
+}
+
+model Appointment {
+  transaction_id        Int
+  service_id            Int
+  appointment_status_id Int
+  quantity              Int               @default(1)
+  AppointmentStatus     AppointmentStatus @relation(fields: [appointment_status_id], references: [id], onUpdate: Restrict)
+  Service               Service           @relation(fields: [service_id], references: [id], onUpdate: Restrict)
+  Transaction           Transaction       @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+
+  @@id([transaction_id, service_id])
+}
+
+model AppointmentStatus {
+  id          Int           @id @default(autoincrement())
+  status      String        @unique @db.VarChar(30)
+  Appointment Appointment[]
+}
+
+model Client {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(255)
+  dob          DateTime?     @db.Date
+  contact_info String?       @db.VarChar(20)
+  gender_id    Int?
+  Gender       Gender?       @relation(fields: [gender_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  Transaction  Transaction[]
+}
+
+model CommissionRate {
+  id      Int       @id @default(autoincrement())
+  rate    Decimal   @db.Decimal(4, 2)
+  Promo   Promo[]
+  Service Service[]
+}
+
+model Defect {
+  defective_id Int       @id @default(autoincrement())
+  product_id   Int
+  therapist_id Int
+  quantity     Int
+  date         DateTime  @db.Date
+  Product      Product   @relation(fields: [product_id], references: [id], onUpdate: Restrict)
+  Therapist    Therapist @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
+}
+
+model Gender {
+  id        Int         @id @default(autoincrement())
+  gender    String      @unique @db.VarChar(20)
+  Client    Client[]
+  Therapist Therapist[]
+}
+
+model ModeOfPayment {
+  id          Int           @id @default(autoincrement())
+  mode        String        @unique @db.VarChar(50)
+  Transaction Transaction[]
+}
+
+model Product {
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(50)
+  cost            Decimal          @db.Decimal(6, 2)
+  commission      Decimal          @db.Decimal(6, 2)
+  product_type_id Int
+  critical_level  Int?
+  Defect          Defect[]
+  ProductType     ProductType      @relation(fields: [product_type_id], references: [id], onUpdate: Restrict)
+  ProductsSold    ProductsSold[]
+  StockinProduct  StockinProduct[]
+}
+
+model ProductType {
+  id      Int       @id @default(autoincrement())
+  type    String    @unique @db.VarChar(50)
+  Product Product[]
+}
+
+model ProductsSold {
+  transaction_id Int
+  product_id     Int
+  quantity       Int?
+  Product        Product     @relation(fields: [product_id], references: [id], onUpdate: Restrict)
+  Transaction    Transaction @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+
+  @@id([transaction_id, product_id])
+}
+
+model Promo {
+  id                 Int                @id @default(autoincrement())
+  promo              String             @db.VarChar(255)
+  price              Decimal            @db.Decimal(6, 2)
+  commission_rate_id Int
+  CommissionRate     CommissionRate     @relation(fields: [commission_rate_id], references: [id], onUpdate: Restrict)
+  PromoServices      PromoServices[]
+  PromoTransaction   PromoTransaction[]
+}
+
+model PromoServices {
+  promo_id   Int
+  service_id Int
+  quantity   Int?    @default(1)
+  Promo      Promo   @relation(fields: [promo_id], references: [id], onDelete: Cascade)
+  Service    Service @relation(fields: [service_id], references: [id], onUpdate: Restrict)
+
+  @@id([promo_id, service_id])
+}
+
+model PromoStatus {
+  id               Int                @id @default(autoincrement())
+  status           String             @db.VarChar(50)
+  PromoTransaction PromoTransaction[]
+}
+
+model PromoTransaction {
+  transaction_id Int
+  promo_id       Int
+  status_id      Int
+  Promo          Promo       @relation(fields: [promo_id], references: [id], onUpdate: Restrict)
+  PromoStatus    PromoStatus @relation(fields: [status_id], references: [id], onUpdate: Restrict)
+  Transaction    Transaction @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+
+  @@id([transaction_id, promo_id])
+}
+
+model Service {
+  id                 Int             @id @default(autoincrement())
+  name               String          @db.VarChar(100)
+  price              Decimal?        @db.Decimal(10, 2)
+  commission_rate_id Int
+  service_type_id    Int
+  Appointment        Appointment[]
+  PromoServices      PromoServices[]
+  CommissionRate     CommissionRate  @relation(fields: [commission_rate_id], references: [id], onUpdate: Restrict)
+  ServiceType        ServiceType     @relation(fields: [service_type_id], references: [id], onUpdate: Restrict)
+}
+
+model ServiceType {
+  id      Int       @id @default(autoincrement())
+  type    String    @db.VarChar(50)
+  Service Service[]
+}
+
+model Stockin {
+  inventory_id Int       @id @default(autoincrement())
+  supplier_id  Int
+  therapist_id Int
+  date         DateTime? @db.Date
+  Supplier     Supplier  @relation(fields: [supplier_id], references: [id])
+  Therapist    Therapist @relation(fields: [therapist_id], references: [id])
+}
+
+model StockinProduct {
+  inventory_id   Int      @default(autoincrement())
+  product_id     Int
+  quantity       Int?
+  purchase_price Decimal? @db.Decimal(10, 2)
+  Product        Product  @relation(fields: [product_id], references: [id])
+
+  @@id([inventory_id, product_id])
+}
+
+model Supplier {
+  id                  Int       @id @default(autoincrement())
+  supplier_name       String    @db.VarChar(100)
+  supplier_contactnum String?   @db.VarChar(20)
+  Stockin             Stockin[]
+}
+
+model Therapist {
+  id              Int             @id @default(autoincrement())
+  name            String?         @unique @db.VarChar(255)
+  dob             DateTime?       @db.Date
+  contactinfo     String?         @db.VarChar(50)
+  schedule        String?         @db.VarChar(20)
+  gender_id       Int
+  status_id       Int
+  type_id         Int
+  Account         Account[]
+  Defect          Defect[]
+  Stockin         Stockin[]
+  Gender          Gender          @relation(fields: [gender_id], references: [id])
+  TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
+  TherapistType   TherapistType   @relation(fields: [type_id], references: [id])
+  Transaction     Transaction[]
+}
+
+model TherapistStatus {
+  id        Int         @id @default(autoincrement())
+  status    String      @db.VarChar(50)
+  Therapist Therapist[]
+}
+
+model TherapistType {
+  id        Int         @id @default(autoincrement())
+  type      String?     @db.VarChar(20)
+  Therapist Therapist[]
+}
+
+model Transaction {
+  id                 Int                @id @default(autoincrement())
+  date               DateTime?          @db.Timestamptz(6)
+  client_id          Int
+  therapist_id       Int
+  mode_of_payment_id Int
+  notes              String?
+  Appointment        Appointment[]
+  ProductsSold       ProductsSold[]
+  PromoTransaction   PromoTransaction[]
+  Client             Client             @relation(fields: [client_id], references: [id])
+  ModeOfPayment      ModeOfPayment      @relation(fields: [mode_of_payment_id], references: [id])
+  Therapist          Therapist          @relation(fields: [therapist_id], references: [id])
+}
