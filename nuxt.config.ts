@@ -12,4 +12,10 @@ export default defineNuxtConfig({
      */
     componentDir: './components/ui'
   },
+
+  routeRules: {
+    '/': { redirect: '/login-register/login'}
+  },
+
+  compatibilityDate: '2024-09-23'
 })

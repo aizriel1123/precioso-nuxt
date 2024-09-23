@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^5.19.1",
     "@vee-validate/zod": "^4.13.2",
+    "@vueuse/core": "^11.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.441.0",
