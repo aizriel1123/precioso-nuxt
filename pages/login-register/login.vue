@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 
 const formSchema = toTypedSchema(z.object({
   username: z.string().min(8).max(50),
@@ -14,11 +15,13 @@ const formSchema = toTypedSchema(z.object({
 
 const form = useForm({ validationSchema: formSchema })
 const router = useRouter()
-const onSubmit = form.handleSubmit((values) => console.log('Form submitted!', values))
 
-const handleSignUp = () => {
-  router.push('register')
-}
+// Edit this part later for checking of database
+const onSubmit = form.handleSubmit((values) => {
+  /*  Proceeds to sales-report tab. Change this later to dashboard for owner and pos for therapist
+  To test, fill in username and password first*/
+  router.push('/sales/sales-report')
+})
 
 </script>
 
@@ -26,8 +29,10 @@ const handleSignUp = () => {
   <div class="form-container">
     <form @submit.prevent="onSubmit" class="form" noValidate>
       <FormField v-slot="{ componentField }" name="username">
-        <img src="/src/images/logo_precioso.png">
-          <FormItem>
+        <div class="logo-container">
+          <img class="logo-img" src="/src/images/logo_precioso.png" alt="precioso logo">
+        </div>
+        <FormItem>
           <FormLabel>Username</FormLabel>
           <FormControl>
             <Input type="text" placeholder="Enter username" v-bind="componentField" class="w-full" />
@@ -46,10 +51,7 @@ const handleSignUp = () => {
         </FormItem>
       </FormField>
 
-      <div class="button-group">
-        <Button type="submit">Submit</Button>
-        <Button class="sign-up-button" @click="handleSignUp">Sign Up</Button>
-      </div>
+      <Button type="submit" class="submit-btn">Submit</Button>
     </form>
   </div>
 </template>
@@ -66,6 +68,7 @@ const handleSignUp = () => {
 
 .form {
   max-width: 400px;
+  height: 400px;
   width: 100%;
   padding: 20px;
   background-color: white;
@@ -73,67 +76,34 @@ const handleSignUp = () => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.FormField {
-  margin-bottom: 15px;
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.FormControl,
-.Button[type="submit"] {
-  width: 100%;
+.logo-img {
+  width: 200px;
+  height: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.FormControl {
-  padding: 8px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: white;
-}
-
-.FormMessage {
-  margin-top: 5px;
-  font-size: 0.8em;
-  color: #ff5252;
-}
-
-.Button[type="submit"] {
-  margin-top: 15px;
+.submit-btn {
+  margin-top: 20px; 
   padding: 10px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   border: none;
   border-radius: 4px;
+  width: 100%;
 }
 
-.Button[type="submit"]:hover {
+.submit-btn[type="submit"]:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
-.button-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.sign-up-button {
-  background: transparent;
-  border: none;
-  color: rgb(53, 53, 53);
-  cursor: pointer;
-  padding: 10px 20px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.sign-up-button:hover {
-  transform: translateY(-1px);
-}
-
-
 </style>

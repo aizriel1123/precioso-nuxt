@@ -1,6 +1,7 @@
 <template>
-    <html lang="en">
-    <body>
-    </body>
-    </html>
-  </template>
+  <NavBar />
+</template>
+
+<script setup>
+import NavBar from '~/components/Navbar.vue'
+</script>
