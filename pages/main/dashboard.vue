@@ -1,5 +1,9 @@
 <template>
-  <NavBar />
+    <NavBar />
+
+
+    
+
 </template>
 
 <script setup>
