@@ -20,7 +20,7 @@ const router = useRouter()
 const onSubmit = form.handleSubmit((values) => {
   /*  Proceeds to sales-report tab. Change this later to dashboard for owner and pos for therapist
   To test, fill in username and password first*/
-  router.push('/sales/sales-report')
+  router.push('/inventory/inventory')
 })
 
 </script>

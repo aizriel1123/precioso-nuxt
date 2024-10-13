@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
-
+  devtools: {enabled: true},
   shadcn: {
     /**
      * Prefix for all the imported component

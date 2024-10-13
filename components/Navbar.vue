@@ -34,7 +34,7 @@
   const router = useRouter()
 
   const goToRoute = (route) => {
-  router.push(route)
+  router.push(route) // Go to the specified route
 }
   </script>
   
