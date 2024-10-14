@@ -16,13 +16,28 @@ const formSchema = toTypedSchema(z.object({
 const form = useForm({ validationSchema: formSchema })
 const router = useRouter()
 
-// Edit this part later for checking of database
-const onSubmit = form.handleSubmit((values) => {
-  /*  Proceeds to sales-report tab. Change this later to dashboard for owner and pos for therapist
-  To test, fill in username and password first*/
-  router.push('/inventory/inventory')
-})
+const onSubmit = form.handleSubmit(async (values) => {
+  try {
+    const response = await $fetch('/api/login', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: {
+        username: values.username,
+        password: values.password
+      },
+    });
+    console.log(response)
 
+    // Assuming the response contains a token
+    localStorage.setItem('token', response.token);
+
+    // Redirect based on user role or other criteria
+    router.push('/inventory/inventory');
+  } catch (error) {
+    console.error('Login failed:', error);
+    // Handle login error (e.g., show a message to the user)
+  }
+});
 </script>
 
 <template>
