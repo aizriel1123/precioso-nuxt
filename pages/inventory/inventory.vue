@@ -224,7 +224,7 @@
       <h2 class="selected-product-title">Add New Supplier</h2>
 
       <form @submit.prevent="addNewSupplier">
-        <FormField v-slot="{ componentField }" name="supplier-id">
+        <FormField v-slot="{ componentField }" name="supplier_id">
           <FormItem>
             <FormLabel>Supplier ID</FormLabel>
             <FormControl>
@@ -234,7 +234,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new-supplier-name">
+        <FormField v-slot="{ componentField }" name="new_supplier_name">
           <FormItem>
             <FormLabel>Supplier Name</FormLabel>
             <FormControl>
@@ -244,7 +244,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="supplier-address">
+        <FormField v-slot="{ componentField }" name="supplier_address">
           <FormItem>
             <FormLabel>Supplier Address</FormLabel>
             <FormControl>
@@ -254,7 +254,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="contact-number">
+        <FormField v-slot="{ componentField }" name="contact_number">
           <FormItem>
             <FormLabel>Contact Number</FormLabel>
             <FormControl>
@@ -368,6 +368,10 @@
   import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
   import { ArrowDownWideNarrow } from 'lucide-vue-next';
 
+  // SAMPLE FORM (NOTE: BOTBOT RA NI)
+  import { useForm } from 'vee-validate'
+  const form = useForm()
+
   //Sample data
   const products = ref([
     { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
@@ -450,12 +454,21 @@
   };
 
 
-  const addNewProduct = () => {
-    // Add logic for database here
+  const addNewProduct = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+    } catch (error) {
+      console.error('Add Supplier failed:', error);
+    }
     closeProductModal();
-  };
+  });
 
-  const addNewSupplier = async (values) => {
+
+  const addNewSupplier = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/supplier', {
         method: 'POST',
@@ -466,7 +479,7 @@
       console.error('Add Supplier failed:', error);
     }
     closeProductModal();
-  };
+  });
   
   
 

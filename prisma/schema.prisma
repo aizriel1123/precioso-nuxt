@@ -190,6 +190,8 @@ model Supplier {
   supplier_contactnum String    @db.VarChar(20)
   supplier_address    String    @db.VarChar(150)
   Stockin             Stockin[]
+
+  @@unique([supplier_name, supplier_address])
 }
 
 model Therapist {

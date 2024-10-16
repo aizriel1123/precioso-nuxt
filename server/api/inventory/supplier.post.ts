@@ -1,9 +1,21 @@
+import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
     // Get data form body
-    console.log(event)
 	const body = await readBody(event);
     console.log(body)
+
+    // Implement Validation
+
+
+    // Create
+    const obj = await prisma.supplier.create({
+        data: {
+            supplier_name: body.new_supplier_name,
+            supplier_contactnum: body.contact_number,
+            supplier_address: body.supplier_address,
+        }
+    })
 
     return {
         hatdog: "hehe"
