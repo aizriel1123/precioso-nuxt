@@ -11,6 +11,7 @@
         <Button variant="ghost" @click="goToRoute('/inventory/inventory')">Inventory</Button>
         <Button variant="ghost" @click="goToRoute('/sales/sales-report')">Sales</Button>
         <Button variant="ghost" @click="goToRoute('/customers/client')">Client</Button>
+        <Button variant="ghost" @click="goToRoute('/therapists/therapist')">Therapist</Button>
       </div>
   
       <div class="searchbar-avatar">
