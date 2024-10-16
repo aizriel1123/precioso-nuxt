@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
-  devtools: {enabled: true},
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@prisma/nuxt'],
+  devtools: { enabled: true },
   shadcn: {
     /**
      * Prefix for all the imported component
@@ -12,10 +12,9 @@ export default defineNuxtConfig({
      */
     componentDir: './components/ui'
   },
-
   routeRules: {
-    '/': { redirect: '/login-register/login'}
+    '/': { redirect: '/login-register/login' }
   },
+  compatibilityDate: '2024-09-23',
 
-  compatibilityDate: '2024-09-23'
-})
+});

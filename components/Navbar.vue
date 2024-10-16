@@ -6,7 +6,7 @@
   
       <!-- Added random paths for now, edit this part later -->
       <div class="nav-buttons">
-        <Button variant="ghost" @click="goToRoute('/main/client-info')">Dashboard</Button>
+        <Button variant="ghost" @click="goToRoute('/main/dashboard')">Dashboard</Button>
         <Button variant="ghost" @click="goToRoute('/main/pos/')">Counter</Button>
         <Button variant="ghost" @click="goToRoute('/inventory/inventory')">Inventory</Button>
         <Button variant="ghost" @click="goToRoute('/sales/sales-report')">Sales</Button>
