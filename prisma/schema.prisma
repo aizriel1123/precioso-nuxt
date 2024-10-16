@@ -187,7 +187,8 @@ model StockinProduct {
 model Supplier {
   id                  Int       @id @default(autoincrement())
   supplier_name       String    @db.VarChar(100)
-  supplier_contactnum String?   @db.VarChar(20)
+  supplier_contactnum String    @db.VarChar(20)
+  supplier_address    String    @db.VarChar(150)
   Stockin             Stockin[]
 }
 
