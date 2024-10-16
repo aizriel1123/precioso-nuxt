@@ -43,7 +43,8 @@ model AppointmentStatus {
 
 model Client {
   id           Int           @id @default(autoincrement())
-  name         String        @db.VarChar(255)
+  first_name   String        @db.VarChar(255)
+  last_name    String        @db.VarChar(255)
   dob          DateTime?     @db.Date
   contact_info String?       @db.VarChar(20)
   gender_id    Int?
@@ -196,7 +197,8 @@ model Supplier {
 
 model Therapist {
   id              Int             @id @default(autoincrement())
-  name            String?         @unique @db.VarChar(255)
+  first_name      String?         @unique @db.VarChar(255)
+  last_name       String?         @unique @db.VarChar(255)
   dob             DateTime?       @db.Date
   contactinfo     String?         @db.VarChar(50)
   schedule        String?         @db.VarChar(20)
@@ -214,13 +216,13 @@ model Therapist {
 
 model TherapistStatus {
   id        Int         @id @default(autoincrement())
-  status    String      @db.VarChar(50)
+  status    String      @unique @db.VarChar(50)
   Therapist Therapist[]
 }
 
 model TherapistType {
   id        Int         @id @default(autoincrement())
-  type      String?     @db.VarChar(20)
+  type      String      @unique @db.VarChar(20)
   Therapist Therapist[]
 }
 

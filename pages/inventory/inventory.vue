@@ -224,7 +224,7 @@
       <h2 class="selected-product-title">Add New Supplier</h2>
 
       <form @submit.prevent="addNewSupplier">
-        <FormField v-slot="{ componentField }" name="supplier_id">
+        <!-- <FormField v-slot="{ componentField }" name="supplier_id">
           <FormItem>
             <FormLabel>Supplier ID</FormLabel>
             <FormControl>
@@ -232,7 +232,7 @@
             </FormControl>
             <FormMessage />
           </FormItem>
-        </FormField>
+        </FormField> -->
 
         <FormField v-slot="{ componentField }" name="new_supplier_name">
           <FormItem>
@@ -367,7 +367,6 @@
   import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
   import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
   import { ArrowDownWideNarrow } from 'lucide-vue-next';
-
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
   const form = useForm()
@@ -452,7 +451,6 @@
   const closeSupplierModal = () => {
     isSupplierModalOpen.value = false;
   };
-
 
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
