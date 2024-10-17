@@ -2,10 +2,6 @@
   <div @click="clearSelection">
     <Navbar />
 
-    <div class="button-container">
-      <router-link to="@/pages/therapist.vue" class="right-button">Therapist ➔</router-link>
-    </div>
-
     <div class="client-info-container">
       <ClientTable 
         class="client-table" 
@@ -81,33 +77,6 @@ const clearSelection = (event) => {
   .client-info {
     width: 100%;
   }
-}
-
-.button-container {
-  text-align: right;
-  margin-right: 20px;
-  margin-top: 20px;
-  margin-bottom: 5px; 
-  font-size: 20px;     
-}
-
-.right-button {
-  background-color: black; /* Black background */
-  color: white;           /* White text */
-  padding: 10px 20px;    /* Padding for the button */
-         /* Remove default border */
-  border-radius: 10px;    /* Slightly rounded corners */
-  cursor: pointer;       /* Cursor pointer on hover */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
-  font-weight: bold;
-}
-
-.right-button:hover {
-  background-color: white; /* Change to white on hover */
-  color: black;            /* Change text color to black on hover */
-  border: 2px solid black; /* Add a black border on hover */
-  border-radius: 10px;      /* Set border radius to 1px on hover */
-  font-weight: bold;
 }
 
 </style>

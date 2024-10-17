@@ -218,16 +218,16 @@
       <h2 class="selected-product-title">Add New Supplier</h2>
 
       <form @submit.prevent="addNewSupplier">
-        <FormField v-slot="{ componentField }" name="supplier-id">
+        <!-- <FormField v-slot="{ componentField }" name="supplier_id">
           <FormItem>
             <FormLabel>Supplier ID</FormLabel>
             <FormControl>
               <Input type="text" v-bind="componentField" />
             </FormControl>
           </FormItem>
-        </FormField>
+        </FormField> -->
 
-        <FormField v-slot="{ componentField }" name="new-supplier-name">
+        <FormField v-slot="{ componentField }" name="new_supplier_name">
           <FormItem>
             <FormLabel>Supplier Name</FormLabel>
             <FormControl>
@@ -236,7 +236,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="supplier-address">
+        <FormField v-slot="{ componentField }" name="supplier_address">
           <FormItem>
             <FormLabel>Supplier Address</FormLabel>
             <FormControl>
@@ -245,7 +245,7 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="contact-number">
+        <FormField v-slot="{ componentField }" name="contact_number">
           <FormItem>
             <FormLabel>Contact Number</FormLabel>
             <FormControl>
@@ -343,6 +343,7 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
 import NavBar from '~/components/Navbar.vue';
 import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -352,275 +353,317 @@ import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { ArrowDownWideNarrow } from 'lucide-vue-next';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+=======
+  import NavBar from '~/components/Navbar.vue';
+  import { ref, computed } from 'vue';
+  import { Button } from '@/components/ui/button';
+  import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+  import { Input } from '@/components/ui/input';
+  import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
+  import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
+  import { ArrowDownWideNarrow } from 'lucide-vue-next';
+  // SAMPLE FORM (NOTE: BOTBOT RA NI)
+  import { useForm } from 'vee-validate'
+  const form = useForm()
+>>>>>>> c962294daeabd352343be22427663de7bf133e34
 
-//Sample data
-const products = ref([
-  { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
-  { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, status: 'Available', commissionRate: 15 },
-  { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, status: 'Available', commissionRate: 12 },
-  { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, status: 'Out of Stock', commissionRate: 20 },
-  { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, status: 'Available', commissionRate: 25 },
-  { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, status: 'Available', commissionRate: 18 },
-  { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, status: 'Out of Stock', commissionRate: 30 },
-  { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, status: 'Out of Stock', commissionRate: 20 },
-  { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, status: 'Available', commissionRate: 10 },
-  { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3, status: 'Available', commissionRate: 12 },
-  { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-  { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 }
+  //Sample data
+  const products = ref([
+    { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
+    { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, status: 'Available', commissionRate: 15 },
+    { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, status: 'Available', commissionRate: 12 },
+    { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, status: 'Out of Stock', commissionRate: 20 },
+    { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, status: 'Available', commissionRate: 25 },
+    { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, status: 'Available', commissionRate: 18 },
+    { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, status: 'Out of Stock', commissionRate: 30 },
+    { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, status: 'Out of Stock', commissionRate: 20 },
+    { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, status: 'Available', commissionRate: 10 },
+    { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3, status: 'Available', commissionRate: 12 },
+    { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 }
 
-]);
+  ]);
 
-//ID, Name and type of chosen row from table
-const selectedProductId = ref(null); 
-const selectedProductName = ref('');
-const selectedProductType = ref('');
+  //ID, Name and type of chosen row from table
+  const selectedProductId = ref(null); 
+  const selectedProductName = ref('');
+  const selectedProductType = ref('');
 
-const selectedType = ref('products'); //default
+  const selectedType = ref('products'); //default
 
-//For pagination (may delete later)
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
+  //For pagination (may delete later)
+  const currentPage = ref(1);
+  const itemsPerPage = ref(10);
 
-//Keep track whether input is editable or not
-const isEditable = ref(false);
+  //Keep track whether input is editable or not
+  const isEditable = ref(false);
 
-//For pop ups
-const isProductModalOpen = ref(false);
-const isSupplierModalOpen = ref(false);
+  //For pop ups
+  const isProductModalOpen = ref(false);
+  const isSupplierModalOpen = ref(false);
 
-// Filter products based on the selected option in dropdown
-const filteredProducts = computed(() => {
-  return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
-});
+  // Filter products based on the selected option in dropdown
+  const filteredProducts = computed(() => {
+    return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
+  });
 
-//Pagination not working
-const paginatedProducts = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
-});
-const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+  //Pagination not working
+  const paginatedProducts = computed(() => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+  });
+  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
 
-const onPageChange = newPage => {
-  if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
-};
+  const onPageChange = newPage => {
+    if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
+  };
 
-//Open popup for adding new products
-const openProductModal = () => {
-  isProductModalOpen.value = true;
-};
+  //Open popup for adding new products
+  const openProductModal = () => {
+    isProductModalOpen.value = true;
+  };
 
-//Close popup
-const closeProductModal = () => {
-  isProductModalOpen.value = false;
-};
+  //Close popup
+  const closeProductModal = () => {
+    isProductModalOpen.value = false;
+  };
 
-//Open popup for adding new supplier
-const openSupplierModal = () => {
-  isSupplierModalOpen.value = true;
-};
+  //Open popup for adding new supplier
+  const openSupplierModal = () => {
+    isSupplierModalOpen.value = true;
+  };
 
-//Close popup
-const closeSupplierModal = () => {
-  isSupplierModalOpen.value = false;
-};
+  //Close popup
+  const closeSupplierModal = () => {
+    isSupplierModalOpen.value = false;
+  };
+
+  const addNewProduct = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+    } catch (error) {
+      console.error('Add Supplier failed:', error);
+    }
+    closeProductModal();
+  });
 
 
-const addNewProduct = () => {
-  // Add logic for database here
-  closeProductModal();
-};
+  const addNewSupplier = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/inventory/supplier', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+    } catch (error) {
+      console.error('Add Supplier failed:', error);
+    }
+    closeProductModal();
+  });
+  
+  
 
-const addNewSupplier = () => {
-  // Add logic for database here
-  closeSupplierModal();
-};
+  
 
-const selectProduct = (product) => {
-  selectedProductId.value = product.id;
-  selectedProductName.value = product.name;
-  selectedProductType.value = product.type;
-};
-
+  const selectProduct = (product) => {
+    selectedProductId.value = product.id;
+    selectedProductName.value = product.name;
+    selectedProductType.value = product.type;
+  };
 
 </script>
+
+
 <style scoped>
 
-.title {
-  font-size: 48px;
-  font-weight: bolder;
-}
+  .title {
+    font-size: 48px;
+    font-weight: bolder;
+  }
 
 
+<<<<<<< HEAD
 .center-components {
   margin-top: 10px;
   margin-left: 2%;
   margin-right: 2%;
   margin-bottom: 50px;
 }
+=======
+  .center-components {
+    margin-top: 10px;
+    margin-left: 2%;
+    margin-right: 2%;
+  }
+>>>>>>> c962294daeabd352343be22427663de7bf133e34
 
-/* Flexbox for dropdown, input, filter, and other buttons */
-.flex-components {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  margin-top: 10px;
-  width: 100%; 
-}
+  /* Flexbox for dropdown, input, filter, and other buttons */
+  .flex-components {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    width: 100%; 
+  }
 
-/* Left side of table (dropdown, input and filter) */
-.left-side {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-start;
-  width: 66.66%;
-}
+  /* Left side of table (dropdown, input and filter) */
+  .left-side {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    width: 66.66%;
+  }
 
-/* Right side of table (buttons) */
-.right-side {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-end;
-  width: 33.33%;
+  /* Right side of table (buttons) */
+  .right-side {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 33.33%;
 
-}
+  }
 
-/* Table div and Edit Selected Product div */
-.table-product-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
+  /* Table div and Edit Selected Product div */
+  .table-product-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
 
-/* Table container */
-.container-table {
-  flex-basis: 66.66%; 
-  border: 1px solid #000000;
-  border-radius: 8px;
-  padding: 16px;
-}
+  /* Table container */
+  .container-table {
+    flex-basis: 66.66%; 
+    border: 1px solid #000000;
+    border-radius: 8px;
+    padding: 16px;
+  }
 
-/* Edit Selected Product container */
-.container-selectedproduct {
-  flex-basis: 33.33%;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  padding: 16px;
+  /* Edit Selected Product container */
+  .container-selectedproduct {
+    flex-basis: 33.33%;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    padding: 16px;
 
-}
+  }
 
-/* Dropdown select trigger */
-.dropdown-trigger {
-  width: 200px;
-}
+  /* Dropdown select trigger */
+  .dropdown-trigger {
+    width: 200px;
+  }
 
-/* Search input */
-.input-search {
-  width: 250px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
+  /* Search input */
+  .input-search {
+    width: 250px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
 
-/* All black buttons  */
-.button {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  margin: 2px;
-  background-color: #000000;
-  color: #ffffff;
-}
+  /* All black buttons  */
+  .button {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 2px;
+    background-color: #000000;
+    color: #ffffff;
+  }
 
-.icon-small {
-  width: 16px;
-  height: 16px;
-}
-
-
-.table-content {
-  flex-grow: 1;
-}
-
-/* Pagination (might remove)  */
-.pagination-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px; 
-}
-
-/* Pagination (might remove)  */
-.pagination-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Pagination (might remove)  */
-.pagination-button {
-  width: 40px;
-  height: 40px;
-}
-
-/* Specifically for H2s */
-.selected-product-title {
-  font-size: 20px;
-  margin-bottom: 16px;
-  font-weight: bolder;
-}
-
-/* Cancel and Save Changes button */
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.cancel-button {
-  color: #ffffff;
-  background-color: #dc2626;
-}
+  .icon-small {
+    width: 16px;
+    height: 16px;
+  }
 
 
-/* Popups */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .table-content {
+    flex-grow: 1;
+  }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-}
+  /* Pagination (might remove)  */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; 
+  }
 
-.modal-action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
+  /* Pagination (might remove)  */
+  .pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Pagination (might remove)  */
+  .pagination-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Specifically for H2s */
+  .selected-product-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+    font-weight: bolder;
+  }
+
+  /* Cancel and Save Changes button */
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .cancel-button {
+    color: #ffffff;
+    background-color: #dc2626;
+  }
+
+
+  /* Popups */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+  }
+
+  .modal-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
 
 </style>

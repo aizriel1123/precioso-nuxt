@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
-import * as z from 'zod'
-import { useRouter } from 'vue-router'
+  import { useForm } from 'vee-validate'
+  import { toTypedSchema } from '@vee-validate/zod'
+  import * as z from 'zod'
+  import { useRouter } from 'vue-router'
 
-import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+  import { Button } from '@/components/ui/button'
+  import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+  import { Input } from '@/components/ui/input'
 
-const formSchema = toTypedSchema(z.object({
-  username: z.string().min(8).max(50),
-  password: z.string().min(8),
-}))
+  const formSchema = toTypedSchema(z.object({
+    username: z.string().min(8).max(50),
+    password: z.string().min(8),
+  }))
 
-const form = useForm({ validationSchema: formSchema })
-const router = useRouter()
+  const form = useForm({ validationSchema: formSchema })
+  const router = useRouter()
 
-const onSubmit = form.handleSubmit(async (values) => {
-  try {
-    const response = await $fetch('/api/login', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: {
-        username: values.username,
-        password: values.password
-      },
-    });
-    console.log(response)
+  const onSubmit = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/login', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: {
+          username: values.username,
+          password: values.password
+        },
+      });
+      console.log(response)
 
-    // Assuming the response contains a token
-    localStorage.setItem('token', response.token);
+      // Assuming the response contains a token
+      localStorage.setItem('token', response.token);
 
-    // Redirect based on user role or other criteria
-    router.push('/inventory/inventory');
-  } catch (error) {
-    console.error('Login failed:', error);
-    // Handle login error (e.g., show a message to the user)
-  }
-});
+      // Redirect based on user role or other criteria
+      router.push('/inventory/inventory');
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Handle login error (e.g., show a message to the user)
+    }
+  });
 </script>
 
 <template>
@@ -72,53 +72,53 @@ const onSubmit = form.handleSubmit(async (values) => {
 </template>
 
 <style scoped>
-.form-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  background-color: #E9DB5D;
-}
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #E9DB5D;
+  }
 
-.form {
-  max-width: 400px;
-  height: 400px;
-  width: 100%;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+  .form {
+    max-width: 400px;
+    height: 400px;
+    width: 100%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
 
-.logo-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
 
-.logo-img {
-  width: 200px;
-  height: auto;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
+  .logo-img {
+    width: 200px;
+    height: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 
-.submit-btn {
-  margin-top: 20px; 
-  padding: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #000000;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 100%;
-}
+  .submit-btn {
+    margin-top: 20px; 
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+  }
 
-.submit-btn[type="submit"]:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+  .submit-btn[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
 </style>
