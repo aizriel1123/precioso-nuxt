@@ -138,7 +138,6 @@
                   disabled 
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -154,7 +153,6 @@
                   :disabled="!isEditable" 
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -164,7 +162,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" :disabled="!isEditable"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -174,7 +171,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" :disabled="!isEditable"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -195,7 +191,6 @@
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -205,7 +200,6 @@
               <FormControl>
                 <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" :disabled="!isEditable"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -230,7 +224,6 @@
             <FormControl>
               <Input type="text" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -240,7 +233,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -250,7 +242,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Supplier Address" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -260,7 +251,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Contact Number" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -284,7 +274,6 @@
             <FormControl>
               <Input type="text" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -294,7 +283,6 @@
               <FormControl>
                 <Input type="text" placeholder="Enter Product Name" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -315,7 +303,6 @@
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -325,7 +312,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -335,7 +321,6 @@
               <FormControl>
                 <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -345,7 +330,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -367,6 +351,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { ArrowDownWideNarrow } from 'lucide-vue-next';
+import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 
 //Sample data
 const products = ref([
@@ -480,6 +465,7 @@ const selectProduct = (product) => {
   margin-top: 10px;
   margin-left: 2%;
   margin-right: 2%;
+  margin-bottom: 50px;
 }
 
 /* Flexbox for dropdown, input, filter, and other buttons */
