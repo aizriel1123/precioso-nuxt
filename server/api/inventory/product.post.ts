@@ -22,7 +22,6 @@ export default defineEventHandler(async (event) => {
             StockinProduct:{
                 create:{
                     quantity: body.new_stock_level,
-
                 }
             }
         }

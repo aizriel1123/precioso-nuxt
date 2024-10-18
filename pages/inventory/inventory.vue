@@ -297,24 +297,30 @@
         </FormField>
 
         <FormField v-slot="{ componentField }" name="product_type">
-            <FormItem>
+          <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
                 <Select v-bind="componentField">
                   <SelectTrigger class="dropdown-trigger">
-                    <SelectValue placeholder="Service" />
+                    <SelectValue placeholder="Product Type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="promos">Promos</SelectItem>
+                    <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        {{ productType.type }}
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </FormControl>
             </FormItem>
-          </FormField>
+        </FormField>
+
 
         <FormField v-slot="{ componentField }" name="new_stock_level">
             <FormItem>
@@ -326,10 +332,26 @@
         </FormField>
 
         <FormField v-slot="{ componentField }" name="supplier_name">
-            <FormItem>
+          <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Supplier Name" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                    <!-- Dynamically create SelectItem for each supplier -->
+                      <SelectItem 
+                        v-for="supplier in supplier_names" 
+                        :key="supplier.supplier_name" 
+                        :value="supplier.supplier_name"
+                      >
+                        {{ supplier.supplier_name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItem>
         </FormField>
@@ -396,9 +418,11 @@ import { useForm } from 'vee-validate'
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
   const selectedProductType = ref('');
-
+  
   const selectedType = ref('products'); //default
-
+  //Variable for Drop Down Variables
+  const supplier_names = ref([]);
+  const product_types = ref([]);
   //For pagination (may delete later)
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
@@ -446,7 +470,7 @@ import { useForm } from 'vee-validate'
   const closeSupplierModal = () => {
     isSupplierModalOpen.value = false;
   };
-
+  // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/product', {
@@ -460,7 +484,7 @@ import { useForm } from 'vee-validate'
     closeProductModal();
   });
 
-
+  // Add New Supplier
   const addNewSupplier = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/supplier', {
@@ -474,8 +498,40 @@ import { useForm } from 'vee-validate'
     closeProductModal();
   });
   
+  // Fill up supplier names dropdown
+  async function fetchSuppliers() {
+    try {
+      const response = await $fetch('/api/inventory/supplier', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      supplier_names.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Supplier failed:', error);
+      return {}
+    }
+  }
+  fetchSuppliers();
+  // Fill up product type dropdown
+  async function fetchProducts() {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      product_types.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Product Type failed:', error);
+      return {}
+    }
+  }
+  fetchProducts();
   
-
+  // To fetch suppliers
   
 
   const selectProduct = (product) => {
