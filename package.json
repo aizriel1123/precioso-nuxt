@@ -11,6 +11,10 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+<<<<<<< HEAD
+    "@prisma/client": "^5.19.1",
+=======
+>>>>>>> c962294daeabd352343be22427663de7bf133e34
     "@prisma/nuxt": "^0.0.35",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@vee-validate/zod": "^4.13.2",
