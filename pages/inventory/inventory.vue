@@ -136,7 +136,6 @@
                   disabled 
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -147,7 +146,6 @@
                 <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" 
 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -157,7 +155,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStockIn"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -167,7 +164,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="editedWarningLevel"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -189,8 +185,8 @@
                   </Select>
               </FormControl>
               <FormMessage />
-          </FormItem>
-      </FormField>
+            </FormItem>
+          </FormField>
 
           <FormField v-slot="{ componentField }" name="supplier-name">
             <FormItem>
@@ -198,7 +194,6 @@
               <FormControl>
                 <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" v-model="editedSupplierName"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -223,7 +218,6 @@
             <FormControl>
               <Input type="text" v-bind="componentField" disabled/>
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -233,7 +227,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -243,7 +236,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Supplier Address" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -253,7 +245,6 @@
             <FormControl>
               <Input type="text" placeholder="Enter Contact Number" v-bind="componentField" />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -277,7 +268,6 @@
             <FormControl>
               <Input type="text" v-bind="componentField" disabled />
             </FormControl>
-            <FormMessage />
           </FormItem>
         </FormField>
 
@@ -287,7 +277,6 @@
               <FormControl>
                 <Input type="text" placeholder="Enter Product Name" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -308,7 +297,6 @@
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
@@ -328,7 +316,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -350,7 +337,6 @@
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -360,7 +346,6 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
@@ -374,6 +359,17 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
+import NavBar from '~/components/Navbar.vue';
+import { ref, computed } from 'vue';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
+import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
+import { ArrowDownWideNarrow } from 'lucide-vue-next';
+import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+=======
   import NavBar from '~/components/Navbar.vue';
   import { ref, computed } from 'vue';
   import { Button } from '@/components/ui/button';
@@ -384,6 +380,7 @@
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
   const form = useForm()
+>>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   //Sample data
   const products = ref([
@@ -566,11 +563,20 @@ const onSubmit = () => {
   }
 
 
+<<<<<<< HEAD
+.center-components {
+  margin-top: 10px;
+  margin-left: 2%;
+  margin-right: 2%;
+  margin-bottom: 50px;
+}
+=======
   .center-components {
     margin-top: 10px;
     margin-left: 2%;
     margin-right: 2%;
   }
+>>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   /* Flexbox for dropdown, input, filter, and other buttons */
   .flex-components {
