@@ -1,21 +1,21 @@
-import prisma from "~/lib/prisma";
+// import prisma from "~/lib/prisma";
 
-export default defineEventHandler(async (event) => {
-    // Get data form body
-    const body = await readBody(event);
-    console.log(body)
+// export default defineEventHandler(async (event) => {
+//     // Get data form body
+//     const body = await readBody(event);
+//     console.log(body)
 
-    // Implement Validation
+//     // Implement Validation
 
 
-    // Create
-    const obj = await prisma.client.create({
-        data: {
+//     // Create
+//     const obj = await prisma.client.create({
+//         data: {
             
-        }
-    })
+//         }
+//     })
 
-    return {
-        hatdog: "hehe"
-    }
-});
+//     return {
+//         hatdog: "hehe"
+//     }
+// });

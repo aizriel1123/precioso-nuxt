@@ -30,21 +30,27 @@ const aType = [
   { type: "Guest" },
 ];
 
+const pType = [
+  { type: "Disposable" },
+  { type: "Soap" },
+  { type: "Oil" },
+];
+
 const therapists = [
   {
-    name: "therapist6",
+    first_name: "therapist6",
     gender_id: 1,
     status_id: 1,
     type_id: 1,
   },
   {
-    name: "therapist7",
+    first_name: "therapist7",
     gender_id: 2,
     status_id: 1,
     type_id: 1,
   },
   {
-    name: "therapist8",
+    first_name: "therapist8",
     gender_id: 1,
     status_id: 1,
     type_id: 1,
@@ -123,10 +129,20 @@ const seed = async () => {
     });
   }
 
+  for (const type of pType) {
+    await prisma.productType.upsert({
+      where: {
+        type: type.type
+      },
+      update: {},
+      create: type,
+    });
+  }
+
   for (const therapist of therapists) {
     const acc = await prisma.therapist.findFirst({
       where: {
-        name: therapist.name,
+        first_name: therapist.first_name,
         gender_id: therapist.gender_id,
         status_id: therapist.status_id,
         type_id: therapist.type_id,

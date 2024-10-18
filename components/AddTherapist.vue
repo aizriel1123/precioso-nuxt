@@ -3,35 +3,16 @@
     <h2>Add New Therapist</h2>
     <div class="form-content">
       <label for="therapistID">Therapist ID:</label>
-      <input 
-        type="text" 
-        id="therapistID" 
-        v-model="newTherapist.id" 
-        placeholder="Enter Therapist ID" 
-      />
+      <input type="text" id="therapistID" v-model="newTherapist.id" placeholder="Enter Therapist ID" />
 
       <label for="firstName">First Name:</label>
-      <input 
-        type="text" 
-        id="firstName" 
-        v-model="newTherapist.firstName" 
-        placeholder="Enter First Name" 
-      />
+      <input type="text" id="firstName" v-model="newTherapist.firstName" placeholder="Enter First Name" />
 
       <label for="lastName">Last Name:</label>
-      <input 
-        type="text" 
-        id="lastName" 
-        v-model="newTherapist.lastName" 
-        placeholder="Enter Last Name" 
-      />
+      <input type="text" id="lastName" v-model="newTherapist.lastName" placeholder="Enter Last Name" />
 
       <label for="dateOfBirth">Date of Birth:</label>
-      <input 
-        type="date" 
-        id="dateOfBirth" 
-        v-model="newTherapist.dateOfBirth" 
-      />
+      <input type="date" id="dateOfBirth" v-model="newTherapist.dateOfBirth" />
 
       <label for="gender">Gender:</label>
       <select id="gender" v-model="newTherapist.gender">
@@ -41,20 +22,10 @@
       </select>
 
       <label for="email">Email:</label>
-      <input 
-        type="email" 
-        id="email" 
-        v-model="newTherapist.email" 
-        placeholder="Enter Email Address" 
-      />
+      <input type="email" id="email" v-model="newTherapist.email" placeholder="Enter Email Address" />
 
       <label for="contactInfo">Contact Information:</label>
-      <input 
-        type="text" 
-        id="contactInfo" 
-        v-model="newTherapist.contactInfo" 
-        placeholder="Enter Contact Info" 
-      />
+      <input type="text" id="contactInfo" v-model="newTherapist.contactInfo" placeholder="Enter Contact Info" />
     </div>
 
     <div class="button-container">
@@ -76,19 +47,35 @@ const newTherapist = ref({
   contactInfo: ''
 })
 
-const saveNewTherapist = () => {
-  console.log('New therapist added:', newTherapist.value)
-  // Add logic to save the new therapist here
-  Object.assign(newTherapist.value, {
-    id: '',
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    gender: '',
-    email: '',
-    contactInfo: ''
-  })
-}
+import { useForm } from 'vee-validate'
+const form = useForm()
+
+const saveNewTherapist = form.handleSubmit(async (values) => {
+  try {
+    const response = await $fetch('/api/inventory/product', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: values,
+    });
+  } catch (error) {
+    console.error('Add Product failed:', error);
+  }
+  closeProductModal();
+});
+
+// () => {
+//   console.log('New therapist added:', newTherapist.value)
+//   // Add logic to save the new therapist here
+//   Object.assign(newTherapist.value, {
+//     id: '',
+//     firstName: '',
+//     lastName: '',
+//     dateOfBirth: '',
+//     gender: '',
+//     email: '',
+//     contactInfo: ''
+//   })
+// }
 </script>
 
 <style scoped>
@@ -96,8 +83,10 @@ const saveNewTherapist = () => {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 20px;
-  width: 100%; /* Take full width of the container */
-  height: 100%; /* Match the height of parent container */
+  width: 100%;
+  /* Take full width of the container */
+  height: 100%;
+  /* Match the height of parent container */
   display: flex;
   flex-direction: column;
   justify-content: space-between;

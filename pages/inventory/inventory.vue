@@ -199,7 +199,7 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="supplier-name">
+          <FormField v-slot="{ componentField }" name="supplier_name">
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
@@ -278,7 +278,7 @@
       <h2 class="selected-product-title">Add New Product</h2>
 
       <form @submit.prevent="addNewProduct">
-        <FormField v-slot="{ componentField }" name="product-id">
+        <!-- <FormField v-slot="{ componentField }" name="product-id">
           <FormItem>
             <FormLabel>Product ID</FormLabel>
             <FormControl>
@@ -286,9 +286,9 @@
             </FormControl>
             <FormMessage />
           </FormItem>
-        </FormField>
+        </FormField> -->
 
-        <FormField v-slot="{ componentField }" name="new-product-name">
+        <FormField v-slot="{ componentField }" name="new_product_name">
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
@@ -298,7 +298,17 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="category">
+        <FormField v-slot="{ componentField }" name="new_product_cost">
+            <FormItem>
+              <FormLabel>Product Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="product_type">
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
@@ -319,7 +329,7 @@
             </FormItem>
           </FormField>
 
-        <FormField v-slot="{ componentField }" name="new-stock-level">
+        <FormField v-slot="{ componentField }" name="new_stock_level">
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
@@ -329,7 +339,7 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="supplier-name">
+        <FormField v-slot="{ componentField }" name="supplier_name">
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
@@ -339,7 +349,7 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new-product-name">
+        <FormField v-slot="{ componentField }" name="new_commission_rate">
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
@@ -460,7 +470,7 @@
         body: values,
       });
     } catch (error) {
-      console.error('Add Supplier failed:', error);
+      console.error('Add Product failed:', error);
     }
     closeProductModal();
   });

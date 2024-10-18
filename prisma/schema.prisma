@@ -167,7 +167,7 @@ model ServiceType {
 }
 
 model Stockin {
-  inventory_id Int       @id @default(autoincrement())
+  id Int       @id @default(autoincrement())
   supplier_id  Int
   therapist_id Int
   date         DateTime? @db.Date
@@ -176,13 +176,13 @@ model Stockin {
 }
 
 model StockinProduct {
-  inventory_id   Int      @default(autoincrement())
+  id   Int      @default(autoincrement())
   product_id     Int
   quantity       Int?
   purchase_price Decimal? @db.Decimal(10, 2)
   Product        Product  @relation(fields: [product_id], references: [id])
 
-  @@id([inventory_id, product_id])
+  @@id([id, product_id])
 }
 
 model Supplier {
