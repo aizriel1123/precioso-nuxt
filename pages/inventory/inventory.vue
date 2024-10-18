@@ -14,6 +14,7 @@
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="services">Services</SelectItem>
               <SelectItem value="products">Products</SelectItem>
               <SelectItem value="promos">Promos</SelectItem>
@@ -22,20 +23,23 @@
         </Select>
 
         <!-- Search input -->
-        <Input placeholder="Search..." class="input-search" />
-        <Button variant="link">
-          <ArrowDownWideNarrow class="icon-small" />
-        </Button>
-        <Button variant="ghost" class="button">Filter</Button>
+        <Input placeholder="Search..." class="input-search" v-model="searchQuery"/>
+        <Select v-model="selectedFilter">
+        <SelectTrigger class="w-[auto]">
+          <SelectValue placeholder="Select filter" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="option in filterOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
       </div>
 
       <div class="right-side">
         <!-- Buttons for adding new product/supplier and enable editing in form 'edit selected product' -->
         <Button variant="ghost" class="button" @click="openProductModal">Add New Product</Button>
         <Button variant="ghost" class="button" @click="openSupplierModal">Add New Supplier</Button>
-        <Button variant="ghost" class="button" @click="isEditable = !isEditable">
-          {{ isEditable ? "Cancel Edit" : "Edit" }}
-        </Button>
       </div>
     </div>
 
@@ -57,7 +61,7 @@
             </TableHeader>
             <TableBody>
               <TableRow 
-                v-for="product in paginatedProducts" 
+              v-for="product in paginatedProducts" 
                 :key="product.id" 
                 @click="selectProduct(product)"
               >
@@ -85,38 +89,32 @@
 
         <!-- Pagination controls (might delete this part) -->
         <div class="pagination-wrapper">
-          <Pagination
-            v-slot="{ page }"
-            :total="totalPages"
-            :sibling-count="1"
-            show-edges
-            :default-page="currentPage"
-            @change="onPageChange"
-          >
-            <PaginationList v-slot="{ items }" class="pagination-list">
-              <PaginationFirst @click="onPageChange(1)" />
-              <PaginationPrev @click="onPageChange(currentPage - 1)" />
-              <template v-for="(item, index) in items">
-                <PaginationListItem
-                  v-if="item.type === 'page'"
-                  :key="index"
-                  :value="item.value"
-                  as-child
-                >
-                  <Button
-                    class="pagination-button"
-                    :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="onPageChange(item.value)"
-                  >
-                    {{ item.value }}
-                  </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else :key="item.type" :index="index" />
-              </template>
-              <PaginationNext @click="onPageChange(currentPage + 1)" />
-              <PaginationLast @click="onPageChange(totalPages)" />
-            </PaginationList>
-          </Pagination>
+          <div class="mt-4 flex justify-center items-center">
+      <Pagination 
+        v-slot="{ page }" 
+        :total="totalPages" 
+        :sibling-count="1" 
+        show-edges 
+        :default-page="currentPage"
+        :per-page="itemsPerPage"
+        @update:page="handlePageChange"
+      >
+        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+          <PaginationFirst />
+          <PaginationPrev />
+          <template v-for="(item, index) in items">
+            <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+              <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
+                {{ item.value }}
+              </Button>
+            </PaginationListItem>
+            <PaginationEllipsis v-else :key="item.type" :index="index" />
+          </template>
+          <PaginationNext />
+          <PaginationLast />
+        </PaginationList>
+      </Pagination>
+    </div>
         </div>
       </div>
 
@@ -134,7 +132,7 @@
                   min="0" 
                   placeholder="Product ID" 
                   v-bind="componentField" 
-                  :value="selectedProductId" 
+                  v-model="selectedProductId" 
                   disabled 
                 />
               </FormControl>
@@ -146,13 +144,8 @@
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input 
-                  type="text" 
-                  placeholder="Enter Product Name" 
-                  v-bind="componentField" 
-                  :value="selectedProductName" 
-                  :disabled="!isEditable" 
-                />
+                <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" 
+/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -162,7 +155,7 @@
             <FormItem>
               <FormLabel>Stock-in</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" :disabled="!isEditable"/>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStockIn"/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -172,45 +165,45 @@
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" :disabled="!isEditable"/>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="editedWarningLevel"/>
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="category">
-            <FormItem>
-              <FormLabel>Category</FormLabel>
+          <FormField v-slot="{ componentField }" name="type">
+          <FormItem>
+              <FormLabel>Type</FormLabel>
               <FormControl>
-                <Select v-bind="componentField" :value="selectedProductType">
-                  <SelectTrigger class="dropdown-trigger" :disabled="!isEditable">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="promos">Promos</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  <Select v-bind="componentField" :value="selectedProductType" >
+                      <SelectTrigger class="dropdown-trigger2">
+                          <SelectValue :placeholder="selectedProductType ? selectedProductType : 'Select an option'" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectGroup>
+                              <SelectItem value="services">Services</SelectItem>
+                              <SelectItem value="products">Products</SelectItem>
+                              <SelectItem value="promos">Promos</SelectItem>
+                          </SelectGroup>
+                      </SelectContent>
+                  </Select>
               </FormControl>
               <FormMessage />
-            </FormItem>
-          </FormField>
+          </FormItem>
+      </FormField>
 
           <FormField v-slot="{ componentField }" name="supplier-name">
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" :disabled="!isEditable"/>
+                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" v-model="editedSupplierName"/>
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
           <div class="action-buttons">
-            <Button variant="ghost" type="button" class="cancel-button">Cancel</Button>
+            <Button variant="ghost" type="button" class="cancel-button" @click="onCancel">Cancel</Button>
             <Button variant="ghost" type="submit" class="button">Save Changes</Button>
           </div>
         </form>
@@ -224,15 +217,15 @@
       <h2 class="selected-product-title">Add New Supplier</h2>
 
       <form @submit.prevent="addNewSupplier">
-        <!-- <FormField v-slot="{ componentField }" name="supplier_id">
+        <FormField v-slot="{ componentField }" name="supplier_id">
           <FormItem>
             <FormLabel>Supplier ID</FormLabel>
             <FormControl>
-              <Input type="text" v-bind="componentField" />
+              <Input type="text" v-bind="componentField" disabled/>
             </FormControl>
             <FormMessage />
           </FormItem>
-        </FormField> -->
+        </FormField>
 
         <FormField v-slot="{ componentField }" name="new_supplier_name">
           <FormItem>
@@ -282,7 +275,7 @@
           <FormItem>
             <FormLabel>Product ID</FormLabel>
             <FormControl>
-              <Input type="text" v-bind="componentField" />
+              <Input type="text" v-bind="componentField" disabled />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -303,7 +296,7 @@
               <FormLabel>Product Type</FormLabel>
               <FormControl>
                 <Select v-bind="componentField">
-                  <SelectTrigger class="dropdown-trigger">
+                  <SelectTrigger class="dropdown-trigger2">
                     <SelectValue placeholder="Service" />
                   </SelectTrigger>
                   <SelectContent>
@@ -319,6 +312,16 @@
             </FormItem>
           </FormField>
 
+          <FormField v-slot="{ componentField }" name="new-cost">
+            <FormItem>
+              <FormLabel>Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+        </FormField>
+
         <FormField v-slot="{ componentField }" name="new-stock-level">
             <FormItem>
               <FormLabel>Stock</FormLabel>
@@ -329,17 +332,29 @@
             </FormItem>
         </FormField>
 
+        <!-- Sample suppliers only, will change later -->
         <FormField v-slot="{ componentField }" name="supplier-name">
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger2">
+                    <SelectValue placeholder="Select an option" id="supplier"/>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="Supplier1">Supplier 1</SelectItem>
+                      <SelectItem value="Supplier2">Supplier 2</SelectItem>
+                      <SelectItem value="Supplier3">Supplier 3</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new-product-name">
+        <FormField v-slot="{ componentField }" name="new-commission-rate">
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
@@ -366,7 +381,6 @@
   import { Input } from '@/components/ui/input';
   import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
   import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-  import { ArrowDownWideNarrow } from 'lucide-vue-next';
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
   const form = useForm()
@@ -397,40 +411,81 @@
 
   ]);
 
+  const selectProduct = (product) => {
+    selectedProductId.value = product.id;
+    selectedProductName.value = product.name;
+    selectedProductType.value = product.type;
+    selectedStockIn.value = product.stock;
+  };
+
   //ID, Name and type of chosen row from table
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
   const selectedProductType = ref('');
+  const selectedStockIn = ref(0);
 
-  const selectedType = ref('products'); //default
 
-  //For pagination (may delete later)
+
+  //Default values
+  const selectedType = ref('all');
+  const selectedFilter = ref(null)
+  const searchQuery = ref('');
+  const editedWarningLevel=ref (0)
+  const editedSupplierName=ref ('')
+
+  //For pagination
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
-
-  //Keep track whether input is editable or not
-  const isEditable = ref(false);
 
   //For pop ups
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
 
-  // Filter products based on the selected option in dropdown
-  const filteredProducts = computed(() => {
-    return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
-  });
+  const filteredAndSortedProducts = computed(() => {
+    let filtered = products.value;
+    if (selectedType.value !== 'all') {
+        filtered = filtered.filter(product => product.type.toLowerCase() === selectedType.value);
+    }
 
-  //Pagination not working
+    // Filter products based on the search query
+    if (searchQuery.value) {
+        filtered = filtered.filter(product => 
+            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+    }
+
+    // Sort the filtered products based on the selected filter
+    if (selectedFilter.value === 'id-asc') {
+        filtered.sort((a, b) => a.id - b.id);
+    } else if (selectedFilter.value === 'id-desc') {
+        filtered.sort((a, b) => b.id - a.id);
+    } else if (selectedFilter.value === 'name-asc') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (selectedFilter.value === 'name-desc') {
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    return filtered;
+});
+
+  //Pagination
+  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  const totalPages = computed(() => Math.ceil(filteredAndSortedProducts.value.length / itemsPerPage));
   const paginatedProducts = computed(() => {
     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+    return filteredAndSortedProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
   });
-  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+  function handlePageChange(newPage) {
+  currentPage.value = newPage
+}
 
-  const onPageChange = newPage => {
-    if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
-  };
+  //Dropdown menu for filtering
+  const filterOptions = [
+  { value: 'id-asc', label: 'Product ID: Ascending' },
+  { value: 'id-desc', label: 'Product ID: Descending' },
+  { value: 'name-asc', label: 'Product Name: A to Z' },
+  { value: 'name-desc', label: 'Product Name: Z to A' },
+  ];
 
   //Open popup for adding new products
   const openProductModal = () => {
@@ -478,19 +533,30 @@
     }
     closeProductModal();
   });
-  
-  
 
-  
+  const onCancel = () => {
+  if (selectedProductId.value) {
+    selectedProductId.value=''
+    selectedProductName.value = ''
+    selectedProductType.value = ''
+    selectedStockIn.value=''
+    editedWarningLevel.value = ''
+    editedSupplierName.value = ''
+  } 
+};
 
-  const selectProduct = (product) => {
-    selectedProductId.value = product.id;
-    selectedProductName.value = product.name;
-    selectedProductType.value = product.type;
-  };
-
+// Method to save changes (submit form)
+const onSubmit = () => {
+  const productIndex = products.value.findIndex(p => p.id === selectedProductId.value);
+  if (productIndex !== -1) {
+    products.value[productIndex].name = selectedProductName.value;
+    products.value[productIndex].type = selectedProductType.value;
+    alert('Product details saved successfully!');
+  } else {
+    alert('Product not found.');
+  }
+};
 </script>
-
 
 <style scoped>
 
@@ -561,7 +627,11 @@
 
   /* Dropdown select trigger */
   .dropdown-trigger {
-    width: 200px;
+    width: 100px;
+  }
+
+  .dropdown-trigger2 {
+    width: 100%;
   }
 
   /* Search input */
