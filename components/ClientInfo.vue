@@ -70,14 +70,14 @@ const hasChanges = ref(false)
 const transactions = ref([
   {
     time: '2024-10-18 14:30',
-    products: 'Facial Cum, Serum',
-    therapist: 'Ben Dover',
+    products: 'Facial Cream, Serum',
+    therapist: 'John Postgre',
     totalCost: '₱1,500',
   },
   {
     time: '2024-10-10 11:00',
-    products: 'Massage, Happy Ending',
-    therapist: 'Mike Hawk',
+    products: 'Massage, Body Scrub',
+    therapist: 'John Nuxt',
     totalCost: '₱2,000',
   },
 ])
@@ -179,3 +179,4 @@ button {
   margin: 0 5px;
 }
 </style>
+
