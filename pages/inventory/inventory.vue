@@ -353,7 +353,6 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import NavBar from '~/components/Navbar.vue';
 import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -363,19 +362,9 @@ import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { ArrowDownWideNarrow } from 'lucide-vue-next';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
-=======
-  import NavBar from '~/components/Navbar.vue';
-  import { ref, computed } from 'vue';
-  import { Button } from '@/components/ui/button';
-  import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-  import { Input } from '@/components/ui/input';
-  import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
-  import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-  import { ArrowDownWideNarrow } from 'lucide-vue-next';
-  // SAMPLE FORM (NOTE: BOTBOT RA NI)
-  import { useForm } from 'vee-validate'
+// SAMPLE FORM (NOTE: BOTBOT RA NI)
+import { useForm } from 'vee-validate'
   const form = useForm()
->>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   //Sample data
   const products = ref([
@@ -506,20 +495,12 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
   }
 
 
-<<<<<<< HEAD
 .center-components {
   margin-top: 10px;
   margin-left: 2%;
   margin-right: 2%;
   margin-bottom: 50px;
 }
-=======
-  .center-components {
-    margin-top: 10px;
-    margin-left: 2%;
-    margin-right: 2%;
-  }
->>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   /* Flexbox for dropdown, input, filter, and other buttons */
   .flex-components {
