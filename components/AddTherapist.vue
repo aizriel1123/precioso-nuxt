@@ -99,6 +99,7 @@
                   <SelectItem value="Busy">Busy</SelectItem>
                   <SelectItem value="Not Busy">Not Busy</SelectItem>
                   <SelectItem value="Occupied">Occupied</SelectItem>
+                  <!-- Delete the last 3 options when you can -->
                 </SelectGroup>
               </SelectContent>
             </Select>

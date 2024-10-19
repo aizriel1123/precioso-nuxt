@@ -26,10 +26,6 @@ const selectTherapist = (therapist) => {
   selectedTherapist.value = therapist
 }
 
-// const addTherapist = (newTherapist) => {
-//   therapists.value.push(newTherapist) // Add new therapist to the list
-// }
-
 const addNewTherapist = form.handleSubmit(async (values) => {
   try {
     const response = await $fetch('/api/therapist/therapist', {

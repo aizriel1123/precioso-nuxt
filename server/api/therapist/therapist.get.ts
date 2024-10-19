@@ -3,9 +3,10 @@ import prisma from "~/lib/prisma";
 export default defineEventHandler(async (event) => {
     try {
         // Fetch clients from Client Table
-        const product = await prisma.client.findMany({
+        const product = await prisma.therapist.findMany({
           include: {
             Gender: true,
+            TherapistStatus: true,
           }
         });
         
@@ -14,6 +15,6 @@ export default defineEventHandler(async (event) => {
         return product;
       } catch (error) {
         // Handle any errors that occur during the database query
-        return { error: 'Failed to fetch clients' };
+        return { error: 'Failed to fetch therapists' };
       }
 });

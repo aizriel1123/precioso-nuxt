@@ -30,22 +30,26 @@
         <table>
           <thead>
             <tr>
+              <th>ID</th>
               <th>First Name</th>
               <th>Last Name</th>
               <th>Schedule</th>
+              <th>Date of Birth</th>
               <th>Gender</th>
-              <th>Email</th>
               <th>Contact Information</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="therapist in filteredTherapists" :key="therapist.id" @click="selectTherapist(therapist)">
-              <td>{{ therapist.firstName }}</td>
-              <td>{{ therapist.lastName }}</td>
-              <td>{{ therapist.birthdate }}</td>
-              <td>{{ therapist.gender }}</td>
-              <td>{{ therapist.email }}</td>
-              <td>{{ therapist.contactInfo }}</td>
+              <td>{{ therapist.id }}</td>
+              <td>{{ therapist.first_name }}</td>
+              <td>{{ therapist.last_name }}</td>
+              <td>{{ therapist.schedule }}</td>
+              <td>{{ new Date(therapist.dob).toLocaleDateString() }}</td>
+              <td>{{ therapist.Gender.gender }}</td>
+              <td>{{ therapist.contactinfo }}</td>
+              <td>{{ therapist.TherapistStatus.status }}</td>
             </tr>
           </tbody>
         </table>
@@ -58,11 +62,12 @@
   
   // Sample Therapist Data
   const therapists = ref([
-    { id: 1, firstName: 'Anna', lastName: 'Lee', birthdate: '9AM - 5PM', gender: 'Female', email: 'anna.lee@example.com', contactInfo: '0917-123-4567' },
-    { id: 2, firstName: 'Ben', lastName: 'Wong', birthdate: '9AM - 5PM', gender: 'Male', email: 'ben.wong@example.com', contactInfo: '0918-456-7890' },
-    { id: 3, firstName: 'Chris', lastName: 'Taylor', birthdate: '9AM - 5PM', gender: 'Other', email: 'chris.taylor@example.com', contactInfo: '0922-333-4444' }
+    // { id: 1, firstName: 'Anna', lastName: 'Lee', birthdate: '9AM - 5PM', gender: 'Female', email: 'anna.lee@example.com', contactInfo: '0917-123-4567' },
+    // { id: 2, firstName: 'Ben', lastName: 'Wong', birthdate: '9AM - 5PM', gender: 'Male', email: 'ben.wong@example.com', contactInfo: '0918-456-7890' },
+    // { id: 3, firstName: 'Chris', lastName: 'Taylor', birthdate: '9AM - 5PM', gender: 'Other', email: 'chris.taylor@example.com', contactInfo: '0922-333-4444' }
   ])
-  
+  fetchTherapists();
+
   const searchQuery = ref('')
   const selectedFilter = ref('All')
   
@@ -101,6 +106,21 @@
     return result
   })
   
+  async function fetchTherapists() {
+  try {
+    const response = await $fetch('/api/therapist/therapist', {
+      method: 'GET',
+
+    });
+    therapists.value = response;
+    console.log(response)
+    return response
+  } catch (error) {
+    console.error('Get Therapist failed:', error);
+    return {}
+  }
+}
+
   // Emit the selected therapist to parent component
   const emit = defineEmits(['selectTherapist'])
   const selectTherapist = (therapist) => {
