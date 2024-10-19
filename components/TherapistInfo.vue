@@ -11,8 +11,8 @@
       <label for="lastName">Last Name:</label>
       <input type="text" id="lastName" v-model="therapist.lastName" @input="trackChanges" />
 
-      <label for="birthdate">Date of Birth:</label>
-      <input type="date" id="birthdate" v-model="therapist.birthdate" @input="trackChanges" />
+      <label for="schedule">Schedule:</label>
+      <input type="text" id="schedule" v-model="therapist.schedule" placeholder="Enter Schedule" @input="trackChanges" />
 
       <label for="gender">Gender:</label>
       <select id="gender" v-model="therapist.gender" @change="trackChanges">
@@ -22,10 +22,32 @@
       </select>
 
       <label for="email">Email:</label>
-        <input type="email" id="email" v-model="therapist.email" @input="trackChanges" />
+      <input type="email" id="email" v-model="therapist.email" @input="trackChanges" />
 
       <label for="contactInfo">Contact Information:</label>
       <input type="text" id="contactInfo" v-model="therapist.contactInfo" @input="trackChanges" />
+    </div>
+
+    <div class="transactions-section">
+      <h3>Recent Transactions</h3>
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Products Availed</th>
+            <th>Client Name</th>
+            <th>Commission</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(transaction, index) in transactions" :key="index">
+            <td>{{ transaction.time }}</td>
+            <td>{{ transaction.products }}</td>
+            <td>{{ transaction.clientName }}</td>
+            <td>{{ transaction.commission }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="button-container" v-if="hasChanges">
@@ -47,7 +69,21 @@ const props = defineProps({
 
 const hasChanges = ref(false)
 
-// Watch for changes to the therapist object
+const transactions = ref([
+  {
+    time: '2024-10-18 15:00',
+    products: 'Facial Treatment',
+    clientName: 'Jane Doe',
+    commission: '₱300',
+  },
+  {
+    time: '2024-10-12 09:00',
+    products: 'Body Massage, Aromatherapy',
+    clientName: 'Alice Nuxt',
+    commission: '₱500',
+  },
+])
+
 watch(
   () => props.therapist,
   () => {
@@ -71,8 +107,8 @@ const cancelEdit = () => {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 20px;
-  width: 100%; /* Take full width of the container */
-  height: 100%; /* Match the height of parent container */
+  width: 100%; 
+  height: 100%; 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -98,6 +134,28 @@ select {
   margin-top: 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+.transactions-section {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.transactions-table th {
+  background-color: #f2f2f2;
 }
 
 .button-container {

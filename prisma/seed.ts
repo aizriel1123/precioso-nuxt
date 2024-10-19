@@ -30,6 +30,12 @@ const aType = [
   { type: "Guest" },
 ];
 
+const pType = [
+  { type: "Disposable" },
+  { type: "Soap" },
+  { type: "Oil" },
+];
+
 const therapists = [
   {
     first_name: "therapist6",
@@ -70,6 +76,12 @@ const accounts = [
     therapist_id: 1,
     type_id: 1,
   },
+  {
+    username: "carloisthebest",
+    password: "carloisthebest",
+    therapist_id: 1,
+    type_id: 1,
+  }
 ]
 
 const seed = async () => {
@@ -115,6 +127,16 @@ const seed = async () => {
 
   for (const type of aType) {
     await prisma.accountType.upsert({
+      where: {
+        type: type.type
+      },
+      update: {},
+      create: type,
+    });
+  }
+
+  for (const type of pType) {
+    await prisma.productType.upsert({
       where: {
         type: type.type
       },

@@ -32,7 +32,7 @@
             <tr>
               <th>First Name</th>
               <th>Last Name</th>
-              <th>Birthdate</th>
+              <th>Schedule</th>
               <th>Gender</th>
               <th>Email</th>
               <th>Contact Information</th>
@@ -58,9 +58,9 @@
   
   // Sample Therapist Data
   const therapists = ref([
-    { id: 1, firstName: 'Anna', lastName: 'Lee', birthdate: '1987-06-14', gender: 'Female', email: 'anna.lee@example.com', contactInfo: '0917-123-4567' },
-    { id: 2, firstName: 'Ben', lastName: 'Wong', birthdate: '1990-10-09', gender: 'Male', email: 'ben.wong@example.com', contactInfo: '0918-456-7890' },
-    { id: 3, firstName: 'Chris', lastName: 'Taylor', birthdate: '1992-03-05', gender: 'Other', email: 'chris.taylor@example.com', contactInfo: '0922-333-4444' }
+    { id: 1, firstName: 'Anna', lastName: 'Lee', birthdate: '9AM - 5PM', gender: 'Female', email: 'anna.lee@example.com', contactInfo: '0917-123-4567' },
+    { id: 2, firstName: 'Ben', lastName: 'Wong', birthdate: '9AM - 5PM', gender: 'Male', email: 'ben.wong@example.com', contactInfo: '0918-456-7890' },
+    { id: 3, firstName: 'Chris', lastName: 'Taylor', birthdate: '9AM - 5PM', gender: 'Other', email: 'chris.taylor@example.com', contactInfo: '0922-333-4444' }
   ])
   
   const searchQuery = ref('')
@@ -168,5 +168,7 @@
     background-color: #f5f5f5;
     cursor: pointer;
   }
+
+  
   </style>
   

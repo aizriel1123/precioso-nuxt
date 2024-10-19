@@ -3,21 +3,9 @@
     <Navbar />
 
     <div class="client-info-container">
-      <ClientTable 
-        class="client-table" 
-        @select-client="selectClient" 
-        :clients="clients" 
-      />
-      <ClientInfo 
-        v-if="selectedClient" 
-        :client="selectedClient" 
-        class="client-info" 
-      />
-      <AddClient 
-        v-else 
-        class="add-client" 
-        @clientAdded="addClient" 
-      />
+      <ClientTable class="client-table" @select-client="selectClient" :clients="clients" />
+      <ClientInfo v-if="selectedClient" :client="selectedClient" class="client-info" />
+      <AddClient v-else class="add-client" @clientAdded="addNewClient" />
     </div>
   </div>
 </template>
@@ -28,6 +16,8 @@ import Navbar from '@/components/Navbar.vue'
 import ClientInfo from '@/components/ClientInfo.vue'
 import ClientTable from '@/components/ClientTable.vue'
 import AddClient from '@/components/AddClient.vue'
+import { useForm } from 'vee-validate'
+const form = useForm()
 
 const selectedClient = ref(null)
 const clients = ref([]) // Initialize clients list
@@ -36,9 +26,18 @@ const selectClient = (client) => {
   selectedClient.value = client
 }
 
-const addClient = (newClient) => {
-  clients.value.push(newClient) // Add new client to the list
-}
+const addNewClient = form.handleSubmit(async (values) => {
+  try {
+    const response = await $fetch('/api/client/client', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: values,
+    });
+  } catch (error) {
+    console.error('Add Client failed:', error);
+  }
+  closeProductModal();
+});
 
 const clearSelection = (event) => {
   const isClickInsideTableOrClientInfo = event.target.closest('.client-table') || event.target.closest('.client-info')
@@ -56,15 +55,18 @@ const clearSelection = (event) => {
 }
 
 .client-table {
-  flex: 0 0 70%; /* Takes 70% of space */
+  flex: 0 0 70%;
+  /* Takes 70% of space */
 }
 
 .add-client {
-  flex: 0 0 30%; /* Takes 30% of space */
+  flex: 0 0 30%;
+  /* Takes 30% of space */
 }
 
 .client-info {
-  flex: 0 0 30%; /* Takes 30% of space */
+  flex: 0 0 30%;
+  /* Takes 30% of space */
 }
 
 @media (max-width: 768px) {
@@ -78,5 +80,4 @@ const clearSelection = (event) => {
     width: 100%;
   }
 }
-
 </style>
