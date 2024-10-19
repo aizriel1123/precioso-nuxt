@@ -135,7 +135,7 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
-        <form @submit.prevent="updateProduct" class="form" noValidate>
+        <form @submit.prevent="updateProduct" >
           <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
@@ -145,8 +145,8 @@
                   min="0" 
                   placeholder="Product ID" 
                   v-bind="componentField" 
-                  :value="selectedProductId" 
-                  disabled 
+                  v-model="selectedProductId" 
+                  disabled
                 />
               </FormControl>
             </FormItem>
@@ -156,13 +156,7 @@
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input 
-                  type="text" 
-                  placeholder="Enter Product Name" 
-                  v-bind="componentField" 
-                  :value="selectedProductName" 
-                  
-                />
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  />
               </FormControl>
             </FormItem>
           </FormField>
@@ -172,7 +166,7 @@
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
-                <Select v-bind="componentField" :value="selectedProductType">
+                <Select v-bind="componentField" v-model="selectedProductType" >
                   <SelectTrigger class="dropdown-trigger" >
                     <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
@@ -198,7 +192,7 @@
             <FormItem>
               <FormLabel>Product Cost</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost"/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -207,7 +201,7 @@
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock"/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -242,7 +236,7 @@
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" />
               </FormControl>
             </FormItem>
           </FormField>
@@ -251,7 +245,7 @@
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -259,7 +253,7 @@
 
           <div class="action-buttons">
             <Button variant="ghost" type="button" class="cancel-button">Cancel</Button>
-            <Button variant="ghost" type="submit" class="button">Save Changes</Button>
+            <Button variant="ghost" type="submit">Save Changes</Button>
           </div>
         </form>
       </div>
@@ -459,7 +453,10 @@ import { useForm } from 'vee-validate'
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
   const selectedProductType = ref('');
-  
+  const selectedCost = ref('');
+  const selectedStock = ref('');
+  const selectedCritical = ref('');
+  const selectedCommissionRate = ref('');
   const selectedType = ref('all'); //default
   //Variable for Drop Down Variables
   const supplier_names = ref([]);
@@ -480,8 +477,46 @@ import { useForm } from 'vee-validate'
   { value: 'id-desc', label: 'Product ID: Descending' },
   { value: 'name-asc', label: 'Product Name: A to Z' },
   { value: 'name-desc', label: 'Product Name: Z to A' },
-
+  
   ];
+
+  // Filter Function
+  const filteredProducts = computed(() => {
+    // Initialize the filtered products array with all products
+    let filtered = products.value;
+
+    // Filter based on the selected product type
+    if (selectedType.value && selectedType.value !== 'all') {
+      filtered = filtered.filter(product => 
+        product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
+      );
+    }
+
+    // Filter based on the search query
+    if (searchQuery.value) {
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    }
+
+    // Sort the filtered products based on the selected filter
+    if (selectedFilter.value === 'id-asc') {
+      filtered.sort((a, b) => a.id - b.id);
+    } else if (selectedFilter.value === 'id-desc') {
+      filtered.sort((a, b) => b.id - a.id);
+    } else if (selectedFilter.value === 'name-asc') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (selectedFilter.value === 'name-desc') {
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (selectedFilter.value === 'supplier-asc') {
+      filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+    } else if (selectedFilter.value === 'supplier-desc') {
+      filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
+    }
+
+    return filtered;
+  });
+// Example stock ID, replace with actual stock ID
   // // Filter products based on the selected option in dropdown
   // const filteredProducts = computed(() => {
   //   return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
@@ -548,25 +583,33 @@ import { useForm } from 'vee-validate'
     closeProductModal();
   });
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
-  const updateProduct = form.handleSubmit(async (values) =>  {
+  // Define the function to handle the form submission
+  const updateProduct = form.handleSubmit(async (values) => {
+    // Add the selectedProductId to the body
+    const updatedValues = {
+      ...values,                      // Spread the existing values
+      update_id: selectedProductId.value,    // Add selectedProductId to the body
+    };
+    
+    console.log("BRO WHAT THE HECK");
     try {
-      // Make a PUT or PATCH request to the update product API
       const response = await $fetch('/api/inventory/product', {
-        method: 'PATCH', // Or 'PUT' depending on your API convention
+        method: 'PUT',
         headers: { "Content-Type": "application/json" },
-        body: values,
+        body: JSON.stringify(updatedValues), // Stringify the combined object
       });
-      console.log("This is the response")
-      console.log(response)
-      // Handle success response
-      console.log("Product updated successfully:", response);
-      return response; // Return response if needed
+
+      console.log("This is the response");
+      console.log(response);
     } catch (error) {
-      // Handle error
-      console.error('Failed to update product:', error);
-      throw error; // Throw error if further handling is needed
+      console.error('Update Product failed:', error);
     }
+    // filtered.sort((a, b) => a.id - b.id);
+    fetchProductDetails();
+    closeProductModal();
   });
+
+
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
     try {
@@ -607,8 +650,8 @@ import { useForm } from 'vee-validate'
         headers: { "Content-Type": "application/json" },
       });
       products.value = response;
-      console.log("This is to confirm that there actually is a products data")
-      console.log(response)
+      // console.log("This is to confirm that there actually is a products data")
+      // console.log(response)
     } catch (error) {
       console.error('Failed to fetch products:', error);
     }
@@ -618,41 +661,7 @@ import { useForm } from 'vee-validate'
   // Load Tables
   // Filter products based on the selected option in the dropdown
 
-	const filteredProducts = computed(() => {
-    // Initialize the filtered products array with all products
-    let filtered = products.value;
-
-    // Filter based on the selected product type
-    if (selectedType.value && selectedType.value !== 'all') {
-      filtered = filtered.filter(product => 
-        product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
-      );
-    }
-
-    // Filter based on the search query
-    if (searchQuery.value) {
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-      );
-    }
-
-    // Sort the filtered products based on the selected filter
-    if (selectedFilter.value === 'id-asc') {
-      filtered.sort((a, b) => a.id - b.id);
-    } else if (selectedFilter.value === 'id-desc') {
-      filtered.sort((a, b) => b.id - a.id);
-    } else if (selectedFilter.value === 'name-asc') {
-      filtered.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (selectedFilter.value === 'name-desc') {
-      filtered.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (selectedFilter.value === 'supplier-asc') {
-      filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
-    } else if (selectedFilter.value === 'supplier-desc') {
-      filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
-    }
-
-    return filtered;
-  });
+	
 
   // Get Status For Table
   function getStockStatus(product) {
@@ -672,6 +681,10 @@ import { useForm } from 'vee-validate'
     selectedProductId.value = product.id;
     selectedProductName.value = product.name;
     selectedProductType.value = product.type;
+    selectedCost.value = product.cost
+    selectedStock.value = product.StockinProduct
+    selectedCritical.value = product.critical_level
+    selectedCommissionRate.value = product.commission
   };
   
 </script>
