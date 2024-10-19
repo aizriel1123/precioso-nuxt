@@ -19,11 +19,13 @@ export default defineEventHandler(async (event) => {
                     type: body.product_type
                 }
             },
+            critical_level: body.warning_level,
             StockinProduct:{
                 create:{
                     quantity: body.new_stock_level,
                 }
             }
+            
         }
     })
     // {
