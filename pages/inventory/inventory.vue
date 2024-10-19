@@ -135,7 +135,7 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
-        <form @submit.prevent="onSubmit" class="form" noValidate>
+        <form @submit.prevent="updateProduct" class="form" noValidate>
           <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
@@ -548,25 +548,25 @@ import { useForm } from 'vee-validate'
     closeProductModal();
   });
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
-  // const updateProduct() {
-  //   try {
-  //     // Make a PUT or PATCH request to the update product API
-  //     const response = await $fetch('/api/inventory/product', {
-  //       method: 'PATCH', // Or 'PUT' depending on your API convention
-  //       headers: { "Content-Type": "application/json" },
-  //       body: values,
-  //     });
-
-  //     // Handle success response
-  //     console.log("Product updated successfully:", response);
-  //     return response; // Return response if needed
-  //   } catch (error) {
-  //     // Handle error
-  //     console.error('Failed to update product:', error);
-  //     throw error; // Throw error if further handling is needed
-  //   }
-  // }
-  // updateProduct()
+  const updateProduct = form.handleSubmit(async (values) =>  {
+    try {
+      // Make a PUT or PATCH request to the update product API
+      const response = await $fetch('/api/inventory/product', {
+        method: 'PATCH', // Or 'PUT' depending on your API convention
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+      console.log("This is the response")
+      console.log(response)
+      // Handle success response
+      console.log("Product updated successfully:", response);
+      return response; // Return response if needed
+    } catch (error) {
+      // Handle error
+      console.error('Failed to update product:', error);
+      throw error; // Throw error if further handling is needed
+    }
+  });
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
     try {
