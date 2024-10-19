@@ -11,10 +11,6 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@prisma/client": "^5.19.1",
-=======
->>>>>>> c962294daeabd352343be22427663de7bf133e34
     "@prisma/nuxt": "^0.0.35",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@vee-validate/zod": "^4.13.2",
@@ -32,12 +28,13 @@
     "tailwindcss-animate": "^1.0.7",
     "vee-validate": "^4.13.2",
     "vue": "latest",
+    "vue-chartjs": "^5.3.1",
     "vue-router": "^4.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.1",
-    "@prisma/client": "^5.21.0",
+    "@prisma/client": "^5.21.1",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.7",
     "eslint": "^9.12.0",
