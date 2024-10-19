@@ -45,7 +45,7 @@ model Client {
   id           Int           @id @default(autoincrement())
   first_name   String        @db.VarChar(255)
   last_name    String        @db.VarChar(255)
-  dob          DateTime?     @db.Date
+  dob          DateTime?     @default(now()) @db.Date
   contact_info String?       @db.VarChar(20)
   gender_id    Int?
   Gender       Gender?       @relation(fields: [gender_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
@@ -167,7 +167,7 @@ model ServiceType {
 }
 
 model Stockin {
-  id Int       @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   supplier_id  Int
   therapist_id Int
   date         DateTime? @db.Date
@@ -176,7 +176,7 @@ model Stockin {
 }
 
 model StockinProduct {
-  id   Int      @default(autoincrement())
+  id             Int      @default(autoincrement())
   product_id     Int
   quantity       Int?
   purchase_price Decimal? @db.Decimal(10, 2)

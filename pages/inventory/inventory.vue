@@ -8,16 +8,21 @@
     <div class="flex-components">
       <div class="left-side">
         <!-- Dropdown for selecting product type -->
+        <!-- This is for the table by the way -->
         <Select v-model="selectedType">
           <SelectTrigger class="dropdown-trigger">
-            <SelectValue placeholder="Select an option" />
+            <SelectValue placeholder="Select Item to Filter" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="services">Services</SelectItem>
-              <SelectItem value="products">Products</SelectItem>
-              <SelectItem value="promos">Promos</SelectItem>
+            <!-- Dynamically create SelectItem for each product -->
+              <SelectItem 
+                v-for="productType in product_types" 
+                :key="productType.type" 
+                :value="productType.type"
+              >
+                {{ productType.type }}
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -67,15 +72,14 @@
                 :key="product.id" 
                 @click="selectProduct(product)"
               >
+              <!-- I changed product.stock to StockinProduct and product.CommissionRate to product.commission-->
                 <TableCell>{{ product.id }}</TableCell>
                 <TableCell>{{ product.name }}</TableCell>
-                <TableCell>{{ product.type }}</TableCell>
+                <TableCell>{{ product.ProductType }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
                 <TableCell>{{ product.stock }}</TableCell>
-                <TableCell>{{ product.warningLevel }}</TableCell>
-                <TableCell>{{ product.supplierName }}</TableCell>
-                <TableCell>{{ product.commissionRate }}%</TableCell>
                 <TableCell>{{ product.status }}</TableCell>
+                <TableCell>{{ product.commissionRate }}%</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
@@ -415,40 +419,29 @@
 
   //Sample data
   const products = ref([
-    { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, warningLevel: 20, supplierName: 'ABC',  commissionRate: 10, status: 'Available' },
-    { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, warningLevel: 30, supplierName: 'BCD',  status: 'Available', commissionRate: 15 },
-    { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 12 },
-    { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, warningLevel: 30, supplierName: 'BCD', status: 'Out of Stock', commissionRate: 20 },
-    { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, warningLevel: 20, supplierName: 'ABC', status: 'Available', commissionRate: 25 },
-    { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 18 },
-    { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, warningLevel: 30, supplierName: 'ABC',  status: 'Out of Stock', commissionRate: 30 },
-    { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, warningLevel: 20, supplierName: 'ABC', status: 'Out of Stock', commissionRate: 20 },
-    { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, warningLevel: 30, supplierName: 'BCD',  status: 'Available', commissionRate: 10 },
-    { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3,warningLevel: 30, supplierName: 'ABC',  status: 'Available', commissionRate: 12 },
-    { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, warningLevel: 20, supplierName: 'ABC', status: 'Available', commissionRate: 15 },
-    { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, warningLevel: 20, supplierName: 'EFG', status: 'Available', commissionRate: 15 },
-    { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'EFG',status: 'Available', commissionRate: 15 },
-    { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 15 },
-    { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 15 },
-    { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 15 },
-    { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 15 }
+    { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
+    { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, status: 'Available', commissionRate: 15 },
+    { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, status: 'Available', commissionRate: 12 },
+    { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, status: 'Out of Stock', commissionRate: 20 },
+    { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, status: 'Available', commissionRate: 25 },
+    { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, status: 'Available', commissionRate: 18 },
+    { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, status: 'Out of Stock', commissionRate: 30 },
+    { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, status: 'Out of Stock', commissionRate: 20 },
+    { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, status: 'Available', commissionRate: 10 },
+    { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3, status: 'Available', commissionRate: 12 },
+    { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+    { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 }
 
   ]);
-
-  const selectProduct = (product) => {
-    selectedProductId.value = product.id
-    selectedProductName.value = product.name
-    selectedProductType.value = product.type
-    selectedCost.value = product.cost
-    selectedStockIn.value = product.stock
-    selectedWarningLevel.value=product.warningLevel
-    selectedSupplierName.value = product.supplierName
-    selectedCommissionRate.value=product.commissionRate
-  };
 
   //ID, Name and type of chosen row from table
   const selectedProductId = ref(null); 
@@ -473,58 +466,22 @@
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
 
-  const filteredAndSortedProducts = computed(() => {
-    let filtered = products.value;
-    if (selectedType.value !== 'all') {
-        filtered = filtered.filter(product => product.type.toLowerCase() === selectedType.value);
-    }
+  // Filter products based on the selected option in dropdown
+  const filteredProducts = computed(() => {
+    return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
+  });
 
-    // Filter products based on the search query
-    if (searchQuery.value) {
-        filtered = filtered.filter(product => 
-            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-        );
-    }
-
-    // Sort the filtered products based on the selected filter
-    if (selectedFilter.value === 'id-asc') {
-        filtered.sort((a, b) => a.id - b.id);
-    } else if (selectedFilter.value === 'id-desc') {
-        filtered.sort((a, b) => b.id - a.id);
-    } else if (selectedFilter.value === 'name-asc') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (selectedFilter.value === 'name-desc') {
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (selectedFilter.value === 'supplier-asc') {
-        filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
-    } else if (selectedFilter.value === 'supplier-desc') {
-        filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
-    }
-
-    return filtered;
-});
-
-  //Pagination
-  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-  const totalPages = computed(() => Math.ceil(filteredAndSortedProducts.value.length / itemsPerPage));
+  //Pagination not working
   const paginatedProducts = computed(() => {
     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredAndSortedProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+    return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
   });
-  function handlePageChange(newPage) {
-  currentPage.value = newPage
-}
+  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
 
-  //Dropdown menu for filtering
-  const filterOptions = [
-  { value: 'id-asc', label: 'Product ID: Ascending' },
-  { value: 'id-desc', label: 'Product ID: Descending' },
-  { value: 'name-asc', label: 'Product Name: A to Z' },
-  { value: 'name-desc', label: 'Product Name: Z to A' },
-  { value: 'supplier-asc', label: 'Supplier Name: A to Z' },
-  { value: 'supplier-desc', label: 'Supplier Name: Z to A' },
-
-  ];
+  const onPageChange = newPage => {
+    if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
+  };
 
   //Open popup for adding new products
   const openProductModal = () => {
@@ -572,31 +529,48 @@
     }
     closeSupplierModal();
   });
-
-  const onCancel = () => {
-  if (selectedProductId.value) {
-    selectedProductId.value=''
-    selectedProductName.value = ''
-    selectedProductType.value = ''
-    selectedCost.value=''
-    selectedStockIn.value=''
-    selectedSupplierName.value = ''
-    selectedWarningLevel.value = ''
-    selectedCommissionRate.value=''
-  } 
-};
-
-// Method to save changes (submit form)
-const onSubmit = () => {
-  const productIndex = products.value.findIndex(p => p.id === selectedProductId.value);
-  if (productIndex !== -1) {
-    products.value[productIndex].name = selectedProductName.value;
-    products.value[productIndex].type = selectedProductType.value;
-    alert('Product details saved successfully!');
-  } else {
-    alert('Product not found.');
+  
+  // Fill up supplier names dropdown
+  async function fetchSuppliers() {
+    try {
+      const response = await $fetch('/api/inventory/supplier', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      supplier_names.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Supplier failed:', error);
+      return {}
+    }
   }
-};
+  fetchSuppliers();
+  // Fill up product type dropdown
+  async function fetchProducts() {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      product_types.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Product Type failed:', error);
+      return {}
+    }
+  }
+  fetchProducts();
+  
+  // To fetch suppliers
+  
+
+  const selectProduct = (product) => {
+    selectedProductId.value = product.id;
+    selectedProductName.value = product.name;
+    selectedProductType.value = product.type;
+  };
 
 </script>
 
