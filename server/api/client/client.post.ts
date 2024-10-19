@@ -22,9 +22,6 @@ export default defineEventHandler(async (event) => {
                     gender: body.gender,
                 }
             },
-            Transaction:{
-                // Fill in with transaction details
-            }
         }
     })
 

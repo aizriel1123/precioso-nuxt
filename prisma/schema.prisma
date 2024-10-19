@@ -199,30 +199,22 @@ model Therapist {
   id              Int             @id @default(autoincrement())
   first_name      String?         @unique @db.VarChar(255)
   last_name       String?         @unique @db.VarChar(255)
-  dob             DateTime?       @db.Date
+  dob             DateTime?       @default(now()) @db.Date
   contactinfo     String?         @db.VarChar(50)
   schedule        String?         @db.VarChar(20)
   gender_id       Int
   status_id       Int
-  type_id         Int
   Account         Account[]
   Defect          Defect[]
   Stockin         Stockin[]
   Gender          Gender          @relation(fields: [gender_id], references: [id])
   TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
-  TherapistType   TherapistType   @relation(fields: [type_id], references: [id])
   Transaction     Transaction[]
 }
 
 model TherapistStatus {
   id        Int         @id @default(autoincrement())
   status    String      @unique @db.VarChar(50)
-  Therapist Therapist[]
-}
-
-model TherapistType {
-  id        Int         @id @default(autoincrement())
-  type      String      @unique @db.VarChar(20)
   Therapist Therapist[]
 }
 

@@ -1,7 +1,8 @@
 <template>
   <div class="add-therapist-form">
     <h2>Add New Therapist</h2>
-    <div class="form-content">
+    <!-- 
+    
       <label for="therapistID">Therapist ID:</label>
       <input type="text" id="therapistID" v-model="newTherapist.id" placeholder="Enter Therapist ID" />
 
@@ -31,11 +32,102 @@
 
       <label for="contactInfo">Contact Information:</label>
       <input type="text" id="contactInfo" v-model="newTherapist.contactInfo" placeholder="Enter Contact Info" />
-    </div>
+    </div> 
+    
+    -->
 
-    <div class="button-container">
-      <button @click="saveNewTherapist">Add Therapist</button>
-    </div>
+    <form @submit.prevent="addNewTherapist" class="form" noValidate>
+      <FormField v-slot="{ componentField }" name="first_name">
+        <FormItem>
+          <FormLabel>First Name:</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="Enter First Name" v-bind="componentField" v-model="newTherapist.firstName"/>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="last_name">
+        <FormItem>
+          <FormLabel>Last Name:</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="Enter Last Name" v-bind="componentField" v-model="newTherapist.lastName"/>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="date_of_birth">
+        <FormItem>
+          <FormLabel>Date of Birth:</FormLabel>
+          <FormControl>
+            <Input type="date" placeholder="Enter Date Of Birth" v-bind="componentField" v-model="newTherapist.dateOfBirth"/>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="gender">
+        <FormItem>
+          <FormLabel>Gender:</FormLabel>
+          <FormControl>
+            <Select v-bind="componentField" v-model="newTherapist.gender">
+              <SelectTrigger class="dropdown-trigger">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="therapist_status">
+        <FormItem>
+          <FormLabel>Status:</FormLabel>
+          <FormControl>
+            <Select v-bind="componentField" v-model="newTherapist.therapistStatus">
+              <SelectTrigger class="dropdown-trigger">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Available">Available</SelectItem>
+                  <SelectItem value="Unavailable">Unavailable</SelectItem>
+                  <SelectItem value="Busy">Busy</SelectItem>
+                  <SelectItem value="Not Busy">Not Busy</SelectItem>
+                  <SelectItem value="Occupied">Occupied</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="schedule">
+        <FormItem>
+          <FormLabel>Schedule:</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="Enter Schedule" v-bind="componentField" v-model="newTherapist.schedule"/>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <FormField v-slot="{ componentField }" name="contact_information">
+        <FormItem>
+          <FormLabel>Contact Information:</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="Enter Contact Information" v-bind="componentField" v-model="newTherapist.contactInfo"/>
+          </FormControl>
+        </FormItem>
+      </FormField>
+
+      <div class="action-buttons">
+      <Button variant="ghost" type="submit">Add Therapist</button>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -55,9 +147,9 @@ const newTherapist = ref({
 
 const form = useForm()
 
-const saveNewTherapist = form.handleSubmit(async (values) => {
+const addNewTherapist = form.handleSubmit(async (values) => {
   try {
-    const response = await $fetch('/api/inventory/product', {
+    const response = await $fetch('/api/therapist/therapist', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: values,
@@ -65,7 +157,6 @@ const saveNewTherapist = form.handleSubmit(async (values) => {
   } catch (error) {
     console.error('Add Therapist failed:', error);
   }
-  closeProductModal();
 });
 </script>
 

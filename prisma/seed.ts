@@ -41,19 +41,16 @@ const therapists = [
     first_name: "therapist6",
     gender_id: 1,
     status_id: 1,
-    type_id: 1,
   },
   {
     first_name: "therapist7",
     gender_id: 2,
     status_id: 1,
-    type_id: 1,
   },
   {
     first_name: "therapist8",
     gender_id: 1,
     status_id: 1,
-    type_id: 1,
   },
 ]
 
@@ -115,16 +112,6 @@ const seed = async () => {
     });
   }
 
-  for (const type of tType) {
-    await prisma.therapistType.upsert({
-      where: {
-        type: type.type
-      },
-      update: {},
-      create: type,
-    });
-  }
-
   for (const type of aType) {
     await prisma.accountType.upsert({
       where: {
@@ -151,7 +138,6 @@ const seed = async () => {
         first_name: therapist.first_name,
         gender_id: therapist.gender_id,
         status_id: therapist.status_id,
-        type_id: therapist.type_id,
       },
       select: {
         id: true,

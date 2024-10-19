@@ -1,7 +1,9 @@
 <template>
   <div class="add-client-form">
     <h2>Add New Client</h2>
-    <!-- <div class="form-content">
+    <!-- 
+    
+    <div class="form-content">
   
       <label for="clientID">Client ID:</label>
         <input type="text" id="clientID" v-model="newClient.id" placeholder="Enter Client ID" />
@@ -28,7 +30,11 @@
 
     <div class="button-container">
       <button @click="addNewClient">Add Client</button>
-    </div> -->
+    </div> 
+    
+    Delete this after confirming it is no longer needed
+    
+    -->
     <form @submit.prevent="addNewClient" class="form" noValidate>
       <FormField v-slot="{ componentField }" name="first_name">
         <FormItem>
@@ -119,6 +125,7 @@ const newClient = ref({
 //     contactInfo: ''
 //   })
 // }
+//Delete this after confirming it is no longer needed
 
 const addNewClient = form.handleSubmit(async (values) => {
   try {
