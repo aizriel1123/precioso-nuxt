@@ -76,6 +76,12 @@ const accounts = [
     therapist_id: 1,
     type_id: 1,
   },
+  {
+    username: "carloisthebest",
+    password: "carloisthebest",
+    therapist_id: 1,
+    type_id: 1,
+  }
 ]
 
 const seed = async () => {
