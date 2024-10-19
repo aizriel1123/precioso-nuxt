@@ -43,7 +43,7 @@
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Time</TableHead>
+                <TableHead>Date</TableHead>
                 <TableHead>Products Availed</TableHead>
                 <TableHead>Client Name</TableHead>
                 <TableHead>Therapist Name</TableHead>
@@ -56,9 +56,9 @@
             <TableBody>
               <TableRow 
                 v-for="report in paginatedReports" 
-                :key="report.time" 
+                :key="report.date" 
               >
-                <TableCell>{{ report.time }}</TableCell>
+                <TableCell>{{ report.date }}</TableCell>
                 <TableCell>{{ report['products-availed'] }}</TableCell>
                 <TableCell>{{ report['client-name'] }}</TableCell>
                 <TableCell>{{ report['therapist-name'] }}</TableCell>
@@ -121,7 +121,7 @@
           <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
                   <TableCell>10/16/2024</TableCell>
                 </TableRow>
                 <TableRow>
@@ -200,20 +200,21 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Input } from '@/components/ui/input'
 import { AreaChart } from '@/components/ui/chart-area'
 
+
 //Sample data for Individual Sales
 const salesReport = ref([
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 }
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 }
 
 ]);
 
