@@ -14,15 +14,28 @@
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
+<<<<<<< HEAD
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="services">Services</SelectItem>
               <SelectItem value="products">Products</SelectItem>
               <SelectItem value="promos">Promos</SelectItem>
+=======
+            <!-- Dynamically create SelectItem for each product -->
+              <SelectItem  value="all">All</SelectItem>
+              <SelectItem 
+                v-for="productType in product_types" 
+                :key="productType.type" 
+                :value="productType.type"
+              >
+                {{ productType.type }}
+              </SelectItem>
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
             </SelectGroup>
           </SelectContent>
         </Select>
 
         <!-- Search input -->
+<<<<<<< HEAD
         <Input placeholder="Search Product Name..." class="input-search" v-model="searchQuery"/>
         <Select v-model="selectedFilter">
         <SelectTrigger class="w-[auto]">
@@ -34,6 +47,13 @@
           </SelectItem>
         </SelectContent>
       </Select>
+=======
+        <Input placeholder="Search..." class="input_search" />
+        <Button variant="link">
+          <ArrowDownWideNarrow class="icon-small" />
+        </Button>
+        <Button variant="ghost" class="button">Filter</Button>
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
       </div>
 
       <div class="right-side">
@@ -71,11 +91,17 @@
                 <TableCell>{{ product.name }}</TableCell>
                 <TableCell>{{ product.type }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
+<<<<<<< HEAD
                 <TableCell>{{ product.stock }}</TableCell>
                 <TableCell>{{ product.warningLevel }}</TableCell>
                 <TableCell>{{ product.supplierName }}</TableCell>
                 <TableCell>{{ product.commissionRate }}%</TableCell>
                 <TableCell>{{ product.status }}</TableCell>
+=======
+                <TableCell>{{ product.StockinProduct }}</TableCell>
+                <TableCell>{{ getStockStatus(product) }}</TableCell>
+                <TableCell>{{ product.commission }}%</TableCell>
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
@@ -309,6 +335,7 @@
             </FormItem>
         </FormField>
 
+<<<<<<< HEAD
         <FormField v-slot="{ componentField }" name="category">
             <FormItem>
               <FormLabel>Product Type</FormLabel>
@@ -322,10 +349,32 @@
                       <SelectItem value="services">Services</SelectItem>
                       <SelectItem value="products">Products</SelectItem>
                       <SelectItem value="promos">Promos</SelectItem>
+=======
+        <FormField v-slot="{ componentField }" name="product_type">
+          <FormItem>
+              <FormLabel>Product Type</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Product Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                    <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        
+                        {{ productType.type }}
+                      </SelectItem>
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </FormControl>
+<<<<<<< HEAD
               <FormMessage />
             </FormItem>
           </FormField>
@@ -335,12 +384,26 @@
               <FormLabel>Cost</FormLabel>
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" />
+=======
+            </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_product_cost">
+            <FormItem>
+              <FormLabel>Product Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
               </FormControl>
               <FormMessage />
             </FormItem>
         </FormField>
+<<<<<<< HEAD
 
         <FormField v-slot="{ componentField }" name="new-stock-level">
+=======
+        <FormField v-slot="{ componentField }" name="new_stock_level">
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
@@ -382,7 +445,20 @@
             </FormItem>
         </FormField>
 
+<<<<<<< HEAD
         <FormField v-slot="{ componentField }" name="new-commission-rate">
+=======
+        <FormField v-slot="{ componentField }" name="warning_level">
+            <FormItem>
+              <FormLabel>Warning Level</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_commission_rate">
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
@@ -412,6 +488,7 @@
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
   const form = useForm()
+<<<<<<< HEAD
 
   //Sample data
   const products = ref([
@@ -466,6 +543,21 @@
   const searchQuery = ref('');
 
   //For pagination
+=======
+  let products = ref([]);
+  // Fetch product details of selected item
+
+  //ID, Name and type of chosen row from table
+  const selectedProductId = ref(null); 
+  const selectedProductName = ref('');
+  const selectedProductType = ref('');
+  
+  const selectedType = ref('all'); //default
+  //Variable for Drop Down Variables
+  const supplier_names = ref([]);
+  const product_types = ref([]);
+  //For pagination (may delete later)
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
 
@@ -556,6 +648,7 @@
     } catch (error) {
       console.error('Add Supplier failed:', error);
     }
+    fetchProductDetails()
     closeProductModal();
   });
 
@@ -570,6 +663,7 @@
     } catch (error) {
       console.error('Add Supplier failed:', error);
     }
+<<<<<<< HEAD
     closeSupplierModal();
   });
 
@@ -598,6 +692,91 @@ const onSubmit = () => {
   }
 };
 
+=======
+    fetchProductDetails()
+    closeProductModal();
+  });
+  
+  // Fill up supplier names dropdown
+  async function fetchSuppliers() {
+    try {
+      const response = await $fetch('/api/inventory/supplier', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      supplier_names.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Supplier failed:', error);
+      return {}
+    }
+  }
+  fetchSuppliers();
+  // Fill up product type dropdown
+  async function fetchProducts() {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'GET',
+        
+      });
+      product_types.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Product Type failed:', error);
+      return {}
+    }
+  }
+  fetchProducts();
+  // To fetch product details
+  async function fetchProductDetails() {
+    try {
+      const response = await $fetch('/api/inventory/populate', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      products.value = response;
+      console.log("This is to confirm that there actually is a products data")
+      console.log(response)
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    }
+  }
+  fetchProductDetails()
+  // Load Tables
+  // Filter products based on the selected option in the dropdown
+	const filteredProducts = computed(() => {
+	  // Check if selectedType has a value to filter, otherwise return all products
+	  if (selectedType.value && selectedType.value != "all") {
+		return products.value.filter(product => 
+		  product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
+		);
+	  }
+	  // Return all products if no filter is selected
+	  return products.value;
+	});
+  // Get Status For Table
+  function getStockStatus(product) {
+      return product.StockinProduct < product.critical_level 
+        ? "Critical - Restock Needed" 
+        : "Normal";
+     }
+	// Paginate the filtered products
+	const paginatedProducts = computed(() => {
+	  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+	  // Use filteredProducts for pagination, not products directly
+	  return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+	});
+  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+  const selectProduct = (product) => {
+    selectedProductId.value = product.id;
+    selectedProductName.value = product.name;
+    selectedProductType.value = product.type;
+  };
+  
+>>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
 </script>
 
 <style scoped>
