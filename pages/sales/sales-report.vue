@@ -387,68 +387,67 @@
 import NavBar from '~/components/Navbar.vue';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import { Input } from '@/components/ui/input'
 import { AreaChart } from '@/components/ui/chart-area'
 
-//Sample data for Individual Sales
-const salesReport = ref([
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 }
+// //Sample data for Individual Sales
+// const salesReport = ref([
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
+// { time: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 }
 
-]);
+// ]);
 
-//Sample data for Total Sales
-const data = [
-  { name: 'Jan', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Feb', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Mar', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Apr', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'May', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Jun', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Jul', Revenue: Math.floor(Math.random() * 2000) + 500},
-]
+// //Sample data for Total Sales
+// const data = [
+//   { name: 'Jan', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'Feb', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'Mar', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'Apr', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'May', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'Jun', Revenue: Math.floor(Math.random() * 2000) + 500},
+//   { name: 'Jul', Revenue: Math.floor(Math.random() * 2000) + 500},
+// ]
 
-//Defauls values for inputs/selects
-const selectedReport = ref('individual-sales');
-const searchTerm = ref('');
-const selectedPeriod = ref('past-24-hours');
+// //Defauls values for inputs/selects
+// const selectedReport = ref('individual-sales');
+// const searchTerm = ref('');
+// const selectedPeriod = ref('past-24-hours');
 
-//For pagination
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
+// //For pagination
+// const currentPage = ref(1);
+// const itemsPerPage = ref(10);
 
-// Filter products based on the selected option in dropdown
-const filteredReports = computed(() => {
-  return salesReport.value.filter(report => 
-    report.type.toLowerCase() && 
-    JSON.stringify(report).toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
-});
+// // Filter products based on the selected option in dropdown
+// const filteredReports = computed(() => {
+//   return salesReport.value.filter(report => 
+//     report.type.toLowerCase() && 
+//     JSON.stringify(report).toLowerCase().includes(searchTerm.value.toLowerCase())
+//   );
+// });
 
-// Pagination
-const paginatedReports = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  return filteredReports.value.slice(startIndex, startIndex + itemsPerPage.value);
-});
+// // Pagination
+// const paginatedReports = computed(() => {
+//   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+//   return filteredReports.value.slice(startIndex, startIndex + itemsPerPage.value);
+// });
 
-const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedReports.value.length));
-const totalPages = computed(() => Math.ceil(filteredReports.value.length / itemsPerPage));
+// const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedReports.value.length));
+// const totalPages = computed(() => Math.ceil(filteredReports.value.length / itemsPerPage));
 
-function handlePageChange(newPage) {
-  currentPage.value = newPage
-}
-import { AreaChart } from '@/components/ui/chart-area'
+// function handlePageChange(newPage) {
+//   currentPage.value = newPage
+// }
+// import { AreaChart } from '@/components/ui/chart-area'
 
 
 //Sample data for Individual Sales

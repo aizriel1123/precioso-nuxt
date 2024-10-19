@@ -176,7 +176,7 @@ select {
   border-radius: 4px;
 }
 
-.button-container {
+.action-buttons {
   display: flex;
   justify-content: center;
   margin-top: 20px;
