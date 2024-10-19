@@ -8,15 +8,21 @@
     <div class="flex-components">
       <div class="left-side">
         <!-- Dropdown for selecting product type -->
+        <!-- This is for the table by the way -->
         <Select v-model="selectedType">
           <SelectTrigger class="dropdown-trigger">
-            <SelectValue placeholder="Select an option" />
+            <SelectValue placeholder="Select Item to Filter" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="services">Services</SelectItem>
-              <SelectItem value="products">Products</SelectItem>
-              <SelectItem value="promos">Promos</SelectItem>
+            <!-- Dynamically create SelectItem for each product -->
+              <SelectItem 
+                v-for="productType in product_types" 
+                :key="productType.type" 
+                :value="productType.type"
+              >
+                {{ productType.type }}
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -61,13 +67,14 @@
                 :key="product.id" 
                 @click="selectProduct(product)"
               >
+              <!-- I changed product.stock to StockinProduct and product.CommissionRate to product.commission-->
                 <TableCell>{{ product.id }}</TableCell>
                 <TableCell>{{ product.name }}</TableCell>
-                <TableCell>{{ product.type }}</TableCell>
+                <TableCell>{{ product.ProductType }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
-                <TableCell>{{ product.stock }}</TableCell>
+                <TableCell>{{ product.StockinProduct }}</TableCell>
                 <TableCell>{{ product.status }}</TableCell>
-                <TableCell>{{ product.commissionRate }}%</TableCell>
+                <TableCell>{{ product.commission }}%</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
@@ -389,30 +396,33 @@ import { useForm } from 'vee-validate'
   const form = useForm()
 
   //Sample data
-  const products = ref([
-    { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
-    { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, status: 'Available', commissionRate: 15 },
-    { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, status: 'Available', commissionRate: 12 },
-    { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, status: 'Out of Stock', commissionRate: 20 },
-    { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, status: 'Available', commissionRate: 25 },
-    { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, status: 'Available', commissionRate: 18 },
-    { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, status: 'Out of Stock', commissionRate: 30 },
-    { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, status: 'Out of Stock', commissionRate: 20 },
-    { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, status: 'Available', commissionRate: 10 },
-    { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3, status: 'Available', commissionRate: 12 },
-    { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
-    { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 }
+  // const products = ref([
+  //   { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, status: 'Available', commissionRate: 10 },
+  //   { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, status: 'Available', commissionRate: 15 },
+  //   { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, status: 'Available', commissionRate: 12 },
+  //   { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, status: 'Out of Stock', commissionRate: 20 },
+  //   { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, status: 'Available', commissionRate: 25 },
+  //   { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, status: 'Available', commissionRate: 18 },
+  //   { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, status: 'Out of Stock', commissionRate: 30 },
+  //   { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, status: 'Out of Stock', commissionRate: 20 },
+  //   { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, status: 'Available', commissionRate: 10 },
+  //   { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3, status: 'Available', commissionRate: 12 },
+  //   { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 },
+  //   { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, status: 'Available', commissionRate: 15 }
 
-  ]);
+  // ]);
+  let products = ref([]);
+  // Fetch product details of selected item
+  
 
   //ID, Name and type of chosen row from table
   const selectedProductId = ref(null); 
@@ -434,19 +444,19 @@ import { useForm } from 'vee-validate'
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
 
-  // Filter products based on the selected option in dropdown
-  const filteredProducts = computed(() => {
-    return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
-  });
+  // // Filter products based on the selected option in dropdown
+  // const filteredProducts = computed(() => {
+  //   return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
+  // });
 
-  //Pagination not working
-  const paginatedProducts = computed(() => {
-    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
-  });
-  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
-
+  // //Pagination not working
+  // const paginatedProducts = computed(() => {
+  //   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+  //   return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+  // });
+  // const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  // const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+  // Open new page 
   const onPageChange = newPage => {
     if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
   };
@@ -519,7 +529,7 @@ import { useForm } from 'vee-validate'
     try {
       const response = await $fetch('/api/inventory/product', {
         method: 'GET',
-        headers: { "Content-Type": "application/json" },
+        
       });
       product_types.value = response;
       console.log(response)
@@ -530,10 +540,42 @@ import { useForm } from 'vee-validate'
     }
   }
   fetchProducts();
-  
   // To fetch suppliers
-  
+  async function fetchProductDetails() {
+    try {
+      const response = await $fetch('/api/inventory/populate', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      products.value = response;
+      console.log("This is to confirm that there actually is a products data")
+      console.log(response)
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    }
+  }
+  fetchProductDetails()
+  // Load Tables
+  // Filter products based on the selected option in the dropdown
+	const filteredProducts = computed(() => {
+	  // Check if selectedType has a value to filter, otherwise return all products
+	  if (selectedType.value) {
+		return products.value.filter(product => 
+		  product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
+		);
+	  }
+	  // Return all products if no filter is selected
+	  return products.value;
+	});
 
+	// Paginate the filtered products
+	const paginatedProducts = computed(() => {
+	  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+	  // Use filteredProducts for pagination, not products directly
+	  return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+	});
+  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
   const selectProduct = (product) => {
     selectedProductId.value = product.id;
     selectedProductName.value = product.name;
