@@ -25,7 +25,29 @@
       <input type="text" id="contactInfo" v-model="client.contactInfo" @input="trackChanges" />
     </div>
 
-    <!-- Conditionally show Save and Cancel buttons -->
+    <div class="transactions-section">
+      <h3>Recent Transactions</h3>
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Products Availed</th>
+            <th>Therapist Name</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(transaction, index) in transactions" :key="index">
+            <td>{{ transaction.time }}</td>
+            <td>{{ transaction.products }}</td>
+            <td>{{ transaction.therapist }}</td>
+            <td>{{ transaction.totalCost }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Static Save and Cancel Buttons -->
     <div class="button-container" v-if="hasChanges">
       <button @click="saveChanges">Save</button>
       <button @click="cancelEdit">Cancel</button>
@@ -45,22 +67,36 @@ const props = defineProps({
 
 const hasChanges = ref(false)
 
-// Watch for changes to the client object
+const transactions = ref([
+  {
+    time: '2024-10-18 14:30',
+    products: 'Facial Cream, Serum',
+    therapist: 'John Postgre',
+    totalCost: '₱1,500',
+  },
+  {
+    time: '2024-10-10 11:00',
+    products: 'Massage, Body Scrub',
+    therapist: 'John Nuxt',
+    totalCost: '₱2,000',
+  },
+])
+
 watch(
   () => props.client,
   () => {
     hasChanges.value = true
   },
-  { deep: true } // This allows tracking nested changes
+  { deep: true }
 )
 
 const saveChanges = () => {
   console.log('Changes saved:', props.client)
-  hasChanges.value = false // Reset the flag after saving
+  hasChanges.value = false
 }
 
 const cancelEdit = () => {
-  hasChanges.value = false // Reset the flag
+  hasChanges.value = false
 }
 </script>
 
@@ -68,22 +104,25 @@ const cancelEdit = () => {
 .client-info {
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 20px;
-  width: 100%; /* Take full width of the container */
-  height: 100%; /* Match the height of AddClient */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: 100%; /* Full height of the container */
+  overflow: hidden; /* Prevent overflow from spilling */
+  position: relative;
 }
 
 h2 {
   text-align: center;
   font-size: 20px;
+  margin-top: 10px;
 }
 
 .info-content {
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  flex: 1; /* Allow this section to take up available space */
 }
 
 label {
@@ -98,10 +137,36 @@ select {
   border-radius: 4px;
 }
 
+.transactions-section {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 200px; /* Optional: Limit the height of the transaction section */
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.transactions-table th {
+  background-color: #f2f2f2;
+}
+
 .button-container {
+  position: sticky;
+  bottom: 0;
+  background-color: white; /* Match background to avoid overlap issues */
+  padding: 10px 0;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  border-top: 1px solid #ccc;
 }
 
 button {
@@ -111,6 +176,7 @@ button {
   background-color: black;
   color: white;
   cursor: pointer;
-  margin: 0 5px; /* Add space between buttons */
+  margin: 0 5px;
 }
 </style>
+

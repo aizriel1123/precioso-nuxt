@@ -188,7 +188,7 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="supplier-name">
+          <FormField v-slot="{ componentField }" name="supplier_name">
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
@@ -262,16 +262,16 @@
       <h2 class="selected-product-title">Add New Product</h2>
 
       <form @submit.prevent="addNewProduct">
-        <FormField v-slot="{ componentField }" name="product-id">
+        <!-- <FormField v-slot="{ componentField }" name="product-id">
           <FormItem>
             <FormLabel>Product ID</FormLabel>
             <FormControl>
               <Input type="text" v-bind="componentField" disabled />
             </FormControl>
           </FormItem>
-        </FormField>
+        </FormField> -->
 
-        <FormField v-slot="{ componentField }" name="new-product-name">
+        <FormField v-slot="{ componentField }" name="new_product_name">
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
@@ -280,26 +280,47 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="category">
+        <FormField v-slot="{ componentField }" name="new_product_cost">
             <FormItem>
+              <FormLabel>Product Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="product_type">
+          <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
                 <Select v-bind="componentField">
+<<<<<<< HEAD
                   <SelectTrigger class="dropdown-trigger2">
                     <SelectValue placeholder="Service" />
+=======
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Product Type" />
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="promos">Promos</SelectItem>
+                    <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        {{ productType.type }}
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </FormControl>
             </FormItem>
-          </FormField>
+        </FormField>
 
+<<<<<<< HEAD
           <FormField v-slot="{ componentField }" name="new-cost">
             <FormItem>
               <FormLabel>Cost</FormLabel>
@@ -311,6 +332,10 @@
         </FormField>
 
         <FormField v-slot="{ componentField }" name="new-stock-level">
+=======
+
+        <FormField v-slot="{ componentField }" name="new_stock_level">
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
@@ -319,6 +344,7 @@
             </FormItem>
         </FormField>
 
+<<<<<<< HEAD
         <!-- Sample suppliers only, will change later -->
         <FormField v-slot="{ componentField }" name="supplier-name">
             <FormItem>
@@ -333,6 +359,26 @@
                       <SelectItem value="Supplier1">Supplier 1</SelectItem>
                       <SelectItem value="Supplier2">Supplier 2</SelectItem>
                       <SelectItem value="Supplier3">Supplier 3</SelectItem>
+=======
+        <FormField v-slot="{ componentField }" name="supplier_name">
+          <FormItem>
+              <FormLabel>Supplier Name</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Supplier Name" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                    <!-- Dynamically create SelectItem for each supplier -->
+                      <SelectItem 
+                        v-for="supplier in supplier_names" 
+                        :key="supplier.supplier_name" 
+                        :value="supplier.supplier_name"
+                      >
+                        {{ supplier.supplier_name }}
+                      </SelectItem>
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -340,7 +386,11 @@
             </FormItem>
         </FormField>
 
+<<<<<<< HEAD
         <FormField v-slot="{ componentField }" name="new-commission-rate">
+=======
+        <FormField v-slot="{ componentField }" name="new_commission_rate">
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
@@ -359,7 +409,6 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import NavBar from '~/components/Navbar.vue';
 import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -369,6 +418,7 @@ import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { ArrowDownWideNarrow } from 'lucide-vue-next';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+<<<<<<< HEAD
 =======
   import NavBar from '~/components/Navbar.vue';
   import { ref, computed } from 'vue';
@@ -379,8 +429,11 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
   import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
+=======
+// SAMPLE FORM (NOTE: BOTBOT RA NI)
+import { useForm } from 'vee-validate'
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
   const form = useForm()
->>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   //Sample data
   const products = ref([
@@ -419,6 +472,7 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
   const selectedProductType = ref('');
+<<<<<<< HEAD
   const selectedStockIn = ref(0);
 
 
@@ -431,6 +485,14 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
   const editedSupplierName=ref ('')
 
   //For pagination
+=======
+  
+  const selectedType = ref('products'); //default
+  //Variable for Drop Down Variables
+  const supplier_names = ref([]);
+  const product_types = ref([]);
+  //For pagination (may delete later)
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
 
@@ -503,7 +565,7 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
   const closeSupplierModal = () => {
     isSupplierModalOpen.value = false;
   };
-
+  // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/product', {
@@ -512,12 +574,12 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
         body: values,
       });
     } catch (error) {
-      console.error('Add Supplier failed:', error);
+      console.error('Add Product failed:', error);
     }
     closeProductModal();
   });
 
-
+  // Add New Supplier
   const addNewSupplier = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/supplier', {
@@ -530,6 +592,7 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
     }
     closeProductModal();
   });
+<<<<<<< HEAD
 
   const onCancel = () => {
   if (selectedProductId.value) {
@@ -541,6 +604,50 @@ import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/for
     editedSupplierName.value = ''
   } 
 };
+=======
+  
+  // Fill up supplier names dropdown
+  async function fetchSuppliers() {
+    try {
+      const response = await $fetch('/api/inventory/supplier', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      supplier_names.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Supplier failed:', error);
+      return {}
+    }
+  }
+  fetchSuppliers();
+  // Fill up product type dropdown
+  async function fetchProducts() {
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" },
+      });
+      product_types.value = response;
+      console.log(response)
+      return response
+    } catch (error) {
+      console.error('Get Product Type failed:', error);
+      return {}
+    }
+  }
+  fetchProducts();
+  
+  // To fetch suppliers
+  
+
+  const selectProduct = (product) => {
+    selectedProductId.value = product.id;
+    selectedProductName.value = product.name;
+    selectedProductType.value = product.type;
+  };
+>>>>>>> cd690cb98039382980df64c1e1e2cdbd34457f86
 
 // Method to save changes (submit form)
 const onSubmit = () => {
@@ -563,20 +670,12 @@ const onSubmit = () => {
   }
 
 
-<<<<<<< HEAD
 .center-components {
   margin-top: 10px;
   margin-left: 2%;
   margin-right: 2%;
   margin-bottom: 50px;
 }
-=======
-  .center-components {
-    margin-top: 10px;
-    margin-left: 2%;
-    margin-right: 2%;
-  }
->>>>>>> c962294daeabd352343be22427663de7bf133e34
 
   /* Flexbox for dropdown, input, filter, and other buttons */
   .flex-components {
