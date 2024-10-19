@@ -136,7 +136,7 @@
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
         <form @submit.prevent="onSubmit" class="form" noValidate>
-          <FormField v-slot="{ componentField }" name="product-id">
+          <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
               <FormControl>
@@ -152,7 +152,7 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="product-name">
+          <FormField v-slot="{ componentField }" name="update_product_name">
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
@@ -167,27 +167,10 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="stock-in">
-            <FormItem>
-              <FormLabel>Stock-in</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" />
-              </FormControl>
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="warning-level">
-            <FormItem>
-              <FormLabel>Warning Level</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
-              </FormControl>
-            </FormItem>
-          </FormField>
           <!-- Remember this 1 -->
-          <FormField v-slot="{ componentField }" name="category">
+          <FormField v-slot="{ componentField }" name="update_product_type">
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Product Type</FormLabel>
               <FormControl>
                 <Select v-bind="componentField" :value="selectedProductType">
                   <SelectTrigger class="dropdown-trigger" >
@@ -210,8 +193,27 @@
               </FormControl>
             </FormItem>
           </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_cost">
+            <FormItem>
+              <FormLabel>Product Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_stock">
+            <FormItem>
+              <FormLabel>Stock</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
           <!-- Remember this 2 -->
-          <FormField v-slot="{ componentField }" name="supplier_name">
+          <FormField v-slot="{ componentField }" name="update_product_supplier_name">
           <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
@@ -235,6 +237,24 @@
               </FormControl>
             </FormItem>
         </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_warning_level">
+            <FormItem>
+              <FormLabel>Warning Level</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          
+          <FormField v-slot="{ componentField }" name="update_product_commission_rate">
+            <FormItem>
+              <FormLabel>Commission Rate</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
 
           <div class="action-buttons">
@@ -527,7 +547,26 @@ import { useForm } from 'vee-validate'
     fetchProductDetails()
     closeProductModal();
   });
-  
+  // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
+  // const updateProduct() {
+  //   try {
+  //     // Make a PUT or PATCH request to the update product API
+  //     const response = await $fetch('/api/inventory/product', {
+  //       method: 'PATCH', // Or 'PUT' depending on your API convention
+  //       headers: { "Content-Type": "application/json" },
+  //       body: values,
+  //     });
+
+  //     // Handle success response
+  //     console.log("Product updated successfully:", response);
+  //     return response; // Return response if needed
+  //   } catch (error) {
+  //     // Handle error
+  //     console.error('Failed to update product:', error);
+  //     throw error; // Throw error if further handling is needed
+  //   }
+  // }
+  // updateProduct()
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
     try {
@@ -575,6 +614,7 @@ import { useForm } from 'vee-validate'
     }
   }
   fetchProductDetails()
+  
   // Load Tables
   // Filter products based on the selected option in the dropdown
 
