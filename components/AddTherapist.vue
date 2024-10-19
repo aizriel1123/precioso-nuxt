@@ -11,8 +11,13 @@
       <label for="lastName">Last Name:</label>
       <input type="text" id="lastName" v-model="newTherapist.lastName" placeholder="Enter Last Name" />
 
-      <label for="dateOfBirth">Date of Birth:</label>
-      <input type="date" id="dateOfBirth" v-model="newTherapist.dateOfBirth" />
+      <label for="schedule">Schedule:</label>
+      <input 
+        type="text" 
+        id="schedule" 
+        v-model="newTherapist.schedule" 
+        placeholder="Enter Schedule" 
+      />
 
       <label for="gender">Gender:</label>
       <select id="gender" v-model="newTherapist.gender">
@@ -36,18 +41,18 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useForm } from 'vee-validate'
 
 const newTherapist = ref({
   id: '',
   firstName: '',
   lastName: '',
-  dateOfBirth: '',
+  schedule: '',
   gender: '',
   email: '',
   contactInfo: ''
 })
 
-import { useForm } from 'vee-validate'
 const form = useForm()
 
 const saveNewTherapist = form.handleSubmit(async (values) => {
@@ -58,24 +63,10 @@ const saveNewTherapist = form.handleSubmit(async (values) => {
       body: values,
     });
   } catch (error) {
-    console.error('Add Product failed:', error);
+    console.error('Add Therapist failed:', error);
   }
   closeProductModal();
 });
-
-// () => {
-//   console.log('New therapist added:', newTherapist.value)
-//   // Add logic to save the new therapist here
-//   Object.assign(newTherapist.value, {
-//     id: '',
-//     firstName: '',
-//     lastName: '',
-//     dateOfBirth: '',
-//     gender: '',
-//     email: '',
-//     contactInfo: ''
-//   })
-// }
 </script>
 
 <style scoped>
@@ -84,9 +75,7 @@ const saveNewTherapist = form.handleSubmit(async (values) => {
   border-radius: 5px;
   padding: 20px;
   width: 100%;
-  /* Take full width of the container */
   height: 100%;
-  /* Match the height of parent container */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
