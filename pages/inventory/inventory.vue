@@ -29,7 +29,7 @@
         </Select>
 
         <!-- Search input -->
-        <Input placeholder="Search Product Name..." class="input-search" v-model="searchQuery"/>
+        <Input placeholder="Search Product Name..." class="input_search" v-model="searchQuery"/>
         <Select v-model="selectedFilter">
         <SelectTrigger class="w-[auto]">
           <SelectValue placeholder="Select filter" />
@@ -46,9 +46,6 @@
         <!-- Buttons for adding new product/supplier and enable editing in form 'edit selected product' -->
         <Button variant="ghost" class="button" @click="openProductModal">Add New Product</Button>
         <Button variant="ghost" class="button" @click="openSupplierModal">Add New Supplier</Button>
-        <Button variant="ghost" class="button" @click="isEditable = !isEditable">
-          {{ isEditable ? "Cancel Edit" : "Edit" }}
-        </Button>
       </div>
     </div>
 
@@ -164,7 +161,7 @@
                   placeholder="Enter Product Name" 
                   v-bind="componentField" 
                   :value="selectedProductName" 
-                  :disabled="!isEditable" 
+                  
                 />
               </FormControl>
             </FormItem>
@@ -174,7 +171,7 @@
             <FormItem>
               <FormLabel>Stock-in</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" :disabled="!isEditable"/>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" />
               </FormControl>
             </FormItem>
           </FormField>
@@ -183,39 +180,62 @@
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" :disabled="!isEditable"/>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
               </FormControl>
             </FormItem>
           </FormField>
-
+          <!-- Remember this 1 -->
           <FormField v-slot="{ componentField }" name="category">
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
                 <Select v-bind="componentField" :value="selectedProductType">
-                  <SelectTrigger class="dropdown-trigger" :disabled="!isEditable">
+                  <SelectTrigger class="dropdown-trigger" >
                     <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="promos">Promos</SelectItem>
+                      <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        
+                        {{ productType.type }}
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </FormControl>
             </FormItem>
           </FormField>
-
+          <!-- Remember this 2 -->
           <FormField v-slot="{ componentField }" name="supplier_name">
-            <FormItem>
+          <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" :disabled="!isEditable"/>
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Supplier Name" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                    <!-- Dynamically create SelectItem for each supplier -->
+                      <SelectItem 
+                        v-for="supplier in supplier_names" 
+                        :key="supplier.supplier_name" 
+                        :value="supplier.supplier_name"
+                      >
+                        {{ supplier.supplier_name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItem>
-          </FormField>
+        </FormField>
+
 
           <div class="action-buttons">
             <Button variant="ghost" type="button" class="cancel-button">Cancel</Button>
@@ -412,7 +432,9 @@ import { useForm } from 'vee-validate'
   const form = useForm()
   let products = ref([]);
   // Fetch product details of selected item
-
+  // Set up For the search filtering 
+  const searchQuery = ref('');
+  const selectedFilter = ref(null)
   //ID, Name and type of chosen row from table
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
@@ -432,7 +454,14 @@ import { useForm } from 'vee-validate'
   //For pop ups
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
+  // Set up the filter options
+  const filterOptions = [
+  { value: 'id-asc', label: 'Product ID: Ascending' },
+  { value: 'id-desc', label: 'Product ID: Descending' },
+  { value: 'name-asc', label: 'Product Name: A to Z' },
+  { value: 'name-desc', label: 'Product Name: Z to A' },
 
+  ];
   // // Filter products based on the selected option in dropdown
   // const filteredProducts = computed(() => {
   //   return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
@@ -548,16 +577,43 @@ import { useForm } from 'vee-validate'
   fetchProductDetails()
   // Load Tables
   // Filter products based on the selected option in the dropdown
+
 	const filteredProducts = computed(() => {
-	  // Check if selectedType has a value to filter, otherwise return all products
-	  if (selectedType.value && selectedType.value != "all") {
-		return products.value.filter(product => 
-		  product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
-		);
-	  }
-	  // Return all products if no filter is selected
-	  return products.value;
-	});
+    // Initialize the filtered products array with all products
+    let filtered = products.value;
+
+    // Filter based on the selected product type
+    if (selectedType.value && selectedType.value !== 'all') {
+      filtered = filtered.filter(product => 
+        product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
+      );
+    }
+
+    // Filter based on the search query
+    if (searchQuery.value) {
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    }
+
+    // Sort the filtered products based on the selected filter
+    if (selectedFilter.value === 'id-asc') {
+      filtered.sort((a, b) => a.id - b.id);
+    } else if (selectedFilter.value === 'id-desc') {
+      filtered.sort((a, b) => b.id - a.id);
+    } else if (selectedFilter.value === 'name-asc') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (selectedFilter.value === 'name-desc') {
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (selectedFilter.value === 'supplier-asc') {
+      filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+    } else if (selectedFilter.value === 'supplier-desc') {
+      filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
+    }
+
+    return filtered;
+  });
+
   // Get Status For Table
   function getStockStatus(product) {
       return product.StockinProduct < product.critical_level 
@@ -655,7 +711,7 @@ import { useForm } from 'vee-validate'
   }
 
   /* Search input */
-  .input-search {
+  .input_search {
     width: 250px;
     padding: 8px;
     border: 1px solid #ddd;
