@@ -44,6 +44,7 @@
 
       <div class="right-side">
         <!-- Buttons for adding new product/supplier and enable editing in form 'edit selected product' -->
+        <Button variant="ghost" class="button" @click="openTypeModal">Add New Type</Button>
         <Button variant="ghost" class="button" @click="openProductModal">Add New Product</Button>
         <Button variant="ghost" class="button" @click="openSupplierModal">Add New Supplier</Button>
       </div>
@@ -63,6 +64,7 @@
                 <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Commission Rate</TableHead>
+                <TableHead>Supplier Name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,9 +81,11 @@
                 <TableCell>{{ product.StockinProduct }}</TableCell>
                 <TableCell>{{ getStockStatus(product) }}</TableCell>
                 <TableCell>{{ product.commission }}%</TableCell>
+                <TableCell>{{ product.supplierName }}</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
+                <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -135,7 +139,7 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
-        <form @submit.prevent="updateProduct" >
+        <form id="update_product_panel" @submit.prevent="updateProduct" >
           <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
@@ -257,6 +261,28 @@
           </div>
         </form>
       </div>
+    </div>
+  </div>
+
+  <!-- Popup to Add New Product Tyoe -->
+  <div v-if="isTypeModalOpen" class="modal-overlay">
+    <div class="modal-content">
+      <h2 class="selected-product-title">Add New Type</h2>
+      <form @submit.prevent="addNewType">
+        <FormField v-slot="{ componentField }" name="new_type">
+          <FormItem>
+            <FormLabel>New Type</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Enter Type" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <div class="action-buttons">
+          <Button variant="ghost" type="button" class="button" @click="isTypeModalOpen = false">Cancel</Button>
+          <Button variant="ghost" type="submit" class="button">Add Type</Button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -469,6 +495,7 @@ import { useForm } from 'vee-validate'
   const isEditable = ref(false);
 
   //For pop ups
+  const isTypeModalOpen = ref(false);
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
   // Set up the filter options
@@ -477,7 +504,7 @@ import { useForm } from 'vee-validate'
   { value: 'id-desc', label: 'Product ID: Descending' },
   { value: 'name-asc', label: 'Product Name: A to Z' },
   { value: 'name-desc', label: 'Product Name: Z to A' },
-  
+
   ];
 
   // Filter Function
@@ -553,6 +580,14 @@ import { useForm } from 'vee-validate'
   const closeSupplierModal = () => {
     isSupplierModalOpen.value = false;
   };
+  //Open popup for adding new products
+  const openTypeModal = () => {
+    isTypeModalOpen.value = true;
+  };
+  //Close popup
+    const closeTypeModal = () => {
+    isTypeModalOpen.value = false;
+  };
   // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
@@ -567,7 +602,20 @@ import { useForm } from 'vee-validate'
     fetchProductDetails()
     closeProductModal();
   });
-
+  // Add New Product Type addNewProductType ?
+  const addNewType = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/inventory/product_type', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+    } catch (error) {
+      console.error('Add Supplier failed:', error);
+    }
+    fetchProducts();
+    closeTypeModal()
+  });
   // Add New Supplier
   const addNewSupplier = form.handleSubmit(async (values) => {
     try {
@@ -582,15 +630,39 @@ import { useForm } from 'vee-validate'
     fetchProductDetails()
     closeProductModal();
   });
+  
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
   // Define the function to handle the form submission
   const updateProduct = form.handleSubmit(async (values) => {
     // Add the selectedProductId to the body
     const updatedValues = {
-      ...values,                      // Spread the existing values
+      // ...values,                      // Spread the existing values
       update_id: selectedProductId.value,    // Add selectedProductId to the body
+      update_product_name: values.update_product_name || selectedProductName.value,
+      update_product_type: values.update_product_type || selectedProductType.value,
+      update_product_cost: values.update_product_cost || selectedCost.value,
+      update_product_stock: values.update_product_stock || selectedStock.value,
+      update_product_supplier_name: values.update_product_supplier_name,
+      update_product_warning_level: values.update_product_warning_level || selectedCritical.value,
+      update_product_commission_rate: values.update_product_commission_rate || selectedCommissionRate.value,
     };
-    
+
+    let missingFields = [];
+
+    // Check if any field is still blank after checking both sources (values and v-models)
+    if (!updatedValues.update_product_name) missingFields.push("Product Name");
+    if (!updatedValues.update_product_type) missingFields.push("Product Type");
+    if (!updatedValues.update_product_cost) missingFields.push("Product Cost");
+    if (!updatedValues.update_product_stock) missingFields.push("Product Stock");
+    if (!updatedValues.update_product_warning_level) missingFields.push("Product Warning Level");
+    if (!updatedValues.update_product_commission_rate) missingFields.push("Product Commission Rate");
+
+    // If any required fields are missing, prompt the user and do not send the request
+    if (missingFields.length > 0) {
+      alert(`Missing data for: ${missingFields.join(", ")}`);
+      return;  // Stop the function here to prevent sending the request
+    }
+
     console.log("BRO WHAT THE HECK");
     try {
       const response = await $fetch('/api/inventory/product', {
@@ -604,11 +676,12 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-    // filtered.sort((a, b) => a.id - b.id);
+
+    location.reload();  // This will reload the current page
     fetchProductDetails();
     closeProductModal();
+    resetSelected();
   });
-
 
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
@@ -657,11 +730,6 @@ import { useForm } from 'vee-validate'
     }
   }
   fetchProductDetails()
-  
-  // Load Tables
-  // Filter products based on the selected option in the dropdown
-
-	
 
   // Get Status For Table
   function getStockStatus(product) {
@@ -685,7 +753,25 @@ import { useForm } from 'vee-validate'
     selectedStock.value = product.StockinProduct
     selectedCritical.value = product.critical_level
     selectedCommissionRate.value = product.commission
+    console.log("New Select")
+    console.log(selectedProductId.value)
+    console.log(selectedProductName.value)
+    console.log(selectedProductType.value)
+    console.log(selectedCost.value)
+    console.log(selectedStock.value)
+    console.log(selectedCritical.value)
+    console.log(selectedCommissionRate.value)
   };
+  function resetSelected() {
+    // Reset selected values
+    selectedProductId.value = "";
+    selectedProductName.value = "";
+    selectedProductType.value = "";
+    selectedCost.value = "";
+    selectedStock.value = "";
+    selectedCritical.value = "";
+    selectedCommissionRate.value = "";
+  }
   
 </script>
 
