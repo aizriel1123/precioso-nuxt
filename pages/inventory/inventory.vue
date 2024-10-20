@@ -627,8 +627,9 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Add Supplier failed:', error);
     }
-    fetchProductDetails()
-    closeProductModal();
+    fetchSuppliers();
+    fetchProductDetails();
+    closeSupplierModal();
   });
   
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
