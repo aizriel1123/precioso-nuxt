@@ -6,18 +6,6 @@
       <div class="flex-components">
         <div class="left-side">
           <!-- Dropdown for selecting sales -->
-          <Select v-model="selectedReport">
-            <SelectTrigger class="dropdown-trigger">
-              <SelectValue placeholder="Select Report" value="individual-sales"/>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="individual-sales">Individual Sales</SelectItem>
-                <SelectItem value="total-sales">Total Sales</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
           <Select v-model="selectedPeriod">
             <SelectTrigger class="dropdown-trigger">
               <SelectValue placeholder="Past 24 hours" />
@@ -33,7 +21,7 @@
           </Select>
 
           <!-- Search input -->
-          <Input placeholder="Find Report" class="input-search" />
+          <Input placeholder="Find Report by Goods/Client/Therapist" v-model="searchQuery" class="input-search" />
         </div>
       </div>
 
@@ -44,7 +32,7 @@
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Products Availed</TableHead>
+                <TableHead>Goods Availed</TableHead>
                 <TableHead>Client Name</TableHead>
                 <TableHead>Therapist Name</TableHead>
                 <TableHead>Type</TableHead>
@@ -59,7 +47,7 @@
                 :key="report.date" 
               >
                 <TableCell>{{ report.date }}</TableCell>
-                <TableCell>{{ report['products-availed'] }}</TableCell>
+                <TableCell>{{ report['goods-availed'] }}</TableCell>
                 <TableCell>{{ report['client-name'] }}</TableCell>
                 <TableCell>{{ report['therapist-name'] }}</TableCell>
                 <TableCell>{{ report.type }}</TableCell>
@@ -115,52 +103,15 @@
 
       <!-- Edit Selected Product container -->
       <div class="container-selectedtransaction">
-        <div v-if="selectedReport === 'individual-sales'">
-          <h2>Transaction Information</h2>
-
-          <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Time</TableHead>
-                  <TableCell>10/16/2024</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead>Products Availed</TableHead>
-                  <TableCell>Vitamin C Serum</TableCell>
-                </TableRow>  
-                <TableRow>
-                  <TableHead>Client Name</TableHead>
-                  <TableCell>Mary Joy</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Therapist Name</TableHead>
-                  <TableCell>Abdul Khan</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableCell>Product</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Total Sale</TableHead>
-                  <TableCell>250.00</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Mode of Payment</TableHead>
-                  <TableCell>Cash</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Commission Re.</TableHead>
-                  <TableCell>10%</TableCell>
-                </TableRow> 
-              </TableHeader>
-            </Table>
-        </div>
-
-        <div v-else-if="selectedReport === 'total-sales'" class="container-total-sales">
           <h2>Sales Chart</h2>
 
           <div class="chart-container">
-            <AreaChart :data="data" index="name" :categories="['Revenue', 'Bookings']" />
+            <template v-if="DisplayChart">
+              <AreaChart :data="chartData" index="day" :categories="['Revenue']" />
+            </template>
+            <template v-else>
+              <p>Cannot Display Sales Chart for Daily Transactions</p>
+            </template>
           </div>
 
           <h3> Summary </h3>
@@ -169,27 +120,25 @@
               <TableHeader>
                 <TableRow>
                   <TableHead>Total Revenue</TableHead>
-                  <TableCell>100000</TableCell>
+                  <TableCell>₱ {{ totalRevenue }}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableHead>Total Bookings</TableHead>
-                  <TableCell>245</TableCell>
+                  <TableCell>{{ totalBookings }}</TableCell>
                 </TableRow>  
                 <TableRow>
                   <TableHead>Top Product</TableHead>
-                  <TableCell>Green Toner</TableCell>
+                  <TableCell>{{ topProduct }}</TableCell>
                 </TableRow> 
                 <TableRow>
                   <TableHead>Top Service</TableHead>
-                  <TableCell>Carbon Peel</TableCell>
+                  <TableCell>{{ topService }}</TableCell>
                 </TableRow> 
               </TableHeader>
             </Table>
           </div>
-
         </div>
       </div>
-    </div>
     </div>
 </template>
 
@@ -199,52 +148,66 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import { Input } from '@/components/ui/input'
 import { AreaChart } from '@/components/ui/chart-area'
+import {ref, computed } from 'vue'
 
 
 //Sample data for Individual Sales
 const salesReport = ref([
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-10-11', 'products-availed': 100, 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Individual Sales', sales: 500, mop: 'Cash', commission: 15 }
-
+{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-19', 'goods-availed': 'Serum', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-19', 'goods-availed': 'Cleansing Gel', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-9-30', 'goods-availed': 'Serum', 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-1', 'goods-availed': 'Toner', 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-9-18', 'goods-availed': 'Manicure', 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-9-17', 'goods-availed': 'Cleansing Gel', 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-14', 'goods-availed': 'Serum, Cleansing Gel', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-14', 'goods-availed': 'Serum', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-14', 'goods-availed': 'Serum', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2024-10-15', 'goods-availed': 'Serum, Cleansing Gel', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2022-10-11', 'goods-availed': 'Skin Consultation', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2022-10-12', 'goods-availed': 'Skin Consultation', 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2022-10-1', 'goods-availed': 'Moisturizing Lotion', 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-3-20', 'goods-availed': 'Serum', 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
+{ date: '2023-6-30', 'goods-availed': 'Moisturizing Lotion', 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 }
 ]);
 
-//Sample data for Total Sales
-const data = [
-  { name: 'Jan', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Feb', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Mar', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Apr', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'May', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Jun', Revenue: Math.floor(Math.random() * 2000) + 500},
-  { name: 'Jul', Revenue: Math.floor(Math.random() * 2000) + 500},
-]
-
 //Defauls values for inputs/selects
-const selectedReport = ref('individual-sales');
-const searchTerm = ref('');
+const searchQuery = ref('');
 const selectedPeriod = ref('past-24-hours');
+
+//Filter by time period
+const filteredReports = computed(() => {
+  const now = new Date(); // Current date and time
+
+  // Calculat start date based on selected period
+  let startDate;
+  if (selectedPeriod.value === 'past-24-hours') {
+    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // Subtract 24 hours
+  } else if (selectedPeriod.value === 'past-7-days') {
+    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Subtract 7 days
+  } else if (selectedPeriod.value === 'past-30-days') {
+    startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Subtract 30 days
+  }
+
+  // Filter reports based on date
+  let reports = salesReport.value;
+  if (startDate) {
+    reports = reports.filter(report => new Date(report.date) >= startDate);
+  }
+
+  // Filter reports based on the search query
+  return reports.filter(report =>
+    ['goods-availed', 'client-name', 'therapist-name']
+      .some(key => report[key].toLowerCase().includes(searchQuery.value.toLowerCase()))
+  );
+});
+
 
 //For pagination
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
-
-// Filter products based on the selected option in dropdown
-const filteredReports = computed(() => {
-  return salesReport.value.filter(report => 
-    report.type.toLowerCase() && 
-    JSON.stringify(report).toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
-});
 
 // Pagination
 const paginatedReports = computed(() => {
@@ -259,6 +222,71 @@ function handlePageChange(newPage) {
   currentPage.value = newPage
 }
 
+//Chart
+const DisplayChart = computed(() => {
+  return selectedPeriod.value !== 'past-24-hours';
+});
+
+const chartData = computed(() => {
+  const dailyData = {};
+
+  filteredReports.value.forEach((report) => {
+    const reportDate = new Date(report.date);
+    const day = reportDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    // Initialize the day if not yet present
+    if (!dailyData[day]) {
+      dailyData[day] = {
+        day: day,
+        Revenue: 0,
+      };
+    }
+
+    // Add to the revenue and booking count for this day
+    dailyData[day].Revenue += report.sales;
+  });
+
+  // Convert the object to an array for the chart component
+  return Object.values(dailyData);
+
+});
+
+
+
+
+
+//Summary Table
+//Total Revenue
+const totalRevenue = computed(() => {
+  return filteredReports.value.reduce((acc, report) => acc + report.sales, 0);
+});
+
+//Total Bookings
+const totalBookings = computed(() => {
+  return filteredReports.value.length;
+});
+
+//Top Product
+const topProduct = computed(() => {
+  const productCount = {};
+  filteredReports.value.forEach((report) => {
+    if (report.type === 'Product') {
+      productCount[report['goods-availed']] = (productCount[report['goods-availed']] || 0) + 1;
+    }
+  });
+  return Object.keys(productCount).reduce((a, b) => (productCount[a] > productCount[b] ? a : b), '');
+});
+
+//Top Service
+const topService = computed(() => {
+  const serviceCount = {};
+  filteredReports.value.forEach((report) => {
+    if (report.type === 'Service') {
+      serviceCount[report['goods-availed']] = (serviceCount[report['goods-availed']] || 0) + 1;
+    }
+  });
+  return Object.keys(serviceCount).reduce((a, b) => (serviceCount[a] > serviceCount[b] ? a : b), '');
+});
 </script>
 
 <style>
@@ -346,7 +374,7 @@ h3 {
 
 /* Search input */
 .input-search {
-  width: 250px;
+  width: 400px;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -372,7 +400,7 @@ h3 {
   flex-grow: 1;
 }
 
-/* Pagination (might remove)  */
+/* Pagination
 .pagination-wrapper {
   display: flex;
   justify-content: center;
@@ -387,7 +415,7 @@ h3 {
   gap: 8px;
 }
 
-/* Pagination (might remove)  */
+/* Pagination
 .pagination-button {
   width: 40px;
   height: 40px;
@@ -438,9 +466,8 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 400px; /* Adjust this value based on your chart size */
+  height: 400px;
   width: 100%;
   margin-left: -20px;
 }
-
 </style>
