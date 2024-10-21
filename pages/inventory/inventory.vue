@@ -139,7 +139,7 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
-        <form id="update_product_panel" @submit.prevent="updateProduct" >
+        <form id="update_product_panel"  >
           <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
@@ -256,13 +256,125 @@
 
 
           <div class="action-buttons">
-            <Button variant="ghost" type="button" class="cancel-button">Cancel</Button>
-            <Button variant="ghost" type="submit">Save Changes</Button>
+            <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+    <!-- Popup to Add New Product Tyoe -->
+    <div v-if="isEditModalOpen" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="selected-product-title">Edit Existing Product</h2>
+
+        <form @submit.prevent="editExistingProduct">
+          <FormField v-slot="{ componentField }" name="edited_product_name">
+              <FormItem>
+                <FormLabel>Product Name</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" />
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <!-- Dynamic Drop Down For Product Type -->
+          <FormField v-slot="{ componentField }" name="edited_product_type">
+            <FormItem>
+              <FormLabel>Product Type</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField" v-model="selectedProductType" >
+                  <SelectTrigger class="dropdown-trigger" >
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        
+                        {{ productType.type }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_product_cost">
+              <FormItem>
+                <FormLabel>Product Cost</FormLabel>
+                <FormControl>
+                  <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="selectedCost"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+          </FormField>
+          
+          <FormField v-slot="{ componentField }" name="edited_stock_level">
+              <FormItem>
+                <FormLabel>Stock</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="selectedStock"/>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="supplier_name">
+            <FormItem>
+                <FormLabel>Supplier Name</FormLabel>
+                <FormControl>
+                  <Select>
+                    <SelectTrigger class="dropdown-trigger">
+                      <SelectValue placeholder="Supplier Name" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                      <!-- Dynamically create SelectItem for each supplier -->
+                        <SelectItem 
+                          v-for="supplier in supplier_names" 
+                          :key="supplier.supplier_name" 
+                          :value="supplier.supplier_name"
+                        >
+                          {{ supplier.supplier_name }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_warning_level">
+              <FormItem>
+                <FormLabel>Warning Level</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical"/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_commission_rate">
+              <FormItem>
+                <FormLabel>Commission Rate</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <div class="modal-action-buttons">
+            <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
+            <Button variant="ghost" type="submit" >Edit Product</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
   <!-- Popup to Add New Product Tyoe -->
   <div v-if="isTypeModalOpen" class="modal-overlay">
@@ -495,6 +607,7 @@ import { useForm } from 'vee-validate'
   const isEditable = ref(false);
 
   //For pop ups
+  const isEditModalOpen = ref(false)
   const isTypeModalOpen = ref(false);
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
@@ -561,6 +674,19 @@ import { useForm } from 'vee-validate'
     if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
   };
 
+    //Open popup for editing existing products
+    const openEditModal = () => {
+
+    //Take data from the right container
+
+    isEditModalOpen.value = true;
+  };
+
+  //Close popup
+  const closeEditModal = () => {
+    isEditModalOpen.value = false;
+  };
+
   //Open popup for adding new products
   const openProductModal = () => {
     isProductModalOpen.value = true;
@@ -588,6 +714,9 @@ import { useForm } from 'vee-validate'
     const closeTypeModal = () => {
     isTypeModalOpen.value = false;
   };
+
+
+
   // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
@@ -634,18 +763,18 @@ import { useForm } from 'vee-validate'
   
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
   // Define the function to handle the form submission
-  const updateProduct = form.handleSubmit(async (values) => {
+  const editExistingProduct = form.handleSubmit(async (values) => {
     // Add the selectedProductId to the body
     const updatedValues = {
       // ...values,                      // Spread the existing values
       update_id: selectedProductId.value,    // Add selectedProductId to the body
-      update_product_name: values.update_product_name || selectedProductName.value,
-      update_product_type: values.update_product_type || selectedProductType.value,
-      update_product_cost: values.update_product_cost || selectedCost.value,
-      update_product_stock: values.update_product_stock || selectedStock.value,
-      update_product_supplier_name: values.update_product_supplier_name,
-      update_product_warning_level: values.update_product_warning_level || selectedCritical.value,
-      update_product_commission_rate: values.update_product_commission_rate || selectedCommissionRate.value,
+      update_product_name: values.edited_product_name || selectedProductName.value, 
+      update_product_type: values.edited_product_type || selectedProductType.value,
+      update_product_cost: values.edited_product_cost || selectedCost.value,
+      update_product_stock: values.edited_product_stock || selectedStock.value,
+      update_product_supplier_name: values.edited_product_supplier_name,
+      update_product_warning_level: values.edited_product_warning_level || selectedCritical.value,
+      update_product_commission_rate: values.edited_product_commission_rate || selectedCommissionRate.value,
     };
 
     let missingFields = [];
@@ -677,8 +806,7 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-
-    location.reload();  // This will reload the current page
+    
     fetchProductDetails();
     closeProductModal();
     resetSelected();
