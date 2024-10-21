@@ -656,19 +656,7 @@ import { useForm } from 'vee-validate'
 
     return filtered;
   });
-// Example stock ID, replace with actual stock ID
-  // // Filter products based on the selected option in dropdown
-  // const filteredProducts = computed(() => {
-  //   return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
-  // });
 
-  // //Pagination not working
-  // const paginatedProducts = computed(() => {
-  //   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  //   return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
-  // });
-  // const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-  // const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
   // Open new page 
   const onPageChange = newPage => {
     if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
@@ -714,8 +702,6 @@ import { useForm } from 'vee-validate'
     const closeTypeModal = () => {
     isTypeModalOpen.value = false;
   };
-
-
 
   // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
@@ -806,7 +792,7 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-    
+
     fetchProductDetails();
     closeProductModal();
     resetSelected();

@@ -19,6 +19,7 @@
             <Search class="h-4 w-4 mr-2" />
             Search
           </Button>
+
           <Select v-model="selectedFilter">
             <SelectTrigger class="w-[180px]">
               <SelectValue placeholder="Select filter" />
@@ -58,7 +59,7 @@
         <div class="w-3/4 grid grid-cols-4 gap-4">
           <div v-for="product in displayedProducts" :key="product.id" class="border p-4 rounded-lg shadow">
             <h3 class="font-bold">{{ product.name }}</h3>
-            <p>₱{{ product.price.toFixed(2) }}</p>
+            <p>₱{{ product.cost || product.price }}</p>
             <div class="flex items-center mt-2 justify-between">
               <Button @click="addToCart(product)" class="bg-navy-blue text-white">Add</Button>
               <div class="flex items-center">
@@ -87,7 +88,7 @@
             </div>
             <ul class="mt-4 space-y-2">
               <li v-for="item in cart" :key="item.id">
-                {{ item.name }} 
+                {{ item.name }}
                 <span class="float-right">
                   {{ item.quantity }}x
                 </span>
@@ -112,114 +113,108 @@
             </div>
             <div class="mt-4 flex space-x-2">
               <Button @click="cancelOrder" class="w-1/2 bg-red-500 text-white hover:bg-red-600">Cancel Order</Button>
-              <Button @click="confirmOrder" class="w-1/2 bg-green-500 text-white hover:bg-green-600">Confirm Order</Button>
+              <Button @click="confirmOrder" class="w-1/2 bg-green-500 text-white hover:bg-green-600">Confirm
+                Order</Button>
             </div>
           </div>
         </div>
       </div>
 
       <div class="mt-4 flex justify-center items-center">
-      <Pagination 
-        v-slot="{ page }" 
-        :total="totalProducts" 
-        :sibling-count="1" 
-        show-edges 
-        :default-page="currentPage"
-        :per-page="itemsPerPage"
-        @update:page="handlePageChange"
-      >
-        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-          <PaginationFirst />
-          <PaginationPrev />
-          <template v-for="(item, index) in items">
-            <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-              <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                {{ item.value }}
-              </Button>
-            </PaginationListItem>
-            <PaginationEllipsis v-else :key="item.type" :index="index" />
-          </template>
-          <PaginationNext />
-          <PaginationLast />
-        </PaginationList>
-      </Pagination>
+        <Pagination v-slot="{ page }" :total="totalProducts" :sibling-count="1" show-edges :default-page="currentPage"
+          :per-page="itemsPerPage" @update:page="handlePageChange">
+          <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+            <PaginationFirst />
+            <PaginationPrev />
+            <template v-for="(item, index) in items">
+              <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
+                  {{ item.value }}
+                </Button>
+              </PaginationListItem>
+              <PaginationEllipsis v-else :key="item.type" :index="index" />
+            </template>
+            <PaginationNext />
+            <PaginationLast />
+          </PaginationList>
+        </Pagination>
+      </div>
+
+      <Dialog :open="showConfirmDialog" @update:open="showConfirmDialog = $event">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Order</DialogTitle>
+            <DialogDescription>
+              <h3 class="font-bold mb-2">Order Details:</h3>
+              <ul class="mb-4">
+                <li v-for="item in cart" :key="item.id">
+                  {{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}
+                </li>
+              </ul>
+              <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
+              <p>Tax: ₱{{ tax.toFixed(2) }}</p>
+              <p>Discount: ₱{{ discount.toFixed(2) }}</p>
+              <p class="font-bold">Total: ₱{{ total.toFixed(2) }}</p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button @click="showConfirmDialog = false">Cancel</Button>
+            <Button @click="handleConfirmOrder" class="bg-green-500 text-white">Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Checkout Successful</DialogTitle>
+            <DialogDescription>Your transaction has been placed successfully.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button @click="showSuccessDialog = false">Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog :open="showDiscountDialog" @update:open="showDiscountDialog = $event">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Discount</DialogTitle>
+          </DialogHeader>
+          <div class="mb-4">
+            <Select v-model="selectedDiscount">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select Discount Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="promo">Promo Discount</SelectItem>
+                <SelectItem value="custom">Custom Discount</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div v-if="selectedDiscount === 'promo'" class="mb-4">
+            <Select v-model="selectedPromoDiscount">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select Promo Discount" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="promo in promoDiscounts" :key="promo.id" :value="promo.id">
+                  {{ promo.name }} - {{ promo.value }}%
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div v-else-if="selectedDiscount === 'custom'" class="mb-4">
+            <Input v-model="customDiscountValue" type="number" placeholder="Enter discount percentage" />
+          </div>
+          <DialogFooter>
+            <Button @click="cancelDiscountDialog">Cancel</Button>
+            <Button @click="applyDiscount" class="bg-green-500 text-white">Apply Discount</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-
-    <Dialog :open="showConfirmDialog" @update:open="showConfirmDialog = $event">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirm Order</DialogTitle>
-          <DialogDescription>
-            <h3 class="font-bold mb-2">Order Details:</h3>
-            <ul class="mb-4">
-              <li v-for="item in cart" :key="item.id">
-                {{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}
-              </li>
-            </ul>
-            <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
-            <p>Tax: ₱{{ tax.toFixed(2) }}</p>
-            <p>Discount: ₱{{ discount.toFixed(2) }}</p>
-            <p class="font-bold">Total: ₱{{ total.toFixed(2) }}</p>
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button @click="showConfirmDialog = false">Cancel</Button>
-          <Button @click="handleConfirmOrder" class="bg-green-500 text-white">Confirm</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Checkout Successful</DialogTitle>
-          <DialogDescription>Your transaction has been placed successfully.</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button @click="showSuccessDialog = false">Done</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog :open="showDiscountDialog" @update:open="showDiscountDialog = $event">
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Add Discount</DialogTitle>
-      </DialogHeader>
-      <div class="mb-4">
-        <Select v-model="selectedDiscount">
-          <SelectTrigger class="w-full">
-            <SelectValue placeholder="Select Discount Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="promo">Promo Discount</SelectItem>
-            <SelectItem value="custom">Custom Discount</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div v-if="selectedDiscount === 'promo'" class="mb-4">
-        <Select v-model="selectedPromoDiscount">
-          <SelectTrigger class="w-full">
-            <SelectValue placeholder="Select Promo Discount" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="promo in promoDiscounts" :key="promo.id" :value="promo.id">
-              {{ promo.name }} - {{ promo.value }}%
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div v-else-if="selectedDiscount === 'custom'" class="mb-4">
-        <Input v-model="customDiscountValue" type="number" placeholder="Enter discount percentage" />
-      </div>
-      <DialogFooter>
-        <Button @click="cancelDiscountDialog">Cancel</Button>
-        <Button @click="applyDiscount" class="bg-green-500 text-white">Apply Discount</Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
   </div>
-</div>
 </template>
 
 <script setup>
@@ -244,7 +239,7 @@ const selectedReservationId = ref(null)
 const paymentMode = ref(null)
 const orderId = ref('123456')
 const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-
+const product_types = ref([]);
 const selectedDiscount = ref(null)
 const selectedPromoDiscount = ref(null)
 const customDiscountValue = ref(null)
@@ -317,8 +312,36 @@ const filterOptions = [
   { value: 'name_z_a', label: 'Name: Z to A' },
 ]
 
+//-------------------------------------------TEST CODE---------------------------------------------
+let testProduct = {
+  services: [],
+  products: [],
+  promos: [],
+}
+
+async function fetchItems() {
+  try {
+    const response = await $fetch('/api/pos/product', {
+      method: 'GET',
+      headers: { "Content-Type": "application/json" },
+    });
+
+    // this things works?
+
+    testProduct = response
+    // console.log(response)
+  } catch (error) {
+    console.error('Failed to fetch items:');
+  }
+}
+
+// THis thing needs to be async para ma load yung data ng testProduct
+// If wala, the var will be empty
+await fetchItems()
+//------------------------------------------TEST CODE----------------------------------------------
+
 const filteredProducts = computed(() => {
-  let filtered = allProducts[selectedCategory.value].filter(product =>
+  let filtered = testProduct[selectedCategory.value].filter(product =>
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 
@@ -363,7 +386,7 @@ const discount = computed(() => {
 
 const total = computed(() => subtotal.value + tax.value - discount.value)
 
-const selectedReservation = computed(() => 
+const selectedReservation = computed(() =>
   reservations.find(r => r.id === selectedReservationId.value)
 )
 
@@ -494,10 +517,32 @@ watch(selectedCategory, () => {
 watch(searchQuery, () => {
   currentPage.value = 1
 })
+
+
+async function fetchProducts() {
+  try {
+    const response = await $fetch('/api/inventory/product', {
+      method: 'GET',
+
+    });
+    product_types.value = response;
+    console.log(response)
+    return response
+  } catch (error) {
+    console.error('Get Product Type failed:');
+    return {}
+  }
+}
+fetchProducts();
 </script>
 
 <style scoped>
 .bg-navy-blue {
   background-color: #1e2a3b;
+}
+
+/* Dropdown select trigger */
+.dropdown-trigger {
+  width: 200px;
 }
 </style>
