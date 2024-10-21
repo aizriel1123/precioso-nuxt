@@ -256,13 +256,98 @@
 
 
           <div class="action-buttons">
-            <Button variant="ghost" type="button" class="cancel-button">Cancel</Button>
-            <Button variant="ghost" type="submit">Save Changes</Button>
+            <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+    <!-- Popup to Add New Product Tyoe -->
+    <div v-if="isEditModalOpen" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="selected-product-title">Edit Existing Product</h2>
+
+        <form @submit.prevent="editExistingProduct">
+          <FormField v-slot="{ componentField }" name="edited_product_name">
+              <FormItem>
+                <FormLabel>Product Name</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" />
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_product_cost">
+              <FormItem>
+                <FormLabel>Product Cost</FormLabel>
+                <FormControl>
+                  <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="selectedCost"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+          </FormField>
+          
+          <FormField v-slot="{ componentField }" name="edited_stock_level">
+              <FormItem>
+                <FormLabel>Stock</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="selectedStock"/>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="supplier_name">
+            <FormItem>
+                <FormLabel>Supplier Name</FormLabel>
+                <FormControl>
+                  <Select>
+                    <SelectTrigger class="dropdown-trigger">
+                      <SelectValue placeholder="Supplier Name" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                      <!-- Dynamically create SelectItem for each supplier -->
+                        <SelectItem 
+                          v-for="supplier in supplier_names" 
+                          :key="supplier.supplier_name" 
+                          :value="supplier.supplier_name"
+                        >
+                          {{ supplier.supplier_name }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_warning_level">
+              <FormItem>
+                <FormLabel>Warning Level</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical"/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_commission_rate">
+              <FormItem>
+                <FormLabel>Commission Rate</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <div class="modal-action-buttons">
+            <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
+            <Button variant="ghost" type="submit" >Edit Product</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
   <!-- Popup to Add New Product Tyoe -->
   <div v-if="isTypeModalOpen" class="modal-overlay">
@@ -495,6 +580,7 @@ import { useForm } from 'vee-validate'
   const isEditable = ref(false);
 
   //For pop ups
+  const isEditModalOpen = ref(false)
   const isTypeModalOpen = ref(false);
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
@@ -561,6 +647,19 @@ import { useForm } from 'vee-validate'
     if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
   };
 
+    //Open popup for editing existing products
+    const openEditModal = () => {
+
+    //Take data from the right container
+
+    isEditModalOpen.value = true;
+  };
+
+  //Close popup
+  const closeEditModal = () => {
+    isEditModalOpen.value = false;
+  };
+
   //Open popup for adding new products
   const openProductModal = () => {
     isProductModalOpen.value = true;
@@ -588,6 +687,13 @@ import { useForm } from 'vee-validate'
     const closeTypeModal = () => {
     isTypeModalOpen.value = false;
   };
+
+  const editExistingProduct = () => {
+    //Add logic here for editing product :( 
+    closeEditModal();
+  }
+
+
   // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
