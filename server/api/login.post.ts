@@ -17,7 +17,11 @@ export default defineEventHandler(async (event) => {
   // if (!user || !(await bcrypt.compare(password, user.password))) {
   //   throw createError({ statusCode: 401, message: 'Invalid username or password' });
   // }
-  console.log("You have mogged-in")
+
+  if (!user || user.password !== password) {
+    throw createError({ statusCode: 401, message: 'Invalid username or password' });
+  }
+  console.log("You have mogged-in");
 
   const token = jwt.sign({ userId: user?.id }, 'your-secret-key', { expiresIn: '1h' });
 
