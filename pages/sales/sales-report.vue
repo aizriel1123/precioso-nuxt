@@ -43,8 +43,8 @@
             </TableHeader>
             <TableBody>
               <TableRow 
-                v-for="report in paginatedReports" 
-                :key="report.date" 
+                v-for="(report,index) in paginatedReports" 
+                :key="`${report.date}-${index}`"  
               >
                 <TableCell>{{ report.date }}</TableCell>
                 <TableCell>{{ report['goods-availed'] }}</TableCell>
