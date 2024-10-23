@@ -61,7 +61,7 @@
   import { ref, computed } from 'vue'
   
   // Sample Therapist Data
-  const therapists = ref([
+  let therapists = ref([
     // { id: 1, firstName: 'Anna', lastName: 'Lee', birthdate: '9AM - 5PM', gender: 'Female', email: 'anna.lee@example.com', contactInfo: '0917-123-4567' },
     // { id: 2, firstName: 'Ben', lastName: 'Wong', birthdate: '9AM - 5PM', gender: 'Male', email: 'ben.wong@example.com', contactInfo: '0918-456-7890' },
     // { id: 3, firstName: 'Chris', lastName: 'Taylor', birthdate: '9AM - 5PM', gender: 'Other', email: 'chris.taylor@example.com', contactInfo: '0922-333-4444' }
@@ -113,7 +113,7 @@
 
     });
     therapists.value = response;
-    console.log(response)
+    // console.log(response)
     return response
   } catch (error) {
     console.error('Get Therapist failed:', error);

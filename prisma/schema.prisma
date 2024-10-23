@@ -89,8 +89,10 @@ model Product {
   commission      Decimal          @db.Decimal(6, 2)
   product_type_id Int
   critical_level  Int?
+  supplier_id     Int
   Defect          Defect[]
   ProductType     ProductType      @relation(fields: [product_type_id], references: [id], onUpdate: Restrict)
+  Supplier        Supplier         @relation(fields: [supplier_id], references: [id])
   ProductsSold    ProductsSold[]
   StockinProduct  StockinProduct[]
 }
@@ -191,14 +193,15 @@ model Supplier {
   supplier_contactnum String    @db.VarChar(20)
   supplier_address    String    @db.VarChar(150)
   Stockin             Stockin[]
+  Product             Product[]
 
   @@unique([supplier_name, supplier_address])
 }
 
 model Therapist {
   id              Int             @id @default(autoincrement())
-  first_name      String?         @unique @db.VarChar(255)
-  last_name       String?         @unique @db.VarChar(255)
+  first_name      String?         @db.VarChar(255)
+  last_name       String?         @db.VarChar(255)
   dob             DateTime?       @default(now()) @db.Date
   contactinfo     String?         @db.VarChar(50)
   schedule        String?         @db.VarChar(20)
@@ -210,6 +213,8 @@ model Therapist {
   Gender          Gender          @relation(fields: [gender_id], references: [id])
   TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
   Transaction     Transaction[]
+
+  @@unique([first_name, last_name])
 }
 
 model TherapistStatus {
