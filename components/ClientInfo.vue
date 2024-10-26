@@ -2,27 +2,92 @@
   <div class="client-info">
     <h2>Client Information</h2>
     <div class="info-content">
-      <label for="clientID">Client ID:</label>
-      <input type="text" id="clientID" v-model="client.id" disabled />
+      <form @submit.prevent="addNewClient" class="form" noValidate>
+        <FormField v-slot="{ componentField }" name="first_name">
+          <FormItem>
+            <FormLabel>First Name:</FormLabel>
+            <FormControl>
+              <Input 
+                type="text" 
+                placeholder="Enter First Name" 
+                v-bind="componentField" 
+                v-model="client.firstName" 
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
 
-      <label for="firstName">First Name:</label>
-      <input type="text" id="firstName" v-model="client.firstName" @input="trackChanges" />
+        <FormField v-slot="{ componentField }" name="last_name">
+          <FormItem>
+            <FormLabel>Last Name:</FormLabel>
+            <FormControl>
+              <Input 
+                type="text" 
+                placeholder="Enter Last Name" 
+                v-bind="componentField" 
+                v-model="client.lastName" 
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
 
-      <label for="lastName">Last Name:</label>
-      <input type="text" id="lastName" v-model="client.lastName" @input="trackChanges" />
+        <FormField v-slot="{ componentField }" name="date_of_birth">
+          <FormItem>
+            <FormLabel>Date of Birth:</FormLabel>
+            <FormControl>
+              <Input 
+                type="date" 
+                placeholder="Enter Date of Birth" 
+                v-bind="componentField" 
+                v-model="client.dateOfBirth" 
+                class="thin-input" 
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
 
-      <label for="dateOfBirth">Date of Birth:</label>
-      <input type="date" id="dateOfBirth" v-model="client.dateOfBirth" @input="trackChanges" />
+        <FormField v-slot="{ componentField }" name="gender">
+          <FormItem>
+            <FormLabel>Gender:</FormLabel>
+            <FormControl>
+              <Select 
+                v-bind="componentField" 
+                v-model="client.gender" 
+                class="custom-select"
+              >
+                <SelectTrigger class="dropdown-trigger">
+                  <SelectValue 
+                    class="select-placeholder" 
+                    placeholder="Select an option" 
+                  />
+                </SelectTrigger>
+                <SelectContent class="select-content">
+                  <SelectGroup>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItem>
+        </FormField>
 
-      <label for="gender">Gender:</label>
-      <select id="gender" v-model="client.gender" @change="trackChanges">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label for="contactInfo">Contact Information:</label>
-      <input type="text" id="contactInfo" v-model="client.contactInfo" @input="trackChanges" />
+        <FormField v-slot="{ componentField }" name="contact_information">
+          <FormItem>
+            <FormLabel>Contact Information:</FormLabel>
+            <FormControl>
+              <Input 
+                type="text" 
+                placeholder="Enter Contact Information" 
+                v-bind="componentField" 
+                v-model="client.contactInfo" 
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
+        
+      </form>
     </div>
 
     <div class="transactions-section">
@@ -47,11 +112,11 @@
       </table>
     </div>
 
-    <!-- Static Save and Cancel Buttons -->
     <div class="button-container" v-if="hasChanges">
-      <button @click="saveChanges">Save</button>
-      <button @click="cancelEdit">Cancel</button>
+          <button type="submit">Save</button>
+          <button type="button" @click="cancelEdit">Cancel</button>
     </div>
+
   </div>
 </template>
 
@@ -106,8 +171,8 @@ const cancelEdit = () => {
   border-radius: 5px;
   display: flex;
   flex-direction: column;
-  height: 100%; /* Full height of the container */
-  overflow: hidden; /* Prevent overflow from spilling */
+  height: 100%;
+  overflow: hidden;
   position: relative;
 }
 
@@ -121,26 +186,14 @@ h2 {
   display: flex;
   flex-direction: column;
   padding: 20px;
-  overflow-y: auto; /* Enable vertical scrolling */
-  flex: 1; /* Allow this section to take up available space */
-}
-
-label {
-  margin-top: 10px;
-}
-
-input,
-select {
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .transactions-section {
   padding: 20px;
   overflow-y: auto;
-  max-height: 200px; /* Optional: Limit the height of the transaction section */
+  max-height: 200px;
 }
 
 .transactions-table {
@@ -160,23 +213,58 @@ select {
 }
 
 .button-container {
-  position: sticky;
-  bottom: 0;
-  background-color: white; /* Match background to avoid overlap issues */
-  padding: 10px 0;
+  margin-top: 10px;
   display: flex;
   justify-content: center;
-  border-top: 1px solid #ccc;
 }
 
 button {
   padding: 10px 15px;
+  margin: 0 5px;
   border: none;
   border-radius: 4px;
   background-color: black;
   color: white;
   cursor: pointer;
-  margin: 0 5px;
+}
+
+.dropdown-trigger {
+  border: 1px solid rgb(206, 206, 206); 
+  border-radius: 4px;
+  padding: 8px;
+  background-color: white; 
+}
+
+.select-placeholder {
+  color: black; 
+  opacity: 1; 
+}
+
+
+.select-content, .select-item {
+  color: black;
+}
+
+.dropdown-trigger:focus {
+  outline: 1px solid gray;
+}
+
+.thin-input {
+  width: 150px;    
+  padding: 4px 6px; 
+  border: 1px solid rgb(206, 206, 206); 
+  border-radius: 4px;
+  background-color: white;
+}
+
+
+.thin-input::placeholder {
+  color: black;
+  font-size: 14px;
+}
+
+
+.thin-input:focus {
+  outline: 2px solid black;
 }
 </style>
-
