@@ -160,13 +160,22 @@
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  />
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  disabled/>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_type">
+            <FormItem>
+              <FormLabel>Product Type</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Enter Product Type" v-bind="componentField" v-model="selectedProductType"  disabled/>
               </FormControl>
             </FormItem>
           </FormField>
 
           <!-- Remember this 1 -->
-          <FormField v-slot="{ componentField }" name="update_product_type">
+          <!-- <FormField v-slot="{ componentField }" name="update_product_type">
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
@@ -175,9 +184,9 @@
                     <SelectValue placeholder="Select an option" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectGroup>
+                    <SelectGroup> -->
                       <!-- Dynamically create SelectItem for each product -->
-                      <SelectItem 
+                      <!-- <SelectItem 
                         v-for="productType in product_types" 
                         :key="productType.type" 
                         :value="productType.type"
@@ -190,13 +199,13 @@
                 </Select>
               </FormControl>
             </FormItem>
-          </FormField>
+          </FormField> -->
 
           <FormField v-slot="{ componentField }" name="update_product_cost">
             <FormItem>
               <FormLabel>Product Cost</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost"/>
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -205,42 +214,25 @@
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock"/>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
-
-          <!-- Remember this 2 -->
+          
           <FormField v-slot="{ componentField }" name="update_product_supplier_name">
-          <FormItem>
+            <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="dropdown-trigger">
-                    <SelectValue placeholder="Supplier Name" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                    <!-- Dynamically create SelectItem for each supplier -->
-                      <SelectItem 
-                        v-for="supplier in supplier_names" 
-                        :key="supplier.supplier_name" 
-                        :value="supplier.supplier_name"
-                      >
-                        {{ supplier.supplier_name }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Input type="number" min="0" placeholder="Enter Supplier Name" v-bind="componentField" v-model="selectedSupplierName" disabled/>
               </FormControl>
             </FormItem>
-        </FormField>
+          </FormField>
 
           <FormField v-slot="{ componentField }" name="update_product_warning_level">
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" />
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -249,7 +241,7 @@
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
+                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -323,8 +315,8 @@
                 </FormControl>
               </FormItem>
           </FormField>
-
-          <FormField v-slot="{ componentField }" name="supplier_name">
+          
+          <FormField v-slot="{ componentField }" name="edited_supplier_name">
             <FormItem>
                 <FormLabel>Supplier Name</FormLabel>
                 <FormControl>
@@ -792,7 +784,7 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-
+    closeEditModal();
     fetchProductDetails();
     closeProductModal();
     resetSelected();
@@ -863,7 +855,7 @@ import { useForm } from 'vee-validate'
   const selectProduct = (product) => {
     selectedProductId.value = product.id;
     selectedProductName.value = product.name;
-    selectedProductType.value = product.type;
+    selectedProductType.value = product.ProductType;
     selectedCost.value = product.cost
     selectedStock.value = product.StockinProduct
     selectedCritical.value = product.critical_level

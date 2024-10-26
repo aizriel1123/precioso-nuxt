@@ -59,7 +59,7 @@
         <div class="w-3/4 grid grid-cols-4 gap-4">
           <div v-for="product in displayedProducts" :key="product.id" class="border p-4 rounded-lg shadow">
             <h3 class="font-bold">{{ product.name }}</h3>
-            <p>₱{{ product.cost || product.price }}</p>
+            <p>₱{{ parseFloat(product.cost || product.price)}}</p>
             <div class="flex items-center mt-2 justify-between">
               <Button @click="addToCart(product)" class="bg-navy-blue text-white">Add</Button>
               <div class="flex items-center">
@@ -254,51 +254,6 @@ const promoDiscounts = [
   { id: 3, name: 'First-Time Customer', value: 20 },
 ]
 
-const allProducts = {
-  services: [
-    { id: 's1', name: 'Facial Treatment', price: 500 },
-    { id: 's2', name: 'Massage Therapy', price: 700 },
-    { id: 's3', name: 'Hair Styling', price: 300 },
-    { id: 's4', name: 'Manicure', price: 200 },
-    { id: 's5', name: 'Pedicure', price: 250 },
-    { id: 's6', name: 'Waxing', price: 350 },
-    { id: 's7', name: 'Skin Consultation', price: 150 },
-    { id: 's8', name: 'Makeup Application', price: 400 },
-    { id: 's9', name: 'Body Scrub', price: 450 },
-    { id: 's10', name: 'Aromatherapy', price: 550 },
-    { id: 's11', name: 'Hot Stone Massage', price: 800 },
-    { id: 's12', name: 'Reflexology', price: 300 },
-  ],
-  products: [
-    { id: 'p1', name: 'Vitamin C Serum', price: 250 },
-    { id: 'p2', name: '3-in-1 Cream', price: 250 },
-    { id: 'p3', name: 'Green Toner', price: 250 },
-    { id: 'p4', name: 'ABC Serum', price: 250 },
-    { id: 'p5', name: 'Moisturizing Lotion', price: 200 },
-    { id: 'p6', name: 'Sunscreen SPF 50', price: 300 },
-    { id: 'p7', name: 'Cleansing Gel', price: 180 },
-    { id: 'p8', name: 'Night Cream', price: 280 },
-    { id: 'p9', name: 'Eye Cream', price: 220 },
-    { id: 'p10', name: 'Face Mask', price: 150 },
-    { id: 'p11', name: 'Body Lotion', price: 270 },
-    { id: 'p12', name: 'Lip Balm', price: 100 },
-  ],
-  promos: [
-    { id: 'pr1', name: 'Summer Package', price: 800 },
-    { id: 'pr2', name: 'Couple Spa Day', price: 1200 },
-    { id: 'pr3', name: 'Beauty Box Set', price: 500 },
-    { id: 'pr4', name: 'Skincare Starter Kit', price: 600 },
-    { id: 'pr5', name: 'Hair Care Bundle', price: 450 },
-    { id: 'pr6', name: 'Nail Polish Set', price: 300 },
-    { id: 'pr7', name: 'Mask Collection', price: 350 },
-    { id: 'pr8', name: 'Anti-Aging Package', price: 900 },
-    { id: 'pr9', name: 'Wellness Package', price: 1000 },
-    { id: 'pr10', name: 'Bridal Beauty Set', price: 1500 },
-    { id: 'pr11', name: 'Men\'s Grooming Kit', price: 550 },
-    { id: 'pr12', name: 'Teen Skincare Bundle', price: 400 },
-  ],
-}
-
 const reservations = [
   { id: 'r1', clientName: 'John Doe', therapistName: 'Jane Smith' },
   { id: 'r2', clientName: 'Alice Johnson', therapistName: 'Bob Williams' },
@@ -313,7 +268,7 @@ const filterOptions = [
 ]
 
 //-------------------------------------------TEST CODE---------------------------------------------
-let testProduct = {
+let dropDownItems = {
   services: [],
   products: [],
   promos: [],
@@ -326,22 +281,20 @@ async function fetchItems() {
       headers: { "Content-Type": "application/json" },
     });
 
-    // this things works?
-
-    testProduct = response
+    dropDownItems = response
     // console.log(response)
   } catch (error) {
     console.error('Failed to fetch items:');
   }
 }
 
-// THis thing needs to be async para ma load yung data ng testProduct
+// THis thing needs to be async para ma load yung data ng dropDownItems
 // If wala, the var will be empty
 await fetchItems()
 //------------------------------------------TEST CODE----------------------------------------------
 
 const filteredProducts = computed(() => {
-  let filtered = testProduct[selectedCategory.value].filter(product =>
+  let filtered = dropDownItems[selectedCategory.value].filter(product =>
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 
@@ -371,7 +324,7 @@ const totalPages = computed(() => {
 })
 
 const subtotal = computed(() => {
-  return cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  return cart.value.reduce((sum, item) => sum + (item.price ? parseFloat(item.price) : parseFloat(item.cost)) * item.quantity, 0)
 })
 
 const tax = computed(() => subtotal.value * 0.1)
