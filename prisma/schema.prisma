@@ -14,13 +14,6 @@ model Account {
   therapist_id Int
   type_id      Int
   Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
-  AccountType  AccountType @relation(fields: [type_id], references: [id], onUpdate: Restrict)
-}
-
-model AccountType {
-  id      Int       @id @default(autoincrement())
-  type    String    @unique @db.VarChar(50)
-  Account Account[]
 }
 
 model Appointment {
@@ -241,7 +234,6 @@ model Transaction {
   // therapist_id       Int
   mode_of_payment_id Int
   appointment_id     Int
-  notes              String?
   ProductsSold       ProductsSold[]
   PromoTransaction   PromoTransaction[]
   // Client             Client             @relation(fields: [client_id], references: [id])
