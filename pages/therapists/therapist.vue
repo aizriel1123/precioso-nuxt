@@ -3,9 +3,21 @@
     <Navbar />
 
     <div class="therapist-info-container">
-      <TherapistTable class="therapist-table" @select-therapist="selectTherapist" :therapists="therapists" />
-      <TherapistInfo v-if="selectedTherapist" :therapist="selectedTherapist" class="therapist-info" />
-      <AddTherapist v-else class="add-therapist" @therapistAdded="addNewTherapist" />
+      <TherapistTable 
+        class="therapist-table" 
+        @select-therapist="selectTherapist" 
+        :therapists="therapists" 
+      />
+      <TherapistInfo 
+        v-if="selectedTherapist" 
+        :therapist="selectedTherapist" 
+        class="therapist-info" 
+      />
+      <AddTherapist 
+        v-else 
+        class="add-therapist" 
+        @therapistAdded="addNewTherapist" 
+      />
     </div>
   </div>
 </template>
@@ -31,22 +43,23 @@ const addNewTherapist = form.handleSubmit(async (values) => {
     const response = await $fetch('/api/therapist/therapist', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: values,
+      body: JSON.stringify(values), // Ensure values are stringified
     });
+    // Optionally, you might want to refresh the therapists list after adding a new therapist
+    fetchTherapists(); // If you have a method to fetch the updated list
   } catch (error) {
     console.error('Add Therapist failed:', error);
   }
-  closeProductModal();
 });
 
 const clearSelection = (event) => {
+  // Check if the click target is outside the therapist table and therapist info
   const isClickInsideTableOrTherapistInfo = event.target.closest('.therapist-table') || event.target.closest('.therapist-info')
   if (!isClickInsideTableOrTherapistInfo) {
-    selectedTherapist.value = null
+    selectedTherapist.value = null // Clear selection
   }
 }
 </script>
-
 <style scoped>
 .therapist-info-container {
   display: flex;
@@ -55,15 +68,11 @@ const clearSelection = (event) => {
 }
 
 .therapist-table {
-  flex: 0 0 70%; /* Takes 70% of space */
+  flex: 0 0 70%; /* Takes 70% of space /
 }
 
-.add-therapist {
-  flex: 0 0 30%; /* Takes 30% of space */
-}
-
-.therapist-info {
-  flex: 0 0 30%; /* Takes 30% of space */
+.add-therapist, .therapist-info {
+  flex: 0 0 30%; / Takes 30% of space */
 }
 
 @media (max-width: 768px) {

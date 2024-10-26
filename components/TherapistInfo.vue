@@ -35,7 +35,7 @@
       <form @submit.prevent="updateTherapist" >
           <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
-              <FormLabel>Product ID</FormLabel>
+              <FormLabel>Therapist ID</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
@@ -109,6 +109,8 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useForm } from 'vee-validate';
+const form = useForm();
 
 const props = defineProps({
   therapist: {
@@ -145,35 +147,36 @@ watch(
 const saveChanges = () => {
   console.log('Changes saved:', props.therapist)
   hasChanges.value = false
+  updateTherapist();
 }
 
 const cancelEdit = () => {
   hasChanges.value = false
 }
 
-// const updateTherapist = form.handleSubmit(async (values) => {
-//     // Add the selectedTherapistId to the body
-//     const updatedValues = {
-//       ...values,                      // Spread the existing values
-//       update_id: selectedTherapistId.value,    // Add selectedProductId to the body
-//     };
+const updateTherapist = form.handleSubmit(async (values) => {
+    // Add the selectedTherapistId to the body
+    const updatedValues = {
+      ...values,                      // Spread the existing values
+      update_id: selectedTherapistId.value,    // Add selectedTherapistId to the body
+    };
     
-//     try {
-//       const response = await $fetch('/api/therapist/therapist', {
-//         method: 'PUT',
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(updatedValues), // Stringify the combined object
-//       });
+    try {
+      const response = await $fetch('/api/therapist/therapist', {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedValues), // Stringify the combined object
+      });
 
-//       console.log(response);
-//     } catch (error) {
-//       console.error('Update Therapist failed:', error);
-//     }
-//     // filtered.sort((a, b) => a.id - b.id);
-//     // Add here fetchTherapist() function when it works
+      console.log(response);
+    } catch (error) {
+      console.error('Update Therapist failed:', error);
+    }
+    // filtered.sort((a, b) => a.id - b.id);
+    // Add here fetchTherapist() function when it works
 
-//     closeProductModal();
-//   });
+    // closeProductModal();
+  });
 </script>
 
 <style scoped>

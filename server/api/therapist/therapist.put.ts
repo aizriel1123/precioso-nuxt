@@ -11,45 +11,38 @@ export default defineEventHandler(async (event) => {
     }
 
     // Update the product using Prisma ORM
-    const updatedTherapist = await prisma.therapist.update({
+    const updateTherapist = await prisma.therapist.update({
       where: {
         id: body.update_id,
       },
       data: {
         // id: body.update_id,
-        name: body.update_product_name,
-        cost: body.update_product_cost,
-        commission: body.update_product_commission_rate,
-        critical_level: body.update_product_warning_level,
-        ProductType: {
+        first_name: body.update_first_name,
+        last_name: body.update_last_name,
+        dob: body.update_dob,
+        contactinfo: body.update_contactinfo,
+        schedule: body.update_schedule,
+        Gender: {
           connect: {
-            type: body.update_product_type, // Assuming type is unique
+            gender: body.update_gender,
           },
         },
-        StockinProduct: {
-          update: {
-            where: {
-              id_product_id: {
-                product_id: body.update_id, // This part is correct
-                id: body.update_id,          // Here, 'id' is missing or not correctly passed
-              },
-            },
-            data: {
-              quantity: body.update_product_stock,
-            },
+        TherapistStatus: {
+          connect: {
+            status: body.update_status,
           },
         },
       },
     });
 
-    console.log(updatedTherapist)
+    console.log(updateTherapist)
     console.log("No")
 
     // Return the updated product details
     return {
       statusCode: 200,
       message: 'Product updated successfully',
-      data: updatedTherapist,
+      data: updateTherapist,
     };
   } catch (error) {
     // Handle errors and return error response
