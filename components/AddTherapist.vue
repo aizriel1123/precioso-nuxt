@@ -59,20 +59,27 @@
         <FormItem>
           <FormLabel>Date of Birth:</FormLabel>
           <FormControl>
-            <Input type="date" placeholder="Enter Date Of Birth" v-bind="componentField" v-model="newTherapist.dateOfBirth"/>
+            <Input 
+              type="date" 
+              placeholder="Enter Date of Birth" 
+              v-bind="componentField" 
+              v-model="newTherapist.dateOfBirth" 
+              class="thin-input" 
+            />
           </FormControl>
         </FormItem>
       </FormField>
+
 
       <FormField v-slot="{ componentField }" name="gender">
         <FormItem>
           <FormLabel>Gender:</FormLabel>
           <FormControl>
-            <Select v-bind="componentField" v-model="newTherapist.gender">
+            <Select v-bind="componentField" v-model="newTherapist.gender" class="custom-select">
               <SelectTrigger class="dropdown-trigger">
-                <SelectValue placeholder="Select an option" />
+                <SelectValue class="select-placeholder" placeholder="Select an option" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent class="select-content">
                 <SelectGroup>
                   <SelectItem value="Male">Male</SelectItem>
                   <SelectItem value="Female">Female</SelectItem>
@@ -88,11 +95,11 @@
         <FormItem>
           <FormLabel>Status:</FormLabel>
           <FormControl>
-            <Select v-bind="componentField" v-model="newTherapist.therapistStatus">
+            <Select v-bind="componentField" v-model="newTherapist.therapistStatus" class="custom-select">
               <SelectTrigger class="dropdown-trigger">
-                <SelectValue placeholder="Select an option" />
+                <SelectValue class="select-placeholder" placeholder="Select an option" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent class="select-content">
                 <SelectGroup>
                   <SelectItem value="Available">Available</SelectItem>
                   <SelectItem value="Unavailable">Unavailable</SelectItem>
@@ -106,6 +113,7 @@
           </FormControl>
         </FormItem>
       </FormField>
+
 
       <FormField v-slot="{ componentField }" name="schedule">
         <FormItem>
@@ -173,6 +181,29 @@ const addNewTherapist = form.handleSubmit(async (values) => {
   justify-content: space-between;
 }
 
+.dropdown-trigger {
+  border: 1px solid rgb(206, 206, 206); 
+  border-radius: 4px;
+  padding: 8px;
+  background-color: white; 
+}
+
+
+.select-placeholder {
+  color: black; 
+  opacity: 1; 
+}
+
+
+.select-content, .select-item {
+  color: black;
+}
+
+
+.dropdown-trigger:focus {
+  outline: 1px solid gray;
+}
+
 h2 {
   text-align: center;
   font-size: 20px;
@@ -208,5 +239,24 @@ button {
   background-color: black;
   color: white;
   cursor: pointer;
+}
+
+.thin-input {
+  width: 150px;    
+  padding: 4px 6px; 
+  border: 1px solid rgb(206, 206, 206); 
+  border-radius: 4px;
+  background-color: white;
+}
+
+
+.thin-input::placeholder {
+  color: black;
+  font-size: 14px;
+}
+
+
+.thin-input:focus {
+  outline: 2px solid black;
 }
 </style>
