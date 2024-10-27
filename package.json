@@ -13,6 +13,7 @@
   "dependencies": {
     "@prisma/nuxt": "^0.0.35",
     "@radix-ui/react-alert-dialog": "^1.1.2",
+    "@shadcn/ui": "^0.0.4",
     "@unovis/ts": "^1.4.4",
     "@unovis/vue": "^1.4.4",
     "@vee-validate/zod": "^4.13.2",
