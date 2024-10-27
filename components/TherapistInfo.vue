@@ -67,6 +67,29 @@
             </FormItem>
           </FormField>
 
+          <FormField v-slot="{ componentField }" name="therapist_status">
+            <FormItem>
+              <FormLabel>Status:</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField" v-model="newTherapist.therapistStatus" class="custom-select">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue class="select-placeholder" placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent class="select-content">
+                    <SelectGroup>
+                      <SelectItem value="Available">Available</SelectItem>
+                      <SelectItem value="Unavailable">Unavailable</SelectItem>
+                      <SelectItem value="Busy">Busy</SelectItem>
+                      <SelectItem value="Not Busy">Not Busy</SelectItem>
+                      <SelectItem value="Occupied">Occupied</SelectItem>
+                      <!-- Delete the last 3 options when you can -->
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
           <FormField v-slot="{ componentField }" name="update_schedule">
             <FormItem>
               <FormLabel>Schedule</FormLabel>
@@ -75,6 +98,16 @@
               </FormControl>
             </FormItem>
           </FormField>
+
+          <FormField v-slot="{ componentField }" name="contact_information">
+            <FormItem>
+              <FormLabel>Contact Information:</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Enter Contact Information" v-bind="componentField" v-model="newTherapist.contactInfo"/>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
       </form>
     </div>
 
