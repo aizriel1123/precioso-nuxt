@@ -167,7 +167,6 @@ const seed = async () => {
         username: account.username,
         password: account.password,
         therapist_id: account.therapist_id,
-        type_id: account.type_id,
       },
       select: {
         id: true,
