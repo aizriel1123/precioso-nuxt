@@ -4,13 +4,7 @@
 
     <!-- Search and Filter Container -->
     <div class="search-filter-container">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search by name"
-        class="search-bar"
-        @input="filterClients"
-      />
+      <input type="text" v-model="searchQuery" placeholder="Search by name" class="search-bar" @input="filterClients" />
 
       <div class="filter-container">
         <select v-model="selectedFilter" @change="applyFilter" class="filter-dropdown">
@@ -41,11 +35,11 @@
         <tbody>
           <tr v-for="client in filteredClients" :key="client.id" @click="selectClient(client)">
             <td>{{ client.id }}</td>
-            <td>{{ client.lastName }}</td>
-            <td>{{ client.firstName }}</td>
-            <td>{{ client.dateOfBirth }}</td>
-            <td>{{ client.gender }}</td>
-            <td>{{ client.contactInfo }}</td>
+            <td>{{ client.last_name }}</td>
+            <td>{{ client.first_name }}</td>
+            <td>{{ new Date(client.dob).toLocaleDateString() }}</td>
+            <td>{{ client.Gender.gender }}</td>
+            <td>{{ client.contact_info }}</td>
           </tr>
         </tbody>
       </table>
@@ -56,27 +50,26 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const clients = ref([
+let clients = ref([
   // Sample client data
-  { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
-  { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
-  { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
-  { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
-  { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
-  { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
-  { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
-  { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
-  { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
-  { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
-  { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
-  { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
-  { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
-  { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
-  { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
-  { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
-  
-  
+  // { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
+  // { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
+  // { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
+  // { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
+  // { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
+  // { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
+  // { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
+  // { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
+  // { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
+  // { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
+  // { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
+  // { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
+  // { id: 1, lastName: 'Doe', firstName: 'John', dateOfBirth: '1990-01-01', gender: 'Male', contactInfo: '123-456-7890' },
+  // { id: 2, lastName: 'Smith', firstName: 'Jane', dateOfBirth: '1992-05-10', gender: 'Female', contactInfo: '987-654-3210' },
+  // { id: 3, lastName: 'Johnson', firstName: 'Alice', dateOfBirth: '1988-08-15', gender: 'Female', contactInfo: '456-789-0123' },
+  // { id: 4, lastName: 'Taylor', firstName: 'Chris', dateOfBirth: '1995-12-22', gender: 'Other', contactInfo: '555-123-4567' },
 ])
+fetchClients();
 
 // States for search and filter
 const searchQuery = ref('')
@@ -123,6 +116,22 @@ const filteredClients = computed(() => {
   return result
 })
 
+async function fetchClients() {
+  try {
+    const response = await $fetch('/api/client/client', {
+      method: 'GET',
+
+    });
+    clients.value = response;
+    console.log(response)
+    return response
+  } catch (error) {
+    console.error('Get Client failed:', error);
+    return {}
+  }
+}
+
+
 // Event to select a client and pass to parent
 const emit = defineEmits(['selectClient'])
 const selectClient = (client) => {
@@ -139,22 +148,30 @@ const selectClient = (client) => {
 }
 
 .table-title {
-  font-size: 24px; /* Set a larger font size */
-  font-weight: bold; /* Make the font bold */
-  margin: 0 0 10px; /* Add some margin below the title */
-  text-align: center; /* Center align the title */
+  font-size: 24px;
+  /* Set a larger font size */
+  font-weight: bold;
+  /* Make the font bold */
+  margin: 0 0 10px;
+  /* Add some margin below the title */
+  text-align: center;
+  /* Center align the title */
 }
 
 .search-filter-container {
-  display: flex; /* Use flexbox for side-by-side layout */
-  gap: 10px; /* Space between the input and select elements */
-  margin-bottom: 10px; /* Add some space below the search/filter container */
+  display: flex;
+  /* Use flexbox for side-by-side layout */
+  gap: 10px;
+  /* Space between the input and select elements */
+  margin-bottom: 10px;
+  /* Add some space below the search/filter container */
 }
 
 .search-bar {
   border: 2px solid black;
   border-radius: 10px;
-  flex: 1; /* Allow the search bar to grow */
+  flex: 1;
+  /* Allow the search bar to grow */
   padding: 8px;
 }
 
@@ -165,29 +182,42 @@ const selectClient = (client) => {
 }
 
 .table-container {
-  max-height: 700px; /* Set a maximum height for the container */
-  overflow-y: auto; /* Enable vertical scrolling */
-  border: 1px solid #ddd; /* Optional: add a border for better visibility */
-  margin-top: 10px; /* Add some space above the table container */
+  max-height: 700px;
+  /* Set a maximum height for the container */
+  overflow-y: auto;
+  /* Enable vertical scrolling */
+  border: 1px solid #ddd;
+  /* Optional: add a border for better visibility */
+  margin-top: 10px;
+  /* Add some space above the table container */
 }
 
 table {
-  width: 100%; /* Make the table take the full width */
-  border-collapse: collapse; /* Collapse table borders */
+  width: 100%;
+  /* Make the table take the full width */
+  border-collapse: collapse;
+  /* Collapse table borders */
 }
 
-th, td {
-  padding: 12px; /* Add some padding */
-  text-align: center; /* Align text to the center */
-  border-bottom: 1px solid #ddd; /* Add bottom border for rows */
+th,
+td {
+  padding: 12px;
+  /* Add some padding */
+  text-align: center;
+  /* Align text to the center */
+  border-bottom: 1px solid #ddd;
+  /* Add bottom border for rows */
 }
 
 th {
-  background-color: #f2f2f2; /* Optional: add a background color for the header */
+  background-color: #f2f2f2;
+  /* Optional: add a background color for the header */
 }
 
 tr:hover {
-  background-color: #f5f5f5; /* Highlight row on hover */
-  cursor: pointer; /* Change cursor on hover */
+  background-color: #f5f5f5;
+  /* Highlight row on hover */
+  cursor: pointer;
+  /* Change cursor on hover */
 }
 </style>

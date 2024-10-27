@@ -1,4 +1,5 @@
 import prisma from "~/lib/prisma";
+import { createClient } from "~/lib/utils";
 
 const genders = [
   { gender: "Male" },
@@ -41,19 +42,16 @@ const therapists = [
     first_name: "therapist6",
     gender_id: 1,
     status_id: 1,
-    type_id: 1,
   },
   {
     first_name: "therapist7",
     gender_id: 2,
     status_id: 1,
-    type_id: 1,
   },
   {
     first_name: "therapist8",
     gender_id: 1,
     status_id: 1,
-    type_id: 1,
   },
 ]
 
@@ -82,6 +80,25 @@ const accounts = [
     therapist_id: 1,
     type_id: 1,
   }
+]
+
+const clients = [
+  { last_name: 'Doe', first_name: 'John', date_of_birth: '1990-01-01', gender: 'Male', contact_information: '123-456-7890' },
+  { last_name: 'Smith', first_name: 'Jane', date_of_birth: '1992-05-10', gender: 'Female', contact_information: '987-654-3210' },
+  { last_name: 'Johnson', first_name: 'Alice', date_of_birth: '1988-08-15', gender: 'Female', contact_information: '456-789-0123' },
+  { last_name: 'Taylor', first_name: 'Chris', date_of_birth: '1995-12-22', gender: 'Other', contact_information: '555-123-4567' },
+  { last_name: 'Doe', first_name: 'John', date_of_birth: '1990-01-01', gender: 'Male', contact_information: '123-456-7890' },
+  { last_name: 'Smith', first_name: 'Jane', date_of_birth: '1992-05-10', gender: 'Female', contact_information: '987-654-3210' },
+  { last_name: 'Johnson', first_name: 'Alice', date_of_birth: '1988-08-15', gender: 'Female', contact_information: '456-789-0123' },
+  { last_name: 'Taylor', first_name: 'Chris', date_of_birth: '1995-12-22', gender: 'Other', contact_information: '555-123-4567' },
+  { last_name: 'Doe', first_name: 'John', date_of_birth: '1990-01-01', gender: 'Male', contact_information: '123-456-7890' },
+  { last_name: 'Smith', first_name: 'Jane', date_of_birth: '1992-05-10', gender: 'Female', contact_information: '987-654-3210' },
+  { last_name: 'Johnson', first_name: 'Alice', date_of_birth: '1988-08-15', gender: 'Female', contact_information: '456-789-0123' },
+  { last_name: 'Taylor', first_name: 'Chris', date_of_birth: '1995-12-22', gender: 'Other', contact_information: '555-123-4567' },
+  { last_name: 'Doe', first_name: 'John', date_of_birth: '1990-01-01', gender: 'Male', contact_information: '123-456-7890' },
+  { last_name: 'Smith', first_name: 'Jane', date_of_birth: '1992-05-10', gender: 'Female', contact_information: '987-654-3210' },
+  { last_name: 'Johnson', first_name: 'Alice', date_of_birth: '1988-08-15', gender: 'Female', contact_information: '456-789-0123' },
+  { last_name: 'Taylor', first_name: 'Chris', date_of_birth: '1995-12-22', gender: 'Other', contact_information: '555-123-4567' },
 ]
 
 const seed = async () => {
@@ -115,16 +132,6 @@ const seed = async () => {
     });
   }
 
-  for (const type of tType) {
-    await prisma.therapistType.upsert({
-      where: {
-        type: type.type
-      },
-      update: {},
-      create: type,
-    });
-  }
-
   for (const type of aType) {
     await prisma.accountType.upsert({
       where: {
@@ -151,7 +158,6 @@ const seed = async () => {
         first_name: therapist.first_name,
         gender_id: therapist.gender_id,
         status_id: therapist.status_id,
-        type_id: therapist.type_id,
       },
       select: {
         id: true,
@@ -183,6 +189,10 @@ const seed = async () => {
         data: account
       });
     }
+  }
+
+  for (const client of clients){
+    createClient(client);
   }
 }
 

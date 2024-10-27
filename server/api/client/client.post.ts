@@ -6,7 +6,6 @@ export default defineEventHandler(async (event) => {
     console.log(body)
 
     // Implement Validation
-
     //Convert Date of Birth to Date Format
     const dob = new Date(body.date_of_birth);
 
@@ -17,18 +16,19 @@ export default defineEventHandler(async (event) => {
             last_name: body.last_name,
             dob: dob.toISOString(),
             contact_info: body.contact_information,
-            Gender:{
-                connect:{
+            Gender: {
+                connect: {
                     gender: body.gender,
                 }
             },
-            Transaction:{
-                // Fill in with transaction details
-            }
         }
     })
+
+    return obj
+
 
     return {
         hatdog: "hehe"
     }
 });
+

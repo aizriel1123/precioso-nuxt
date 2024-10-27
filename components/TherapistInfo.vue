@@ -2,30 +2,80 @@
   <div class="therapist-info">
     <h2>Therapist Information</h2>
     <div class="info-content">
-      <label for="therapistID">Therapist ID:</label>
+      <!-- <label for="therapistID">Therapist ID:</label>
       <input type="text" id="therapistID" v-model="therapist.id" disabled />
 
       <label for="firstName">First Name:</label>
-      <input type="text" id="firstName" v-model="therapist.firstName" @input="trackChanges" />
+      <input type="text" id="firstName" v-model="therapist.first_name" @input="trackChanges" />
 
       <label for="lastName">Last Name:</label>
-      <input type="text" id="lastName" v-model="therapist.lastName" @input="trackChanges" />
+      <input type="text" id="lastName" v-model="therapist.last_name" @input="trackChanges" />
 
       <label for="schedule">Schedule:</label>
       <input type="text" id="schedule" v-model="therapist.schedule" placeholder="Enter Schedule" @input="trackChanges" />
 
       <label for="gender">Gender:</label>
-      <select id="gender" v-model="therapist.gender" @change="trackChanges">
+      <select id="gender" v-model="therapist.Gender.gender" @change="trackChanges">
         <option value="Male">Male</option>
         <option value="Female">Female</option>
         <option value="Other">Other</option>
       </select>
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" v-model="therapist.email" @input="trackChanges" />
+      <label for="gender">Status:</label>
+      <select id="gender" v-model="therapist.TherapistStatus.status" @change="trackChanges">
+        <option value="Busy">Busy</option>
+        <option value="Not Busy">Not Busy</option>
+        <option value="Available">Available</option>
+        <option value="Unavailable">Unavailable</option>
+        <option value="Occupied">Occupied</option>
+      </select>
 
       <label for="contactInfo">Contact Information:</label>
-      <input type="text" id="contactInfo" v-model="therapist.contactInfo" @input="trackChanges" />
+      <input type="text" id="contactInfo" v-model="therapist.contactinfo" @input="trackChanges" /> -->
+      <form @submit.prevent="updateTherapist" >
+          <FormField v-slot="{ componentField }" name="update_id">
+            <FormItem>
+              <FormLabel>Product ID</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Therapist ID" 
+                  v-bind="componentField" 
+                  v-model="therapist.id" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_first_name">
+            <FormItem>
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="therapist.first_name"  />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_last_name">
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="therapist.last_name"  />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_schedule">
+            <FormItem>
+              <FormLabel>Schedule</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="therapist.schedule"  />
+              </FormControl>
+            </FormItem>
+          </FormField>
+      </form>
     </div>
 
     <div class="transactions-section">
@@ -100,6 +150,30 @@ const saveChanges = () => {
 const cancelEdit = () => {
   hasChanges.value = false
 }
+
+// const updateTherapist = form.handleSubmit(async (values) => {
+//     // Add the selectedTherapistId to the body
+//     const updatedValues = {
+//       ...values,                      // Spread the existing values
+//       update_id: selectedTherapistId.value,    // Add selectedProductId to the body
+//     };
+    
+//     try {
+//       const response = await $fetch('/api/therapist/therapist', {
+//         method: 'PUT',
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(updatedValues), // Stringify the combined object
+//       });
+
+//       console.log(response);
+//     } catch (error) {
+//       console.error('Update Therapist failed:', error);
+//     }
+//     // filtered.sort((a, b) => a.id - b.id);
+//     // Add here fetchTherapist() function when it works
+
+//     closeProductModal();
+//   });
 </script>
 
 <style scoped>
