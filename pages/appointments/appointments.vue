@@ -8,6 +8,7 @@
     <div class="flex-components">
       <div class="left-side">
         <!-- Search input -->
+        <h2>{{ dateToday }}</h2>
         <Input placeholder="Search Client..." class="input_search" v-model="searchQuery"/>
         <Select v-model="selectedFilter">
         <SelectTrigger class="w-[auto]">
@@ -481,6 +482,13 @@ const form = useForm()
   const isEditModalOpen = ref(false)
   const isAppointmentModalOpen = ref(false);
 
+  //Date today
+  const date = new Date();
+  let day = date.getDate();
+  let year = date.getFullYear();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const dateToday = `${months[date.getMonth()]} ${day},${year}`;
+
   //Sample data
   const appointments = ref([
   {
@@ -684,6 +692,11 @@ function addPromo() {
   .title {
     font-size: 48px;
     font-weight: bolder;
+  }
+
+  h2 {
+    margin-top: 10px;
+    margin-right:20px;
   }
 
 
