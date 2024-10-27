@@ -132,16 +132,6 @@ const seed = async () => {
     });
   }
 
-  for (const type of aType) {
-    await prisma.accountType.upsert({
-      where: {
-        type: type.type
-      },
-      update: {},
-      create: type,
-    });
-  }
-
   for (const type of pType) {
     await prisma.productType.upsert({
       where: {
