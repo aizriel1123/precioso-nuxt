@@ -595,9 +595,6 @@ import { useForm } from 'vee-validate'
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
 
-  //Keep track whether input is editable or not
-  const isEditable = ref(false);
-
   //For pop ups
   const isEditModalOpen = ref(false)
   const isTypeModalOpen = ref(false);
@@ -656,9 +653,6 @@ import { useForm } from 'vee-validate'
 
     //Open popup for editing existing products
     const openEditModal = () => {
-
-    //Take data from the right container
-
     isEditModalOpen.value = true;
   };
 
