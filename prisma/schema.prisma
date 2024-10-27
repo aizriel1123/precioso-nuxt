@@ -12,7 +12,6 @@ model Account {
   username     String      @db.VarChar(50)
   password     String      @db.VarChar(50)
   therapist_id Int
-  type_id      Int
   Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
 }
 
@@ -25,7 +24,6 @@ model Appointment {
   service_id            Int
   promo_id              Int
   appointment_status_id Int
-  // quantity              Int               @default(1) - Not sure if this is needed
   Client                Client            @relation(fields: [client_id], references: [id])
   Therapist             Therapist         @relation(fields: [therapist_id], references: [id])
   AppointmentStatus     AppointmentStatus @relation(fields: [appointment_status_id], references: [id], onUpdate: Restrict)
@@ -48,7 +46,7 @@ model Client {
   contact_info String?       @db.VarChar(20)
   gender_id    Int?
   Gender       Gender?       @relation(fields: [gender_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  // Transaction  Transaction[]
+  Transaction  Transaction[]
   Appointment  Appointment[]
 }
 
@@ -213,7 +211,7 @@ model Therapist {
   Stockin         Stockin[]
   Gender          Gender          @relation(fields: [gender_id], references: [id])
   TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
-  // Transaction     Transaction[]
+  Transaction     Transaction[]
   Appointment     Appointment[]
 
   @@unique([first_name, last_name])
@@ -230,14 +228,14 @@ model TherapistStatus {
 model Transaction {
   id                 Int                @id @default(autoincrement())
   date               DateTime?          @db.Timestamptz(6)
-  // client_id          Int
-  // therapist_id       Int
+  client_id          Int
+  therapist_id       Int
   mode_of_payment_id Int
   appointment_id     Int
   ProductsSold       ProductsSold[]
   PromoTransaction   PromoTransaction[]
-  // Client             Client             @relation(fields: [client_id], references: [id])
-  // Therapist          Therapist          @relation(fields: [therapist_id], references: [id])
+  Client             Client             @relation(fields: [client_id], references: [id])
+  Therapist          Therapist          @relation(fields: [therapist_id], references: [id])
   ModeOfPayment      ModeOfPayment      @relation(fields: [mode_of_payment_id], references: [id])
   Appointment        Appointment        @relation(fields: [appointment_id], references: [id])
 }
