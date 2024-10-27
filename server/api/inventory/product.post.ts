@@ -24,8 +24,12 @@ export default defineEventHandler(async (event) => {
                 create:{
                     quantity: body.new_stock_level,
                 }
+            },
+            Supplier: {
+                connect: {
+                    supplier_name: body.supplier_name
+                }
             }
-            
         }
     })
     // {

@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
             type: true, // Just select the type
           }
         },
-        
+        Supplier: {
+          select: {
+            supplier_name: true, //This is so that the supplier name is true
+          }
+        }
       },
     });
 
@@ -28,6 +32,7 @@ export default defineEventHandler(async (event) => {
     const output = products.map(product => ({
       ...product,
       ProductType: product.ProductType.type, // Flatten ProductType to just its type
+      supplierName: product.Supplier.supplier_name, // Flatten ProductType to just its type
       StockinProduct: product.StockinProduct.length > 0 
         ? product.StockinProduct[0].quantity // Extract the first quantity if available
         : null, // Handle case where there's no stock

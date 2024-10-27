@@ -4,7 +4,7 @@ import { createClient } from "~/lib/utils";
 const genders = [
   { gender: "Male" },
   { gender: "Female" },
-  { gender: "N/A" },
+  { gender: "Other" },
 ];
 
 const modeOf = [
