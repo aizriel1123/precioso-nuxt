@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import NavBar from '~/components/Navbar.vue'
 import { Calendar } from "@/components/ui/calendar"
 
-import { Calendar as CalendarIcon } from 'lucide-vue' // Using Lucide's Calendar icon
+import { Calendar as CalendarIcon } from 'lucide-vue-next' // Using Lucide's Calendar icon
 
 
 const showDatePicker = ref(false);
@@ -59,29 +59,8 @@ const fetchClients = async () => {
   }
 }
 
-const addNewClient = async () => {
+const addNewClient = async (values) => {
   try {
-    // Form validation
-    if (!newClient.value.firstName || !newClient.value.lastName) {
-      alert('First name and last name are required');
-      return;
-    }
-
-    // Format date to ISO string at midnight UTC
-    const formattedDateOfBirth = newClient.value.dateOfBirth 
-      ? new Date(newClient.value.dateOfBirth + 'T00:00:00.000Z').toISOString()
-      : null;
-
-    const payload = {
-      first_name: newClient.value.firstName.trim(),
-      last_name: newClient.value.lastName.trim(),
-      dob: formattedDateOfBirth, // This will be an ISO string at midnight UTC
-      gender_id: newClient.value.gender_id,
-      contact_info: newClient.value.contact_info.trim()
-    };
-
-    console.log('Sending payload:', payload); // For debugging
-
     const response = await fetch('/api/client/client', {
       method: 'POST',
       headers: {
@@ -90,11 +69,10 @@ const addNewClient = async () => {
       body: values,
     });
 
+    const data = await response.json();
+    console.log('Server response:', data);
+
     if (!response.ok) throw new Error('Failed to add new client');
-    const newClientData = await response.json();
-    clients.value.push(newClientData);
-    resetNewClient();
-    showNewClientDialog.value = false;
     await fetchClients();
   } catch (error) {
     console.error('Error adding new client:', error);
