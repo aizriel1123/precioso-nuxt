@@ -59,6 +59,7 @@ const fetchClients = async () => {
   }
 }
 
+// Add new client
 const addNewClient = async () => {
   try {
     // Form validation
@@ -67,34 +68,46 @@ const addNewClient = async () => {
       return;
     }
 
-    // Format date to ISO string at midnight UTC
+    // Create a proper date string in YYYY-MM-DD format
+    // This ensures we're sending a properly formatted date string
     const formattedDateOfBirth = newClient.value.dateOfBirth 
-      ? new Date(newClient.value.dateOfBirth + 'T00:00:00.000Z').toISOString()
+      ? newClient.value.dateOfBirth // Since we're using input type="date", this is already in YYYY-MM-DD format
       : null;
 
     const payload = {
       first_name: newClient.value.firstName.trim(),
       last_name: newClient.value.lastName.trim(),
-      dob: formattedDateOfBirth, // This will be an ISO string at midnight UTC
+      dob: formattedDateOfBirth,
       gender_id: newClient.value.gender_id,
       contact_info: newClient.value.contact_info.trim()
     };
-
-    console.log('Sending payload:', payload); // For debugging
 
     const response = await fetch('/api/client/client', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: values,
+      body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to add new client');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Failed to add new client: ${response.statusText}`);
+    }
+
     const newClientData = await response.json();
+    
+    // Add the new client to the list
     clients.value.push(newClientData);
+    
+    // Reset form and close dialog
     resetNewClient();
     showNewClientDialog.value = false;
+    
+    // Optional: Show success message
+    alert('Client added successfully!');
+    
+    // Refresh the client list
     await fetchClients();
   } catch (error) {
     console.error('Error adding new client:', error);
@@ -363,6 +376,7 @@ onMounted(() => {
                 <label class="font-medium">Gender</label>
                 <Input v-model="selectedClient.gender" />
               </div>
+
               <div>
                 <label class="font-medium">Contact Information</label>
                 <Input v-model="selectedClient.contactInfo" />
@@ -384,7 +398,7 @@ onMounted(() => {
       </div>
     </div>
     <!-- New Client Dialog -->
-    <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
+  <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Add New Client</DialogTitle>
