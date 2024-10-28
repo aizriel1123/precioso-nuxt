@@ -11,7 +11,7 @@
         <Button variant="ghost" @click="goToRoute('/inventory/inventory')">Inventory</Button>
         <Button variant="ghost" @click="goToRoute('/services/services')">Services</Button>
         <Button variant="ghost" @click="goToRoute('/customers/customers')">Client</Button>
-        <Button variant="ghost" @click="goToRoute('/therapists/therapist')">Therapist</Button>
+        <Button variant="ghost" @click="goToRoute('/therapists/beautician')">Therapist</Button>
         <Button variant="ghost" @click="goToRoute('/suppliers/suppliers')">Suppliers</Button>
         <Button variant="ghost" @click="goToRoute('/appointments/appointments')">Appointments</Button>
       </div>

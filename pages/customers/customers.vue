@@ -66,7 +66,7 @@ const addNewClient = async (values) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: values,
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
@@ -341,6 +341,7 @@ onMounted(() => {
                 <label class="font-medium">Gender</label>
                 <Input v-model="selectedClient.gender" />
               </div>
+
               <div>
                 <label class="font-medium">Contact Information</label>
                 <Input v-model="selectedClient.contactInfo" />
@@ -362,7 +363,7 @@ onMounted(() => {
       </div>
     </div>
     <!-- New Client Dialog -->
-    <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
+  <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Add New Client</DialogTitle>
