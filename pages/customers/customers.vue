@@ -52,13 +52,7 @@ const addNewClient = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        firstName: newClient.value.firstName,
-        lastName: newClient.value.lastName,
-        dateOfBirth: newClient.value.dateOfBirth,
-        gender_id: newClient.value.gender_id,
-        contact_info: newClient.value.contact_info
-      }),
+      body: values,
     });
 
     if (!response.ok) throw new Error('Failed to add new client');
