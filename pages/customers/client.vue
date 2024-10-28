@@ -12,7 +12,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import Navbar from '@/components/Navbar.vue'
 import ClientInfo from '@/components/ClientInfo.vue'
 import ClientTable from '@/components/ClientTable.vue'
 import AddClient from '@/components/AddClient.vue'

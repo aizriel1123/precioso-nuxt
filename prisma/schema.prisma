@@ -167,19 +167,19 @@ model ServiceType {
 }
 
 model Stockin {
-  id           Int       @id @default(autoincrement())
   supplier_id  Int
   therapist_id Int
   date         DateTime? @db.Date
+  id           Int       @id @default(autoincrement())
   Supplier     Supplier  @relation(fields: [supplier_id], references: [id])
   Therapist    Therapist @relation(fields: [therapist_id], references: [id])
 }
 
 model StockinProduct {
-  id             Int      @default(autoincrement())
   product_id     Int
   quantity       Int?
   purchase_price Decimal? @db.Decimal(10, 2)
+  id             Int      @default(autoincrement())
   Product        Product  @relation(fields: [product_id], references: [id])
 
   @@id([id, product_id])
@@ -210,19 +210,12 @@ model Therapist {
   Stockin         Stockin[]
   Gender          Gender          @relation(fields: [gender_id], references: [id])
   TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
-  TherapistType   TherapistType   @relation(fields: [type_id], references: [id])
   Transaction     Transaction[]
 }
 
 model TherapistStatus {
   id        Int         @id @default(autoincrement())
   status    String      @unique @db.VarChar(50)
-  Therapist Therapist[]
-}
-
-model TherapistType {
-  id        Int         @id @default(autoincrement())
-  type      String      @unique @db.VarChar(20)
   Therapist Therapist[]
 }
 

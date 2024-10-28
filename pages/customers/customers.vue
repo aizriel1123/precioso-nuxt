@@ -6,6 +6,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import NavBar from '~/components/Navbar.vue'
+import { Calendar } from "@/components/ui/calendar"
+
+import { Calendar as CalendarIcon } from 'lucide-vue' // Using Lucide's Calendar icon
+
+
+const showDatePicker = ref(false);
+const formattedDate = computed(() => {
+  return newClient.value.dateOfBirth ? newClient.value.dateOfBirth.toLocaleDateString() : '';
+});
+
+const selectDate = (date) => {
+  newClient.value.dateOfBirth = date;
+  showDatePicker.value = false; // Close the date picker after selection
+};
+
 
 // State management
 const clients = ref([])
@@ -44,30 +59,63 @@ const fetchClients = async () => {
   }
 }
 
-// Add new client
 const addNewClient = async () => {
   try {
-    const response = await fetch('/api/client/client', { // Updated endpoint
+    // Form validation
+    if (!newClient.value.firstName || !newClient.value.lastName) {
+      alert('First name and last name are required');
+      return;
+    }
+
+    // Format date to ISO string at midnight UTC
+    const formattedDateOfBirth = newClient.value.dateOfBirth 
+      ? new Date(newClient.value.dateOfBirth + 'T00:00:00.000Z').toISOString()
+      : null;
+
+    const payload = {
+      first_name: newClient.value.firstName.trim(),
+      last_name: newClient.value.lastName.trim(),
+      dob: formattedDateOfBirth, // This will be an ISO string at midnight UTC
+      gender_id: newClient.value.gender_id,
+      contact_info: newClient.value.contact_info.trim()
+    };
+
+    console.log('Sending payload:', payload); // For debugging
+
+    const response = await fetch('/api/client/client', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        firstName: newClient.value.firstName,
-        lastName: newClient.value.lastName,
-        dateOfBirth: newClient.value.dateOfBirth,
-        gender_id: newClient.value.gender_id,
-        contact_info: newClient.value.contact_info
-      }),
+      body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to add new client');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `Failed to add new client: ${response.statusText}`);
+    }
+
     const newClientData = await response.json();
-    // Handle the newly created client data as needed
+    clients.value.push(newClientData);
+    resetNewClient();
+    showNewClientDialog.value = false;
+    await fetchClients();
   } catch (error) {
     console.error('Error adding new client:', error);
+    alert(error.message || 'Failed to add new client. Please try again.');
   }
-}
+};
+
+// Reset new client object
+const resetNewClient = () => {
+  newClient.value = {
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    gender_id: '',
+    contact_info: ''
+  };
+};
 
 // Update client
 const saveChanges = async () => {
@@ -320,10 +368,6 @@ onMounted(() => {
                 <Input v-model="selectedClient.gender" />
               </div>
               <div>
-                <label class="font-medium">Email</label>
-                <Input v-model="selectedClient.email" />
-              </div>
-              <div>
                 <label class="font-medium">Contact Information</label>
                 <Input v-model="selectedClient.contactInfo" />
               </div>
@@ -343,58 +387,56 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
     <!-- New Client Dialog -->
     <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Client</DialogTitle>
-        </DialogHeader>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="font-medium">First Name</label>
-            <Input v-model="newClient.firstName" />
-          </div>
-          <div>
-            <label class="font-medium">Last Name</label>
-            <Input v-model="newClient.lastName" />
-          </div>
-          <div>
-            <label class="font-medium">Birthdate</label>
-            <Input v-model="newClient.dateOfBirth" />
-          </div>
-          <div>
-            <label class="font-medium">Gender</label>
-            <Input v-model="newClient.gender" />
-          </div>
-          <div>
-            <label class="font-medium">Email</label>
-            <Input v-model="newClient.email" />
-          </div>
-          <div>
-            <label class="font-medium">Contact Information</label>
-            <Input v-model="newClient.contactInfo" />
-          </div>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Add New Client</DialogTitle>
+      </DialogHeader>
+      <form @submit.prevent="addNewClient" class="space-y-4">
+        <Input 
+          v-model.trim="newClient.firstName" 
+          placeholder="First Name" 
+          required
+        />
+        <Input 
+          v-model.trim="newClient.lastName" 
+          placeholder="Last Name" 
+          required
+        />
+        <Input 
+          v-model="newClient.dateOfBirth" 
+          placeholder="Date of Birth" 
+          type="date"
+        />
+        <Select v-model="newClient.gender_id">
+          <SelectTrigger>
+            <SelectValue placeholder="Select Gender" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="male">Male</SelectItem>
+            <SelectItem value="female">Female</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+        <Input 
+          v-model.trim="newClient.contact_info" 
+          placeholder="Contact Information"
+        />
+        <div class="flex justify-end gap-2 mt-4">
+          <Button 
+            type="button" 
+            variant="outline" 
+            @click="showNewClientDialog = false"
+          >
+            Cancel
+          </Button>
+          <Button type="submit">Add Client</Button>
         </div>
-        <div class="flex justify-end gap-4 mt-4">
-          <Button @click="showNewClientDialog = false" variant="outline">Cancel</Button>
-          <Button @click="addNewClient">Add Client</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </form>
+    </DialogContent>
+  </Dialog>
 
-    <!-- Success Dialog -->
-    <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog = false">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Client Information Successfully Updated</DialogTitle>
-        </DialogHeader>
-        <p>All changes to the client's information have been saved and are now up-to-date.</p>
-        <div class="flex justify-end">
-          <Button @click="showSuccessDialog = false">Done</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
 
     <!-- Booking History Dialog -->
     <Dialog :open="showTransactions" @update:open="showTransactions = false">
