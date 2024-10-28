@@ -87,14 +87,10 @@ const addNewClient = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: values,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `Failed to add new client: ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error('Failed to add new client');
     const newClientData = await response.json();
     clients.value.push(newClientData);
     resetNewClient();
