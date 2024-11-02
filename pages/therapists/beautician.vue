@@ -1,3 +1,5 @@
+
+
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -230,6 +232,7 @@ onMounted(() => {
 </script>
 
 <template>
+  
   <div class="container mx-auto py-8 px-4">
     <NavBar/>
     <div class="flex justify-between items-center mt-8 mb-8">
@@ -237,7 +240,7 @@ onMounted(() => {
       <div class="flex gap-4">
         <Input 
           v-model="searchTerm"
-          placeholder="Search therapists..." 
+          placeholder="Search therapist" 
           class="w-64" 
         />
         <Select v-model="sortOrder">

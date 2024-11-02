@@ -1,5 +1,7 @@
+<!--New POS UI-->
+
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto py-8 px-4">
     <NavBar/>
     <div class="container mx-auto p-4">
       <!-- Top Navigation Bar -->
@@ -89,16 +91,25 @@
           </div>
 
           <!-- Pagination (9 items per page) -->
-          <div class="mt-6 flex justify-center">
-            <div class="flex items-center space-x-2">
-              <Button variant="outline" @click="prevPage" :disabled="currentPage === 1">Previous</Button>
-              <div v-for="page in totalPages" :key="page" class="flex items-center">
-                <Button variant="outline" :class="{ 'bg-gray-900 text-white': currentPage === page }" @click="currentPage = page">
-                  {{ page }}
-                </Button>
-              </div>
-              <Button variant="outline" @click="nextPage" :disabled="currentPage === totalPages">Next</Button>
-            </div>
+          <!-- Pagination from Old POS -->
+          <div class="mt-4 flex justify-center items-center">
+            <Pagination v-slot="{ page }" :total="totalProducts" :sibling-count="1" show-edges :default-page="currentPage"
+              :per-page="itemsPerPage" @update:page="handlePageChange">
+              <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                <PaginationFirst />
+                <PaginationPrev />
+                <template v-for="(item, index) in items">
+                  <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                    <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
+                      {{ item.value }}
+                    </Button>
+                  </PaginationListItem>
+                  <PaginationEllipsis v-else :key="item.type" :index="index" />
+                </template>
+                <PaginationNext />
+                <PaginationLast />
+              </PaginationList>
+            </Pagination>
           </div>
         </div>
 
@@ -436,18 +447,6 @@ const displayedProducts = computed(() => {
 
 function handlePageChange(newPage) {
   currentPage.value = newPage
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
 }
 
 

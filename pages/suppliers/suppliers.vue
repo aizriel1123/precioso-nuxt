@@ -1,3 +1,5 @@
+<!--Suppliers Page-->
+
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -225,9 +227,20 @@ onMounted(() => {
       <div class="flex gap-4">
         <Input 
           v-model="searchTerm"
-          placeholder="Find Clients..." 
+          placeholder="Find supplier" 
           class="w-64" 
         />
+        <Select v-model="sortOrder">
+          <SelectTrigger class="w-48">
+            <SelectValue placeholder="Sort by..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="id-asc">ID: Ascending</SelectItem>
+            <SelectItem value="id-desc">ID: Descending</SelectItem>
+            <SelectItem value="name-asc">Name: A to Z</SelectItem>
+            <SelectItem value="name-desc">Name: Z to A</SelectItem>
+          </SelectContent>
+        </Select>
         <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
         <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
       </div>

@@ -56,3 +56,23 @@ export async function POST(request: Request) {
     });
   }
 }
+
+// Example handler for your POST request
+export default defineEventHandler(async (event) => {
+    const body = await readBody(event);
+    const { dob } = body;
+
+    // Log DOB for debugging
+    console.log('DOB Value:', dob);
+
+    // Convert and validate date
+    const dateOfBirth = new Date(dob);
+    if (isNaN(dateOfBirth.getTime())) {
+        throw new Error('Invalid date format');
+    }
+
+    // Proceed with the rest of your logic
+    const isoDate = dateOfBirth.toISOString();
+
+    // ... rest of your API logic here
+});

@@ -1,205 +1,232 @@
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import NavBar from '~/components/Navbar.vue'
-import { Calendar } from "@/components/ui/calendar"
+  <script setup>
+  import { ref, computed, onMounted } from 'vue'
+  import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+  import { Button } from '@/components/ui/button'
+  import { Input } from '@/components/ui/input'
+  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+  import NavBar from '~/components/Navbar.vue'
+  import { Calendar } from "@/components/ui/calendar"
 
-import { Calendar as CalendarIcon } from 'lucide-vue-next' // Using Lucide's Calendar icon
-
-
-const showDatePicker = ref(false);
-const formattedDate = computed(() => {
-  return newClient.value.dateOfBirth ? newClient.value.dateOfBirth.toLocaleDateString() : '';
-});
-
-const selectDate = (date) => {
-  newClient.value.dateOfBirth = date;
-  showDatePicker.value = false; // Close the date picker after selection
-};
+  import { Calendar as CalendarIcon } from 'lucide-vue' // Using Lucide's Calendar icon
 
 
-// State management
-const clients = ref([])
-const selectedClient = ref(null)
-const isEditing = ref(false)
-const showNewClientDialog = ref(false)
-const showSuccessDialog = ref(false)
-const showTransactions = ref(false)
-const sortOrder = ref('')
-const searchTerm = ref('')
-const currentPage = ref(1)
-const itemsPerPage = 12
-const isLoading = ref(true)
+  const showDatePicker = ref(false);
+  const formattedDate = computed(() => {
+    return newClient.value.dateOfBirth instanceof Date && !isNaN(newClient.value.dateOfBirth)
+      ? newClient.value.dateOfBirth.toLocaleDateString()
+      : ''; // Return an empty string if date is invalid
+  });
 
-// New client template matching Prisma schema
-const newClient = ref({
-  firstName: '',
-  lastName: '',
-  dateOfBirth: '',
-  gender_id: '',
-  contact_info: ''
-})
+  const selectDate = (date) => {
+    newClient.value.dateOfBirth = new Date(date); // Store as Date object
+    showDatePicker.value = false;
+  };
 
-// Fetch clients from API
-const fetchClients = async () => {
-  try {
-    isLoading.value = true
-    const response = await fetch('/api/client/client'); // Updated endpoint
-    if (!response.ok) throw new Error('Failed to fetch clients');
-    const data = await response.json();
-    clients.value = data;
-  } catch (error) {
-    console.error('Error fetching clients:', error);
-  } finally {
-    isLoading.value = false;
-  }
-}
+  
 
-const addNewClient = async (values) => {
-  try {
-    const response = await fetch('/api/client/client', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
 
-    const data = await response.json();
-    console.log('Server response:', data);
+  // State management
+  const clients = ref([])
+  const selectedClient = ref(null)
+  const isEditing = ref(false)
+  const showNewClientDialog = ref(false)
+  const showSuccessDialog = ref(false)
+  const showTransactions = ref(false)
+  const sortOrder = ref('')
+  const searchTerm = ref('')
+  const currentPage = ref(1)
+  const itemsPerPage = 12
+  const isLoading = ref(true)
 
-    if (!response.ok) throw new Error('Failed to add new client');
-    await fetchClients();
-  } catch (error) {
-    console.error('Error adding new client:', error);
-    alert(error.message || 'Failed to add new client. Please try again.');
-  }
-};
-
-// Reset new client object
-const resetNewClient = () => {
-  newClient.value = {
+  // New client template matching Prisma schema
+  const newClient = ref({
     firstName: '',
     lastName: '',
     dateOfBirth: '',
     gender_id: '',
     contact_info: ''
+  })
+
+  // Fetch clients from API
+  const fetchClients = async () => {
+    try {
+      isLoading.value = true
+      const response = await fetch('/api/client/client'); // Updated endpoint
+      if (!response.ok) throw new Error('Failed to fetch clients');
+      const data = await response.json();
+      clients.value = data;
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  const addNewClient = async () => {
+    try {
+      // Validate form data
+      if (!newClient.value.firstName || !newClient.value.lastName || !newClient.value.gender_id) {
+        alert('First name, last name, and gender are required');
+        return;
+      }
+
+      const payload = {
+        first_name: newClient.value.firstName.trim(),
+        last_name: newClient.value.lastName.trim(),
+        dob: new Date(newClient.value.dateOfBirth).toISOString(),
+        gender_id: newClient.value.gender_id, // Ensure this matches the ID in your database
+        contact_info: newClient.value.contact_info.trim()
+      };
+
+      const response = await fetch('/api/client/client', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Failed to add new client: ${response.statusText}`);
+      }
+
+      // Handle successful response
+      const newClientData = await response.json();
+      clients.value.push(newClientData);
+      resetNewClient();
+      showNewClientDialog.value = false;
+      alert('Client added successfully!');
+      await fetchClients(); // Refresh client list
+    } catch (error) {
+      console.error('Error adding new client:', error);
+      alert(error.message || 'Failed to add new client. Please try again.');
+    }
   };
-};
 
-// Update client
-const saveChanges = async () => {
-  try {
-    const response = await fetch(`/api/clients/${selectedClient.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        firstName: selectedClient.value.first_name,
-        lastName: selectedClient.value.last_name,
-        dateOfBirth: selectedClient.value.dob,
-        gender_id: selectedClient.value.gender_id,
-        contact_info: selectedClient.value.contact_info
+  // Reset new client object
+  const resetNewClient = () => {
+    newClient.value = {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      gender_id: '',
+      contact_info: ''
+    };
+  };
+
+  // Update client
+  const saveChanges = async () => {
+    try {
+      const response = await fetch(`/api/clients/${selectedClient.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: selectedClient.value.first_name,
+          lastName: selectedClient.value.last_name,
+          dateOfBirth: selectedClient.value.dob,
+          gender_id: selectedClient.value.gender_id,
+          contact_info: selectedClient.value.contact_info
+        })
       })
-    })
 
-    if (!response.ok) throw new Error('Failed to update client')
+      if (!response.ok) throw new Error('Failed to update client')
+      
+      await fetchClients() // Refresh client list
+      isEditing.value = false
+      showSuccessDialog.value = true
+    } catch (error) {
+      console.error('Error updating client:', error)
+    }
+  }
+
+  // Format transaction history from Prisma schema
+  const formatTransactionHistory = (transactions) => {
+    return transactions.map(transaction => ({
+      date: new Date(transaction.date).toLocaleDateString(),
+      time: new Date(transaction.date).toLocaleTimeString(),
+      assignedTherapist: `${transaction.Therapist.first_name} ${transaction.Therapist.last_name}`,
+      totalSale: transaction.Appointment.reduce((total, apt) => total + Number(apt.Service.price), 0),
+      modeOfPayment: transaction.ModeOfPayment.mode,
+      productsAvailed: transaction.Appointment.map(apt => apt.Service.name).join(', ')
+    }))
+  }
+
+  // Computed properties for filtering and sorting
+  const filteredAndSortedClients = computed(() => {
+    if (!clients.value.length) return []
     
-    await fetchClients() // Refresh client list
-    isEditing.value = false
-    showSuccessDialog.value = true
-  } catch (error) {
-    console.error('Error updating client:', error)
-  }
-}
+    let result = [...clients.value]
 
-// Format transaction history from Prisma schema
-const formatTransactionHistory = (transactions) => {
-  return transactions.map(transaction => ({
-    date: new Date(transaction.date).toLocaleDateString(),
-    time: new Date(transaction.date).toLocaleTimeString(),
-    assignedTherapist: `${transaction.Therapist.first_name} ${transaction.Therapist.last_name}`,
-    totalSale: transaction.Appointment.reduce((total, apt) => total + Number(apt.Service.price), 0),
-    modeOfPayment: transaction.ModeOfPayment.mode,
-    productsAvailed: transaction.Appointment.map(apt => apt.Service.name).join(', ')
-  }))
-}
+    if (searchTerm.value) {
+      result = result.filter(client => 
+        client.first_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+        client.last_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+        client.id.toString().includes(searchTerm.value)
+      )
+    }
 
-// Computed properties for filtering and sorting
-const filteredAndSortedClients = computed(() => {
-  if (!clients.value.length) return []
-  
-  let result = [...clients.value]
+    switch (sortOrder.value) {
+      case 'id-asc':
+        result.sort((a, b) => a.id - b.id)
+        break
+      case 'id-desc':
+        result.sort((a, b) => b.id - a.id)
+        break
+      case 'name-asc':
+        result.sort((a, b) => a.last_name.localeCompare(b.last_name))
+        break
+      case 'name-desc':
+        result.sort((a, b) => b.last_name.localeCompare(a.last_name))
+        break
+    }
 
-  if (searchTerm.value) {
-    result = result.filter(client => 
-      client.first_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      client.last_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      client.id.toString().includes(searchTerm.value)
-    )
-  }
+    return result
+  })
 
-  switch (sortOrder.value) {
-    case 'id-asc':
-      result.sort((a, b) => a.id - b.id)
-      break
-    case 'id-desc':
-      result.sort((a, b) => b.id - a.id)
-      break
-    case 'name-asc':
-      result.sort((a, b) => a.last_name.localeCompare(b.last_name))
-      break
-    case 'name-desc':
-      result.sort((a, b) => b.last_name.localeCompare(a.last_name))
-      break
+  const totalPages = computed(() => 
+    Math.ceil(filteredAndSortedClients.value.length / itemsPerPage)
+  )
+
+  const paginatedClients = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return filteredAndSortedClients.value.slice(start, end)
+  })
+
+  // Navigation methods
+  const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+      currentPage.value++
+    }
   }
 
-  return result
-})
-
-const totalPages = computed(() => 
-  Math.ceil(filteredAndSortedClients.value.length / itemsPerPage)
-)
-
-const paginatedClients = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredAndSortedClients.value.slice(start, end)
-})
-
-// Navigation methods
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
+  const previousPage = () => {
+    if (currentPage.value > 1) {
+      currentPage.value--
+    }
   }
+
+  const selectClient = (client) => {
+  selectedClient.value = { ...client }  // Create a copy of the client object
 }
 
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
+  const startEditing = () => {
+    isEditing.value = true
   }
-}
 
-const selectClient = (client) => {
-  selectedClient.value = client
-}
+  // Fetch data on component mount
+  onMounted(() => {
+    fetchClients()
+  })
+  </script>
 
-const startEditing = () => {
-  isEditing.value = true
-}
-
-// Fetch data on component mount
-onMounted(() => {
-  fetchClients()
-})
-</script>
-
-<template>
+ <template>
   <div class="container mx-auto py-8 px-4">
     <NavBar/>
     <div class="flex justify-between items-center mt-8 mb-8">
@@ -251,7 +278,7 @@ onMounted(() => {
                 <TableCell>{{ client.id }}</TableCell>
                 <TableCell>{{ client.last_name }}</TableCell>
                 <TableCell>{{ client.first_name }}</TableCell>
-                <TableCell>{{ new Date(client.dob).toLocaleDateString() }}</TableCell>
+                <TableCell>{{ client.dob ? new Date(client.dob).toLocaleDateString() : '' }}</TableCell>
                 <TableCell>{{ client.Gender?.gender }}</TableCell>
                 <TableCell>{{ client.contact_info }}</TableCell>
               </TableRow>
@@ -298,53 +325,61 @@ onMounted(() => {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <p class="font-medium">First Name</p>
-                <p>{{ selectedClient.firstName }}</p>
+                <p>{{ selectedClient.first_name }}</p>
               </div>
               <div>
                 <p class="font-medium">Last Name</p>
-                <p>{{ selectedClient.lastName }}</p>
+                <p>{{ selectedClient.last_name }}</p>
               </div>
               <div>
                 <p class="font-medium">Birthdate</p>
-                <p>{{ selectedClient.dateOfBirth }}</p>
+                <p>{{ selectedClient.dob ? new Date(selectedClient.dob).toLocaleDateString() : '' }}</p>
               </div>
               <div>
                 <p class="font-medium">Gender</p>
-                <p>{{ selectedClient.gender }}</p>
+                <p>{{ selectedClient.Gender?.gender }}</p>
               </div>
-              <div>
-                <p class="font-medium">Email</p>
-                <p>{{ selectedClient.email }}</p>
-              </div>
-              <div>
+              <div class="col-span-2">
                 <p class="font-medium">Contact Information</p>
-                <p>{{ selectedClient.contactInfo }}</p>
+                <p>{{ selectedClient.contact_info }}</p>
               </div>
             </div>
           </div>
-
+          
           <div v-else class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="font-medium">First Name</label>
-                <Input v-model="selectedClient.firstName" />
+                <Input v-model="selectedClient.first_name" />
               </div>
               <div>
                 <label class="font-medium">Last Name</label>
-                <Input v-model="selectedClient.lastName" />
+                <Input v-model="selectedClient.last_name" />
               </div>
               <div>
                 <label class="font-medium">Birthdate</label>
-                <Input v-model="selectedClient.dateOfBirth" />
+                <Input 
+                  v-model="selectedClient.dob" 
+                  type="date"
+                  :value="selectedClient.dob ? new Date(selectedClient.dob).toISOString().split('T')[0] : ''"
+                />
               </div>
               <div>
                 <label class="font-medium">Gender</label>
-                <Input v-model="selectedClient.gender" />
+                <Select v-model="selectedClient.gender_id">
+                  <SelectTrigger>
+                    <SelectValue :placeholder="selectedClient.Gender?.gender || 'Select Gender'" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Male</SelectItem>
+                    <SelectItem value="2">Female</SelectItem>
+                    <SelectItem value="3">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
-              <div>
+              <div class="col-span-2">
                 <label class="font-medium">Contact Information</label>
-                <Input v-model="selectedClient.contactInfo" />
+                <Input v-model="selectedClient.contact_info" />
               </div>
             </div>
 
@@ -362,62 +397,62 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <!-- New Client Dialog -->
-  <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Add New Client</DialogTitle>
-      </DialogHeader>
-      <form @submit.prevent="addNewClient" class="space-y-4">
-        <Input 
-          v-model.trim="newClient.firstName" 
-          placeholder="First Name" 
-          required
-        />
-        <Input 
-          v-model.trim="newClient.lastName" 
-          placeholder="Last Name" 
-          required
-        />
-        <Input 
-          v-model="newClient.dateOfBirth" 
-          placeholder="Date of Birth" 
-          type="date"
-        />
-        <Select v-model="newClient.gender_id">
-          <SelectTrigger>
-            <SelectValue placeholder="Select Gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-        <Input 
-          v-model.trim="newClient.contact_info" 
-          placeholder="Contact Information"
-        />
-        <div class="flex justify-end gap-2 mt-4">
-          <Button 
-            type="button" 
-            variant="outline" 
-            @click="showNewClientDialog = false"
-          >
-            Cancel
-          </Button>
-          <Button type="submit">Add Client</Button>
-        </div>
-      </form>
-    </DialogContent>
-  </Dialog>
 
+    <!-- New Client Dialog -->
+    <Dialog :open="showNewClientDialog" @update:open="showNewClientDialog = false">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Client</DialogTitle>
+        </DialogHeader>
+        <form @submit.prevent="addNewClient" class="space-y-4">
+          <Input 
+            v-model.trim="newClient.firstName" 
+            placeholder="First Name" 
+            required
+          />
+          <Input 
+            v-model.trim="newClient.lastName" 
+            placeholder="Last Name" 
+            required
+          />
+          <Input 
+            v-model="newClient.dateOfBirth" 
+            placeholder="Date of Birth" 
+            type="date"
+          />
+          <Select v-model="newClient.gender_id">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Male</SelectItem>
+              <SelectItem value="2">Female</SelectItem>
+              <SelectItem value="3">Other</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input 
+            v-model.trim="newClient.contact_info" 
+            placeholder="Contact Information"
+          />
+          <div class="flex justify-end gap-2 mt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              @click="showNewClientDialog = false"
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Add Client</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
 
     <!-- Booking History Dialog -->
     <Dialog :open="showTransactions" @update:open="showTransactions = false">
       <DialogContent class="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Booking History - {{ selectedClient?.firstName }} {{ selectedClient?.lastName }}</DialogTitle>
+          <DialogTitle>Booking History - {{ selectedClient?.first_name }} {{ selectedClient?.last_name }}</DialogTitle>
         </DialogHeader>
         <Table>
           <TableHeader>

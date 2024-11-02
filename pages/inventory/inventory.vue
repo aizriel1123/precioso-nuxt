@@ -1,3 +1,5 @@
+<!--Inventory Page-->
+
 <template>
   <NavBar />
 
