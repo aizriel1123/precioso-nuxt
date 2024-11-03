@@ -2,7 +2,7 @@ import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event);
-    const { first_name, last_name, dob, gender, contact_info } = body; // Assuming 'gender' is a string like "male" or "female"
+    const { first_name, last_name, dob, gender_id, contact_info } = body; // Updated field name
 
     // Log input for debugging
     console.log('Input Data:', body);
@@ -10,23 +10,29 @@ export default defineEventHandler(async (event) => {
     // Convert and validate date
     const dateOfBirth = new Date(dob);
     if (isNaN(dateOfBirth.getTime())) {
-        throw new Error('Invalid date format');
+        return {
+            status: 400,
+            message: 'Invalid date format',
+        };
     }
     const isoDate = dateOfBirth.toISOString();
 
     try {
-        // Find the gender record using the provided gender value
+        // Find the gender record using the provided gender_id
         const genderRecord = await prisma.gender.findUnique({
             where: {
-                gender: gender, // Use the gender string from input
+                id: parseInt(gender_id), // Use gender_id to fetch the record
             },
         });
 
         if (!genderRecord) {
-            throw new Error('Gender not found');
+            return {
+                status: 404,
+                message: 'Gender not found',
+            };
         }
 
-        // Example: Create a new client in the database
+        // Create a new client in the database
         const newClient = await prisma.client.create({
             data: {
                 first_name,
@@ -50,10 +56,10 @@ export default defineEventHandler(async (event) => {
         // Log the error
         console.error('Error creating client:', error);
 
-        // Handle different types of errors accordingly
+        // Return a generic error message
         return {
             status: 500,
-            message: 'Failed to create client: ' // Include error message for clarity
+            message: 'Failed to create client. Please try again later.',
         };
     }
 });
