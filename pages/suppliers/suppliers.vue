@@ -77,10 +77,11 @@ const addNewSupplier = async () => {
       body: JSON.stringify(payload),
     })
 
-    if (!response.ok) throw new Error('Failed to add new supplier')
+    if (!response.ok) throw new Error('Supplier added successfully!')
     await fetchSuppliers()
     showNewSupplierDialog.value = false
     resetNewSupplier()
+    alert('Supplier added successfully!');
   } catch (error) {
     console.error('Error adding new supplier:', error)
     alert(error.message || 'Failed to add new supplier. Please try again.')
