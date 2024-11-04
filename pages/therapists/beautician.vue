@@ -148,6 +148,11 @@ const saveChanges = async () => {
     });
 
     if (!response.ok) throw new Error('Failed to update therapist');
+
+    const therapistIndex = therapists.value.findIndex(t => t.id === selectedTherapist.value.id);
+    if (therapistIndex !== -1) {
+      therapists.value[therapistIndex] = { ...selectedTherapist.value }; // Update local state
+    }
     
     await fetchTherapists();
     alert('Therapist updated successfully!'); // Success alert
