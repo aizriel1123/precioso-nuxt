@@ -114,6 +114,7 @@ const deleteSupplier = async () => {
     
     await fetchSuppliers()
     selectedSupplier.value = null
+    alert('Supplier deleted successfully!');
     showSuccessDialog.value = true
   } catch (error) {
     console.error('Error deleting supplier:', error)
@@ -144,6 +145,7 @@ const saveChanges = async () => {
     
     await fetchSuppliers()
     isEditing.value = false
+    alert('Supplier updated successfully!');
     showSuccessDialog.value = true
   } catch (error) {
     console.error('Error updating supplier:', error)
