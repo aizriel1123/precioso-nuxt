@@ -50,14 +50,15 @@ const fetchTherapists = async () => {
 
 const addNewTherapist = async () => {
   try {
+    // Validate form data
     if (!newTherapist.value.first_name || !newTherapist.value.last_name) {
-      alert('First name and last name are required')
-      return
+      alert('First name and last name are required');
+      return;
     }
 
     const formattedDateOfBirth = newTherapist.value.dob 
       ? new Date(newTherapist.value.dob + 'T00:00:00.000Z').toISOString()
-      : null
+      : null;
 
     const payload = {
       first_name: newTherapist.value.first_name.trim(),
@@ -67,7 +68,7 @@ const addNewTherapist = async () => {
       schedule: newTherapist.value.schedule.trim(),
       gender_id: newTherapist.value.gender_id,
       status_id: newTherapist.value.status_id
-    }
+    };
 
     const response = await fetch('/api/therapist/therapist', {
       method: 'POST',
@@ -75,17 +76,23 @@ const addNewTherapist = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-    })
+    });
 
-    if (!response.ok) throw new Error('Failed to add new therapist')
-    await fetchTherapists()
-    showNewTherapistDialog.value = false
-    resetNewTherapist()
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to add therapist');
+    }
+
+    await fetchTherapists(); // Refresh therapist list
+    showNewTherapistDialog.value = false;
+    resetNewTherapist();
+    alert('Therapist added successfully!');
   } catch (error) {
-    console.error('Error adding new therapist:', error)
-    alert(error.message || 'Failed to add new therapist. Please try again.')
+    console.error('Error adding new therapist:', error);
+    alert(error instanceof Error ? error.message : 'Failed to add therapist. Please try again.');
   }
-}
+};
+
 
 // Reset new therapist object
 const resetNewTherapist = () => {
@@ -107,16 +114,17 @@ const deleteTherapist = async () => {
   try {
     const response = await fetch(`/api/therapist/therapist/${selectedTherapist.value.id}`, {
       method: 'DELETE'
-    })
+    });
 
-    if (!response.ok) throw new Error('Failed to delete therapist')
+    if (!response.ok) throw new Error('Failed to delete therapist');
     
-    await fetchTherapists()
-    selectedTherapist.value = null
-    showSuccessDialog.value = true
+    await fetchTherapists();
+    selectedTherapist.value = null;
+    alert('Therapist deleted successfully!'); // Success alert
+    showSuccessDialog.value = true;
   } catch (error) {
-    console.error('Error deleting therapist:', error)
-    alert('Failed to delete therapist. Please try again.')
+    console.error('Error deleting therapist:', error);
+    alert('Failed to delete therapist. Please try again.');
   }
 }
 
@@ -137,18 +145,20 @@ const saveChanges = async () => {
         gender_id: selectedTherapist.value.gender_id,
         status_id: selectedTherapist.value.status_id
       })
-    })
+    });
 
-    if (!response.ok) throw new Error('Failed to update therapist')
+    if (!response.ok) throw new Error('Failed to update therapist');
     
-    await fetchTherapists()
-    isEditing.value = false
-    showSuccessDialog.value = true
+    await fetchTherapists();
+    alert('Therapist updated successfully!'); // Success alert
+    isEditing.value = false;
+    showSuccessDialog.value = true;
   } catch (error) {
-    console.error('Error updating therapist:', error)
-    alert('Failed to update therapist. Please try again.')
+    console.error('Error updating therapist:', error);
+    alert('Failed to update therapist. Please try again.');
   }
 }
+
 
 // Format transaction history from Prisma schema
 const formatTransactionHistory = (transactions) => {
