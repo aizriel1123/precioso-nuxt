@@ -1,12 +1,17 @@
+<!--New POS UI-->
+
 <template>
-  <div>
-    <NavBar />
+  <div class="container mx-auto py-8 px-4">
+    <NavBar/>
     <div class="container mx-auto p-4">
-      <div class="flex justify-between mb-4">
-        <div class="flex space-x-2">
-          <Select v-model="selectedCategory">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="Select category" />
+      <!-- Top Navigation Bar -->
+      <div class="flex justify-between items-center mb-6">
+        <!-- Category and Search Section -->
+        <div class="flex space-x-3 items-center">
+          <!-- Category Select -->
+          <Select v-model="selectedCategory" class="w-[180px]">
+            <SelectTrigger>
+              <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="services">Services</SelectItem>
@@ -14,86 +19,117 @@
               <SelectItem value="promos">Promos</SelectItem>
             </SelectContent>
           </Select>
-          <Input v-model="searchQuery" placeholder="Search..." />
-          <Button variant="outline">
-            <Search class="h-4 w-4 mr-2" />
-            Search
-          </Button>
-          <Select v-model="selectedFilter">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="Select filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="option in filterOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Button @click="applyFilters">
-            <Filter class="h-4 w-4" />
-            Apply Filters
-          </Button>
-        </div>
-        <div class="flex space-x-2">
-          <Select v-model="selectedReservationId" @update:modelValue="handleReservationSelect">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="Select Reservation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="reservation in reservations" :key="reservation.id" :value="reservation.id">
-                {{ reservation.clientName }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Button @click="goToBookingPage">Add Booking</Button>
-        </div>
-      </div>
 
-      <div class="flex space-x-2 mb-4">
-        <Button @click="addDiscount">Add Discount</Button>
-        <Button @click="cancelDiscount" variant="outline">Cancel Discount</Button>
-      </div>
-
-      <div class="flex">
-        <div class="w-3/4 grid grid-cols-4 gap-4">
-          <div v-for="product in displayedProducts" :key="product.id" class="border p-4 rounded-lg shadow">
-            <h3 class="font-bold">{{ product.name }}</h3>
-            <p>₱{{ product.price.toFixed(2) }}</p>
-            <div class="flex items-center mt-2 justify-between">
-              <Button @click="addToCart(product)" class="bg-navy-blue text-white">Add</Button>
-              <div class="flex items-center">
-                <Button @click="decreaseQuantity(product)" variant="outline" class="p-1">
-                  <Minus class="h-4 w-4" />
-                </Button>
-                <span class="mx-2">{{ getItemQuantity(product) }}</span>
-                <Button @click="increaseQuantity(product)" variant="outline" class="p-1">
-                  <Plus class="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+          <!-- Search Input -->
+          <div class="relative">
+            <Input v-model="searchQuery" placeholder="Search" class="pl-8 w-[200px]" />
+            <Search class="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
 
-        <div class="w-1/4 ml-4">
-          <div class="border p-4 rounded-lg">
-            <h2 class="text-xl font-bold mb-4">Checkout</h2>
-            <div class="mt-4">
-              <h3 class="font-bold">Order #{{ orderId }}</h3>
+        <!-- Reservation, Client, and Therapist Selection -->
+        <div class="flex space-x-3 items-center">
+          <Select v-model="selectedReservationId" class="w-[180px]">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Reservation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="res in reservations" :key="res.id" :value="res.id">
+                {{ res.clientName }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- Client Select -->
+          <Select v-model="selectedClientName" class="w-[180px]">
+            <SelectTrigger>
+              <SelectValue placeholder="Client Name" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="client1">Client 1</SelectItem>
+              <SelectItem value="client2">Client 2</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- Therapist Select -->
+          <Select v-model="selectedTherapist" class="w-[180px]">
+            <SelectTrigger>
+              <SelectValue placeholder="Therapist" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="therapist1">Therapist 1</SelectItem>
+              <SelectItem value="therapist2">Therapist 2</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button variant="default" class="bg-gray-900">
+            Add New Booking
+          </Button>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="flex gap-6">
+        <!-- Products Grid -->
+        <div class="flex-1">
+          <div class="grid grid-cols-4 gap-4">
+            <div v-for="product in displayedProducts" :key="product.id" class="bg-white rounded-lg border p-4 shadow-sm">
+              <h3 class="font-medium text-gray-900">{{ product.name }}</h3>
+              <p class="text-gray-600">₱{{ product.price.toFixed(2) }}</p>
+              <div class="flex items-center justify-between mt-4">
+                <div class="flex items-center space-x-2">
+                  <Button variant="outline" size="icon" class="h-8 w-8" @click="decreaseQuantity(product)">
+                    <Minus class="h-4 w-4" />
+                  </Button>
+                  <span class="w-8 text-center">{{ getItemQuantity(product) }}</span>
+                  <Button variant="outline" size="icon" class="h-8 w-8" @click="increaseQuantity(product)">
+                    <Plus class="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination (9 items per page) -->
+          <!-- Pagination from Old POS -->
+          <div class="mt-4 flex justify-center items-center">
+            <Pagination v-slot="{ page }" :total="totalProducts" :sibling-count="1" show-edges :default-page="currentPage"
+              :per-page="itemsPerPage" @update:page="handlePageChange">
+              <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                <PaginationFirst />
+                <PaginationPrev />
+                <template v-for="(item, index) in items">
+                  <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                    <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
+                      {{ item.value }}
+                    </Button>
+                  </PaginationListItem>
+                  <PaginationEllipsis v-else :key="item.type" :index="index" />
+                </template>
+                <PaginationNext />
+                <PaginationLast />
+              </PaginationList>
+            </Pagination>
+          </div>
+        </div>
+
+        <!-- Checkout Panel -->
+        <div class="w-[400px]">
+          <div class="bg-white rounded-lg border p-6">
+            <h2 class="text-xl font-semibold mb-4">Checkout</h2>
+            <div class="mb-6">
+              <h3 class="font-semibold">Order #{{ orderId }}</h3>
               <p class="text-sm text-gray-500">{{ currentDate }}</p>
             </div>
-            <div class="mt-4">
-              <p>Client Name: {{ selectedReservation?.clientName || 'N/A' }}</p>
-              <p>Therapist Name: {{ selectedReservation?.therapistName || 'N/A' }}</p>
+
+            <!-- Display selected Client and Therapist -->
+            <div class="space-y-4 mb-6">
+              <p class="text-gray-600">Client Name: {{ selectedClientName || 'N/A' }}</p>
+              <p class="text-gray-600">Therapist Name: {{ selectedTherapist || 'N/A' }}</p>
             </div>
-            <ul class="mt-4 space-y-2">
-              <li v-for="item in cart" :key="item.id">
-                {{ item.name }} 
-                <span class="float-right">
-                  {{ item.quantity }}x
-                </span>
-              </li>
-            </ul>
-            <div class="mt-4">
+
+            <!-- Payment Mode & Discount -->
+            <div class="space-y-4 mb-6">
               <Select v-model="paymentMode">
                 <SelectTrigger>
                   <SelectValue placeholder="Mode of Payment" />
@@ -103,48 +139,64 @@
                   <SelectItem value="gcash">Gcash</SelectItem>
                 </SelectContent>
               </Select>
+
+              <div class="relative">
+                <Select v-model="selectedDiscount">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select discount" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Discount</SelectItem>
+                    <SelectItem v-for="promo in promoDiscounts" :key="promo.id" :value="promo.id">
+                      {{ promo.name }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <!-- Discount Remove Button
+                  <Button variant="outline" size="sm" class="absolute right-0 top-0" @click="removeDiscount">
+                  Remove Discount
+                </Button> 
+                
+                -->
+              
+              </div>
             </div>
-            <div class="mt-4 space-y-2">
-              <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
-              <p>Tax: ₱{{ tax.toFixed(2) }}</p>
-              <p>Discount: ₱{{ discount.toFixed(2) }}</p>
-              <p class="font-bold">Total: ₱{{ total.toFixed(2) }}</p>
+
+            <!-- Order Summary and Confirm Order -->
+            <div class="border-t pt-4 space-y-2 mb-6">
+              <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span>₱{{ subtotal.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Tax</span>
+                <span>₱{{ tax.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Discount</span>
+                <span>₱{{ discount.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between font-semibold">
+                <span>Total</span>
+                <span>₱{{ total.toFixed(2) }}</span>
+              </div>
             </div>
-            <div class="mt-4 flex space-x-2">
-              <Button @click="cancelOrder" class="w-1/2 bg-red-500 text-white hover:bg-red-600">Cancel Order</Button>
-              <Button @click="confirmOrder" class="w-1/2 bg-green-500 text-white hover:bg-green-600">Confirm Order</Button>
+
+            <!-- Confirm Order Button and Popup Trigger -->
+            <div class="flex space-x-2">
+              <Button variant="destructive" class="flex-1" @click="cancelOrder">
+                Cancel Order
+              </Button>
+              <Button variant="default" class="flex-1 bg-green-600 hover:bg-green-700" @click="confirmOrder">
+                Confirm Order
+              </Button>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="mt-4 flex justify-center items-center">
-      <Pagination 
-        v-slot="{ page }" 
-        :total="totalProducts" 
-        :sibling-count="1" 
-        show-edges 
-        :default-page="currentPage"
-        :per-page="itemsPerPage"
-        @update:page="handlePageChange"
-      >
-        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-          <PaginationFirst />
-          <PaginationPrev />
-          <template v-for="(item, index) in items">
-            <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-              <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                {{ item.value }}
-              </Button>
-            </PaginationListItem>
-            <PaginationEllipsis v-else :key="item.type" :index="index" />
-          </template>
-          <PaginationNext />
-          <PaginationLast />
-        </PaginationList>
-      </Pagination>
     </div>
 
+    <!-- Dialogs (Confirm, Success, Discount) -->
     <Dialog :open="showConfirmDialog" @update:open="showConfirmDialog = $event">
       <DialogContent>
         <DialogHeader>
@@ -152,9 +204,7 @@
           <DialogDescription>
             <h3 class="font-bold mb-2">Order Details:</h3>
             <ul class="mb-4">
-              <li v-for="item in cart" :key="item.id">
-                {{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}
-              </li>
+              <li v-for="item in cart" :key="item.id">{{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}</li>
             </ul>
             <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
             <p>Tax: ₱{{ tax.toFixed(2) }}</p>
@@ -168,58 +218,7 @@
         </DialogFooter>
       </DialogContent>
     </Dialog>
-
-    <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Checkout Successful</DialogTitle>
-          <DialogDescription>Your transaction has been placed successfully.</DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button @click="showSuccessDialog = false">Done</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog :open="showDiscountDialog" @update:open="showDiscountDialog = $event">
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Add Discount</DialogTitle>
-      </DialogHeader>
-      <div class="mb-4">
-        <Select v-model="selectedDiscount">
-          <SelectTrigger class="w-full">
-            <SelectValue placeholder="Select Discount Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="promo">Promo Discount</SelectItem>
-            <SelectItem value="custom">Custom Discount</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div v-if="selectedDiscount === 'promo'" class="mb-4">
-        <Select v-model="selectedPromoDiscount">
-          <SelectTrigger class="w-full">
-            <SelectValue placeholder="Select Promo Discount" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem v-for="promo in promoDiscounts" :key="promo.id" :value="promo.id">
-              {{ promo.name }} - {{ promo.value }}%
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div v-else-if="selectedDiscount === 'custom'" class="mb-4">
-        <Input v-model="customDiscountValue" type="number" placeholder="Enter discount percentage" />
-      </div>
-      <DialogFooter>
-        <Button @click="cancelDiscountDialog">Cancel</Button>
-        <Button @click="applyDiscount" class="bg-green-500 text-white">Apply Discount</Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
   </div>
-</div>
 </template>
 
 <script setup>
@@ -235,7 +234,7 @@ import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, Pagina
 const selectedCategory = ref('products')
 const searchQuery = ref('')
 const currentPage = ref(1)
-const itemsPerPage = 8
+const itemsPerPage = 16
 const cart = ref([])
 const showConfirmDialog = ref(false)
 const showSuccessDialog = ref(false)
@@ -249,7 +248,8 @@ const selectedDiscount = ref(null)
 const selectedPromoDiscount = ref(null)
 const customDiscountValue = ref(null)
 const selectedFilter = ref(null)
-
+const selectedClientName = ref(null)
+const selectedTherapist = ref(null)
 
 
 
@@ -436,10 +436,6 @@ function handleReservationSelect(reservationId) {
   selectedReservationId.value = reservationId
 }
 
-function applyFilters() {
-  // This function can be expanded to apply more complex filters
-  currentPage.value = 1 // Reset to first page when applying filters
-}
 
 const totalProducts = computed(() => filteredProducts.value.length)
 
@@ -453,38 +449,6 @@ function handlePageChange(newPage) {
   currentPage.value = newPage
 }
 
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-function addDiscount() {
-  showDiscountDialog.value = true
-}
-
-function cancelDiscountDialog() {
-  showDiscountDialog.value = false
-  selectedDiscount.value = null
-  selectedPromoDiscount.value = null
-  customDiscountValue.value = null
-}
-
-function applyDiscount() {
-  showDiscountDialog.value = false
-  // The discount will be automatically applied through the computed property
-}
-
-function cancelDiscount() {
-  selectedPromoDiscount.value = null
-  customDiscountValue.value = null
-}
 
 watch(selectedCategory, () => {
   currentPage.value = 1

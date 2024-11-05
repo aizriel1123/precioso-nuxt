@@ -12,7 +12,7 @@
     username: z.string().min(8).max(50),
     password: z.string().min(8),
   }))
-
+  
   const form = useForm({ validationSchema: formSchema })
   const router = useRouter()
 

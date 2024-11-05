@@ -1,3 +1,5 @@
+<!--Inventory Page-->
+
 <template>
   <NavBar />
 
@@ -35,8 +37,7 @@
         </Select>
 
         <!-- Search input -->
-<<<<<<< HEAD
-        <Input placeholder="Search Product Name..." class="input-search" v-model="searchQuery"/>
+        <Input placeholder="Search Product Name..." class="input_search" v-model="searchQuery"/>
         <Select v-model="selectedFilter">
         <SelectTrigger class="w-[auto]">
           <SelectValue placeholder="Select filter" />
@@ -47,17 +48,11 @@
           </SelectItem>
         </SelectContent>
       </Select>
-=======
-        <Input placeholder="Search..." class="input_search" />
-        <Button variant="link">
-          <ArrowDownWideNarrow class="icon-small" />
-        </Button>
-        <Button variant="ghost" class="button">Filter</Button>
->>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
       </div>
 
       <div class="right-side">
         <!-- Buttons for adding new product/supplier and enable editing in form 'edit selected product' -->
+        <Button variant="ghost" class="button" @click="openTypeModal">Add New Type</Button>
         <Button variant="ghost" class="button" @click="openProductModal">Add New Product</Button>
         <Button variant="ghost" class="button" @click="openSupplierModal">Add New Supplier</Button>
       </div>
@@ -78,7 +73,7 @@
                 <TableHead>Warning Level</TableHead>
                 <TableHead>Supplier Name</TableHead>
                 <TableHead>Commission Rate</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Supplier Name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,21 +86,13 @@
                 <TableCell>{{ product.name }}</TableCell>
                 <TableCell>{{ product.type }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
-<<<<<<< HEAD
-                <TableCell>{{ product.stock }}</TableCell>
-                <TableCell>{{ product.warningLevel }}</TableCell>
-                <TableCell>{{ product.supplierName }}</TableCell>
-                <TableCell>{{ product.commissionRate }}%</TableCell>
-                <TableCell>{{ product.status }}</TableCell>
-=======
                 <TableCell>{{ product.StockinProduct }}</TableCell>
                 <TableCell>{{ getStockStatus(product) }}</TableCell>
                 <TableCell>{{ product.commission }}%</TableCell>
->>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
+                <TableCell>{{ product.supplierName }}</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
-                <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -154,104 +141,264 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected Product</h2>
 
-        <form @submit.prevent="onSubmit" class="form" noValidate>
-          <FormField v-slot="{ componentField }" name="product-id">
+        <form id="update_product_panel"  >
+          <FormField v-slot="{ componentField }" name="update_id">
             <FormItem>
               <FormLabel>Product ID</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Product ID" v-bind="componentField" v-model="selectedProductId" disabled/>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Product ID" 
+                  v-bind="componentField" 
+                  v-model="selectedProductId" 
+                  disabled
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="product-name">
+          <FormField v-slot="{ componentField }" name="update_product_name">
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName"/>
+                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  />
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="type">
-          <FormItem>
-              <FormLabel>Type</FormLabel>
-              <FormControl>
-                  <Select v-bind="componentField" :value="selectedProductType" >
-                      <SelectTrigger class="dropdown-trigger2">
-                          <SelectValue :placeholder="selectedProductType ? selectedProductType : 'Select an option'" />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectGroup>
-                              <SelectItem value="services">Services</SelectItem>
-                              <SelectItem value="products">Products</SelectItem>
-                              <SelectItem value="promos">Promos</SelectItem>
-                          </SelectGroup>
-                      </SelectContent>
-                  </Select>
-              </FormControl>
-              <FormMessage />
-          </FormItem>
-      </FormField>
-
-            <FormField v-slot="{ componentField }" name="cost">
-              <FormItem>
-                <FormLabel>Cost</FormLabel>
-                <FormControl>
-                  <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedCost"/>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-
-          <FormField v-slot="{ componentField }" name="stock-in">
+          <!-- Remember this 1 -->
+          <FormField v-slot="{ componentField }" name="update_product_type">
             <FormItem>
-              <FormLabel>Stock-in</FormLabel>
+              <FormLabel>Product Type</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStockIn"/>
+                <Select v-bind="componentField" v-model="selectedProductType" >
+                  <SelectTrigger class="dropdown-trigger" >
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        
+                        {{ productType.type }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="warning-level">
+          <FormField v-slot="{ componentField }" name="update_product_cost">
+            <FormItem>
+              <FormLabel>Product Cost</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost"/>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_stock">
+            <FormItem>
+              <FormLabel>Stock</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock"/>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <!-- Remember this 2 -->
+          <FormField v-slot="{ componentField }" name="update_product_supplier_name">
+          <FormItem>
+              <FormLabel>Supplier Name</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Supplier Name" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                    <!-- Dynamically create SelectItem for each supplier -->
+                      <SelectItem 
+                        v-for="supplier in supplier_names" 
+                        :key="supplier.supplier_name" 
+                        :value="supplier.supplier_name"
+                      >
+                        {{ supplier.supplier_name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+        </FormField>
+
+          <FormField v-slot="{ componentField }" name="update_product_warning_level">
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedWarningLevel"/>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-
-          <FormField v-slot="{ componentField }" name="supplier-name">
+          
+          <FormField v-slot="{ componentField }" name="update_product_commission_rate">
             <FormItem>
-              <FormLabel>Supplier Name</FormLabel>
+              <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" class="w-full input-suppliername" v-model="selectedSupplierName"/>
+                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
               </FormControl>
-              <FormMessage />
             </FormItem>
+          </FormField>
+
+
+          <div class="action-buttons">
+            <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+    <!-- Popup to Add New Product Tyoe -->
+    <div v-if="isEditModalOpen" class="modal-overlay">
+      <div class="modal-content">
+        <h2 class="selected-product-title">Edit Existing Product</h2>
+
+        <form @submit.prevent="editExistingProduct">
+          <FormField v-slot="{ componentField }" name="edited_product_name">
+              <FormItem>
+                <FormLabel>Product Name</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" />
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <!-- Dynamic Drop Down For Product Type -->
+          <FormField v-slot="{ componentField }" name="edited_product_type">
+            <FormItem>
+              <FormLabel>Product Type</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField" v-model="selectedProductType" >
+                  <SelectTrigger class="dropdown-trigger" >
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <!-- Dynamically create SelectItem for each product -->
+                      <SelectItem 
+                        v-for="productType in product_types" 
+                        :key="productType.type" 
+                        :value="productType.type"
+                      >
+                        
+                        {{ productType.type }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_product_cost">
+              <FormItem>
+                <FormLabel>Product Cost</FormLabel>
+                <FormControl>
+                  <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="selectedCost"/>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+          </FormField>
+          
+          <FormField v-slot="{ componentField }" name="edited_stock_level">
+              <FormItem>
+                <FormLabel>Stock</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="selectedStock"/>
+                </FormControl>
+              </FormItem>
           </FormField>
 
           <FormField v-slot="{ componentField }" name="commission-rate">
             <FormItem>
-              <FormLabel>Commission Rate</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCommissionRate"/>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+                <FormLabel>Supplier Name</FormLabel>
+                <FormControl>
+                  <Select>
+                    <SelectTrigger class="dropdown-trigger">
+                      <SelectValue placeholder="Supplier Name" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                      <!-- Dynamically create SelectItem for each supplier -->
+                        <SelectItem 
+                          v-for="supplier in supplier_names" 
+                          :key="supplier.supplier_name" 
+                          :value="supplier.supplier_name"
+                        >
+                          {{ supplier.supplier_name }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
           </FormField>
 
-          <div class="action-buttons">
-            <Button variant="ghost" type="button" class="cancel-button" @click="onCancel">Cancel</Button>
-            <Button variant="ghost" type="submit" class="button">Save Changes</Button>
+          <FormField v-slot="{ componentField }" name="edited_warning_level">
+              <FormItem>
+                <FormLabel>Warning Level</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical"/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_commission_rate">
+              <FormItem>
+                <FormLabel>Commission Rate</FormLabel>
+                <FormControl>
+                  <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
+                </FormControl>
+              </FormItem>
+          </FormField>
+
+          <div class="modal-action-buttons">
+            <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
+            <Button variant="ghost" type="submit" >Edit Product</Button>
           </div>
         </form>
       </div>
+    </div>
+
+
+  <!-- Popup to Add New Product Tyoe -->
+  <div v-if="isTypeModalOpen" class="modal-overlay">
+    <div class="modal-content">
+      <h2 class="selected-product-title">Add New Type</h2>
+      <form @submit.prevent="addNewType">
+        <FormField v-slot="{ componentField }" name="new_type">
+          <FormItem>
+            <FormLabel>New Type</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Enter Type" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <div class="action-buttons">
+          <Button variant="ghost" type="button" class="button" @click="isTypeModalOpen = false">Cancel</Button>
+          <Button variant="ghost" type="submit" class="button">Add Type</Button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -335,21 +482,6 @@
             </FormItem>
         </FormField>
 
-<<<<<<< HEAD
-        <FormField v-slot="{ componentField }" name="category">
-            <FormItem>
-              <FormLabel>Product Type</FormLabel>
-              <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="dropdown-trigger2">
-                    <SelectValue placeholder="Service" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="products">Products</SelectItem>
-                      <SelectItem value="promos">Promos</SelectItem>
-=======
         <FormField v-slot="{ componentField }" name="product_type">
           <FormItem>
               <FormLabel>Product Type</FormLabel>
@@ -379,29 +511,16 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="new-cost">
-            <FormItem>
-              <FormLabel>Cost</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" />
-=======
-            </FormItem>
-        </FormField>
-
         <FormField v-slot="{ componentField }" name="new_product_cost">
             <FormItem>
               <FormLabel>Product Cost</FormLabel>
               <FormControl>
                 <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
->>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
               </FormControl>
               <FormMessage />
             </FormItem>
         </FormField>
-<<<<<<< HEAD
-
-        <FormField v-slot="{ componentField }" name="new-stock-level">
-=======
+        
         <FormField v-slot="{ componentField }" name="new_stock_level">
 >>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
             <FormItem>
@@ -409,23 +528,11 @@
               <FormControl>
                 <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" />
               </FormControl>
-              <FormMessage />
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new-warning-level">
-            <FormItem>
-              <FormLabel>Warning Level</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-        </FormField>
-
-        <!-- Sample suppliers only, will change later -->
-        <FormField v-slot="{ componentField }" name="supplier-name">
-            <FormItem>
+        <FormField v-slot="{ componentField }" name="supplier_name">
+          <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
                 <Select v-bind="componentField">
@@ -448,6 +555,15 @@
 <<<<<<< HEAD
         <FormField v-slot="{ componentField }" name="new-commission-rate">
 =======
+        <FormField v-slot="{ componentField }" name="warning_level">
+            <FormItem>
+              <FormLabel>Warning Level</FormLabel>
+              <FormControl>
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+        </FormField>
+
         <FormField v-slot="{ componentField }" name="warning_level">
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
@@ -488,70 +604,19 @@
   // SAMPLE FORM (NOTE: BOTBOT RA NI)
   import { useForm } from 'vee-validate'
   const form = useForm()
-<<<<<<< HEAD
-
-  //Sample data
-  const products = ref([
-    { id: 1, name: 'Product A', type: 'Products', cost: 10.0, stock: 50, warningLevel: 20, supplierName: 'ABC',  commissionRate: 10, status: 'Available' },
-    { id: 2, name: 'Product B', type: 'Promos', cost: 20.0, stock: 30, warningLevel: 30, supplierName: 'BCD',  status: 'Available', commissionRate: 15 },
-    { id: 3, name: 'Product C', type: 'Services', cost: 15.0, stock: 20, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 12 },
-    { id: 4, name: 'Product D', type: 'Products', cost: 25.0, stock: 15, warningLevel: 30, supplierName: 'BCD', status: 'Out of Stock', commissionRate: 20 },
-    { id: 5, name: 'Product E', type: 'Promos', cost: 30.0, stock: 10, warningLevel: 20, supplierName: 'ABC', status: 'Available', commissionRate: 25 },
-    { id: 6, name: 'Product F', type: 'Products', cost: 12.0, stock: 5, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 18 },
-    { id: 7, name: 'Product G', type: 'Promos', cost: 22.0, stock: 2, warningLevel: 30, supplierName: 'ABC',  status: 'Out of Stock', commissionRate: 30 },
-    { id: 8, name: 'Product H', type: 'Promos', cost: 17.0, stock: 0, warningLevel: 20, supplierName: 'ABC', status: 'Out of Stock', commissionRate: 20 },
-    { id: 9, name: 'Product I', type: 'Services', cost: 11.0, stock: 8, warningLevel: 30, supplierName: 'BCD',  status: 'Available', commissionRate: 10 },
-    { id: 10, name: 'Product J', type: 'Products', cost: 14.0, stock: 3,warningLevel: 30, supplierName: 'ABC',  status: 'Available', commissionRate: 12 },
-    { id: 11, name: 'Product K', type: 'Services', cost: 19.0, stock: 4, warningLevel: 20, supplierName: 'ABC', status: 'Available', commissionRate: 15 },
-    { id: 12, name: 'Product L', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 13, name: 'Product M', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 14, name: 'Product N', type: 'Services', cost: 19.0, stock: 4, warningLevel: 20, supplierName: 'EFG', status: 'Available', commissionRate: 15 },
-    { id: 15, name: 'Product O', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 16, name: 'Product P', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'ABC',status: 'Available', commissionRate: 15 },
-    { id: 17, name: 'Product Q', type: 'Services', cost: 19.0, stock: 4,  warningLevel: 30, supplierName: 'EFG',status: 'Available', commissionRate: 15 },
-    { id: 18, name: 'Product R', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 15 },
-    { id: 19, name: 'Product S', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 15 },
-    { id: 20, name: 'Product T', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'BCD', status: 'Available', commissionRate: 15 },
-    { id: 21, name: 'Product U', type: 'Services', cost: 19.0, stock: 4, warningLevel: 30, supplierName: 'ABC', status: 'Available', commissionRate: 15 }
-
-  ]);
-
-  const selectProduct = (product) => {
-    selectedProductId.value = product.id
-    selectedProductName.value = product.name
-    selectedProductType.value = product.type
-    selectedCost.value = product.cost
-    selectedStockIn.value = product.stock
-    selectedWarningLevel.value=product.warningLevel
-    selectedSupplierName.value = product.supplierName
-    selectedCommissionRate.value=product.commissionRate
-  };
-
-  //ID, Name and type of chosen row from table
-  const selectedProductId = ref(null); 
-  const selectedProductName = ref('')
-  const selectedProductType = ref('')
-  const selectedCost = ref(0)
-  const selectedStockIn = ref('')
-  const selectedWarningLevel = ref(0)
-  const selectedSupplierName = ref('')
-  const selectedCommissionRate  =ref(0)
-
-  //Default values
-  const selectedType = ref('all');
-  const selectedFilter = ref(null)
-  const searchQuery = ref('');
-
-  //For pagination
-=======
   let products = ref([]);
   // Fetch product details of selected item
-
+  // Set up For the search filtering 
+  const searchQuery = ref('');
+  const selectedFilter = ref(null)
   //ID, Name and type of chosen row from table
   const selectedProductId = ref(null); 
   const selectedProductName = ref('');
   const selectedProductType = ref('');
-  
+  const selectedCost = ref('');
+  const selectedStock = ref('');
+  const selectedCritical = ref('');
+  const selectedCommissionRate = ref('');
   const selectedType = ref('all'); //default
   //Variable for Drop Down Variables
   const supplier_names = ref([]);
@@ -562,61 +627,82 @@
   const itemsPerPage = ref(10);
 
   //For pop ups
+  const isEditModalOpen = ref(false)
+  const isTypeModalOpen = ref(false);
   const isProductModalOpen = ref(false);
   const isSupplierModalOpen = ref(false);
-
-  const filteredAndSortedProducts = computed(() => {
-    let filtered = products.value;
-    if (selectedType.value !== 'all') {
-        filtered = filtered.filter(product => product.type.toLowerCase() === selectedType.value);
-    }
-
-    // Filter products based on the search query
-    if (searchQuery.value) {
-        filtered = filtered.filter(product => 
-            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-        );
-    }
-
-    // Sort the filtered products based on the selected filter
-    if (selectedFilter.value === 'id-asc') {
-        filtered.sort((a, b) => a.id - b.id);
-    } else if (selectedFilter.value === 'id-desc') {
-        filtered.sort((a, b) => b.id - a.id);
-    } else if (selectedFilter.value === 'name-asc') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (selectedFilter.value === 'name-desc') {
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (selectedFilter.value === 'supplier-asc') {
-        filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
-    } else if (selectedFilter.value === 'supplier-desc') {
-        filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
-    }
-
-    return filtered;
-});
-
-  //Pagination
-  const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
-  const totalPages = computed(() => Math.ceil(filteredAndSortedProducts.value.length / itemsPerPage));
-  const paginatedProducts = computed(() => {
-    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredAndSortedProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
-  });
-  function handlePageChange(newPage) {
-  currentPage.value = newPage
-}
-
-  //Dropdown menu for filtering
+  // Set up the filter options
   const filterOptions = [
   { value: 'id-asc', label: 'Product ID: Ascending' },
   { value: 'id-desc', label: 'Product ID: Descending' },
   { value: 'name-asc', label: 'Product Name: A to Z' },
   { value: 'name-desc', label: 'Product Name: Z to A' },
-  { value: 'supplier-asc', label: 'Supplier Name: A to Z' },
-  { value: 'supplier-desc', label: 'Supplier Name: Z to A' },
 
   ];
+
+  // Filter Function
+  const filteredProducts = computed(() => {
+    // Initialize the filtered products array with all products
+    let filtered = products.value;
+
+    // Filter based on the selected product type
+    if (selectedType.value && selectedType.value !== 'all') {
+      filtered = filtered.filter(product => 
+        product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
+      );
+    }
+
+    // Filter based on the search query
+    if (searchQuery.value) {
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    }
+
+    // Sort the filtered products based on the selected filter
+    if (selectedFilter.value === 'id-asc') {
+      filtered.sort((a, b) => a.id - b.id);
+    } else if (selectedFilter.value === 'id-desc') {
+      filtered.sort((a, b) => b.id - a.id);
+    } else if (selectedFilter.value === 'name-asc') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (selectedFilter.value === 'name-desc') {
+      filtered.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (selectedFilter.value === 'supplier-asc') {
+      filtered.sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+    } else if (selectedFilter.value === 'supplier-desc') {
+      filtered.sort((a, b) => b.supplierName.localeCompare(a.supplierName));
+    }
+
+    return filtered;
+  });
+// Example stock ID, replace with actual stock ID
+  // // Filter products based on the selected option in dropdown
+  // const filteredProducts = computed(() => {
+  //   return products.value.filter(product => product.type.toLowerCase() === selectedType.value);
+  // });
+
+  // //Pagination not working
+  // const paginatedProducts = computed(() => {
+  //   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+  //   return filteredProducts.value.slice(startIndex, startIndex + itemsPerPage.value);
+  // });
+  // const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedProducts.value.length));
+  // const totalPages = computed(() => Math.ceil(filteredProducts.value.length / itemsPerPage.value));
+  // Open new page 
+  const onPageChange = newPage => {
+    if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
+  };
+
+    //Open popup for editing existing products
+    const openEditModal = () => {
+    isEditModalOpen.value = true;
+  };
+
+  //Close popup
+  const closeEditModal = () => {
+    isEditModalOpen.value = false;
+  };
 
   //Open popup for adding new products
   const openProductModal = () => {
@@ -637,7 +723,18 @@
   const closeSupplierModal = () => {
     isSupplierModalOpen.value = false;
   };
+  //Open popup for adding new products
+  const openTypeModal = () => {
+    isTypeModalOpen.value = true;
+  };
+  //Close popup
+    const closeTypeModal = () => {
+    isTypeModalOpen.value = false;
+  };
 
+
+
+  // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/product', {
@@ -651,8 +748,21 @@
     fetchProductDetails()
     closeProductModal();
   });
-
-
+  // Add New Product Type addNewProductType ?
+  const addNewType = form.handleSubmit(async (values) => {
+    try {
+      const response = await $fetch('/api/inventory/product_type', {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: values,
+      });
+    } catch (error) {
+      console.error('Add Supplier failed:', error);
+    }
+    fetchProducts();
+    closeTypeModal()
+  });
+  // Add New Supplier
   const addNewSupplier = form.handleSubmit(async (values) => {
     try {
       const response = await $fetch('/api/inventory/supplier', {
@@ -663,40 +773,62 @@
     } catch (error) {
       console.error('Add Supplier failed:', error);
     }
-<<<<<<< HEAD
+    fetchSuppliers();
+    fetchProductDetails();
     closeSupplierModal();
   });
-
-  const onCancel = () => {
-  if (selectedProductId.value) {
-    selectedProductId.value=''
-    selectedProductName.value = ''
-    selectedProductType.value = ''
-    selectedCost.value=''
-    selectedStockIn.value=''
-    selectedSupplierName.value = ''
-    selectedWarningLevel.value = ''
-    selectedCommissionRate.value=''
-  } 
-};
-
-// Method to save changes (submit form)
-const onSubmit = () => {
-  const productIndex = products.value.findIndex(p => p.id === selectedProductId.value);
-  if (productIndex !== -1) {
-    products.value[productIndex].name = selectedProductName.value;
-    products.value[productIndex].type = selectedProductType.value;
-    alert('Product details saved successfully!');
-  } else {
-    alert('Product not found.');
-  }
-};
-
-=======
-    fetchProductDetails()
-    closeProductModal();
-  });
   
+  // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
+  // Define the function to handle the form submission
+  const editExistingProduct = form.handleSubmit(async (values) => {
+    // Add the selectedProductId to the body
+    const updatedValues = {
+      // ...values,                      // Spread the existing values
+      update_id: selectedProductId.value,    // Add selectedProductId to the body
+      update_product_name: values.edited_product_name || selectedProductName.value, 
+      update_product_type: values.edited_product_type || selectedProductType.value,
+      update_product_cost: values.edited_product_cost || selectedCost.value,
+      update_product_stock: values.edited_product_stock || selectedStock.value,
+      update_product_supplier_name: values.edited_product_supplier_name,
+      update_product_warning_level: values.edited_product_warning_level || selectedCritical.value,
+      update_product_commission_rate: values.edited_product_commission_rate || selectedCommissionRate.value,
+    };
+
+    let missingFields = [];
+
+    // Check if any field is still blank after checking both sources (values and v-models)
+    if (!updatedValues.update_product_name) missingFields.push("Product Name");
+    if (!updatedValues.update_product_type) missingFields.push("Product Type");
+    if (!updatedValues.update_product_cost) missingFields.push("Product Cost");
+    if (!updatedValues.update_product_stock) missingFields.push("Product Stock");
+    if (!updatedValues.update_product_warning_level) missingFields.push("Product Warning Level");
+    if (!updatedValues.update_product_commission_rate) missingFields.push("Product Commission Rate");
+
+    // If any required fields are missing, prompt the user and do not send the request
+    if (missingFields.length > 0) {
+      alert(`Missing data for: ${missingFields.join(", ")}`);
+      return;  // Stop the function here to prevent sending the request
+    }
+
+    console.log("BRO WHAT THE HECK");
+    try {
+      const response = await $fetch('/api/inventory/product', {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedValues), // Stringify the combined object
+      });
+
+      console.log("This is the response");
+      console.log(response);
+    } catch (error) {
+      console.error('Update Product failed:', error);
+    }
+    
+    fetchProductDetails();
+    closeProductModal();
+    resetSelected();
+  });
+
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
     try {
@@ -737,25 +869,14 @@ const onSubmit = () => {
         headers: { "Content-Type": "application/json" },
       });
       products.value = response;
-      console.log("This is to confirm that there actually is a products data")
-      console.log(response)
+      // console.log("This is to confirm that there actually is a products data")
+      // console.log(response)
     } catch (error) {
       console.error('Failed to fetch products:', error);
     }
   }
   fetchProductDetails()
-  // Load Tables
-  // Filter products based on the selected option in the dropdown
-	const filteredProducts = computed(() => {
-	  // Check if selectedType has a value to filter, otherwise return all products
-	  if (selectedType.value && selectedType.value != "all") {
-		return products.value.filter(product => 
-		  product.ProductType.toLowerCase() === selectedType.value.toLowerCase()
-		);
-	  }
-	  // Return all products if no filter is selected
-	  return products.value;
-	});
+
   // Get Status For Table
   function getStockStatus(product) {
       return product.StockinProduct < product.critical_level 
@@ -774,9 +895,30 @@ const onSubmit = () => {
     selectedProductId.value = product.id;
     selectedProductName.value = product.name;
     selectedProductType.value = product.type;
+    selectedCost.value = product.cost
+    selectedStock.value = product.StockinProduct
+    selectedCritical.value = product.critical_level
+    selectedCommissionRate.value = product.commission
+    console.log("New Select")
+    console.log(selectedProductId.value)
+    console.log(selectedProductName.value)
+    console.log(selectedProductType.value)
+    console.log(selectedCost.value)
+    console.log(selectedStock.value)
+    console.log(selectedCritical.value)
+    console.log(selectedCommissionRate.value)
   };
+  function resetSelected() {
+    // Reset selected values
+    selectedProductId.value = "";
+    selectedProductName.value = "";
+    selectedProductType.value = "";
+    selectedCost.value = "";
+    selectedStock.value = "";
+    selectedCritical.value = "";
+    selectedCommissionRate.value = "";
+  }
   
->>>>>>> 46eca26e24940be514e368a7dd4c4c28b99991bf
 </script>
 
 <style scoped>
@@ -856,7 +998,7 @@ const onSubmit = () => {
   }
 
   /* Search input */
-  .input-search {
+  .input_search {
     width: 250px;
     padding: 8px;
     border: 1px solid #ddd;
