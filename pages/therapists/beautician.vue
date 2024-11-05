@@ -137,6 +137,7 @@ const saveChanges = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        therapistId: selectedTherapist.value.id,
         first_name: selectedTherapist.value.first_name,
         last_name: selectedTherapist.value.last_name,
         dob: selectedTherapist.value.dob,
@@ -483,7 +484,22 @@ onMounted(() => {
               <SelectContent>
                 <SelectItem :value="1">Male</SelectItem>
                 <SelectItem :value="2">Female</SelectItem>
-                <SelectItem :value="3">N/A</SelectItem>
+                <SelectItem :value="3">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label class="font-medium">Status</label>
+            <Select v-model="newTherapist.status_id">
+              <SelectTrigger>
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem :value="1">Available</SelectItem>
+                <SelectItem :value="2">Unavailable</SelectItem>
+                <SelectItem :value="3">Busy</SelectItem>
+                <SelectItem :value="4">Not Busy</SelectItem>
+                <SelectItem :value="5">Occupied</SelectItem>
               </SelectContent>
             </Select>
           </div>
