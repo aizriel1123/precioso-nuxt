@@ -43,7 +43,7 @@ model Client {
   first_name   String        @db.VarChar(255)
   last_name    String        @db.VarChar(255)
   dob          DateTime?     @default(now()) @db.Date
-  contact_info String?       @db.VarChar(20) @unique
+  contact_info String?       @db.VarChar(20)
   gender_id    Int?
   Appointment  Appointment[]
   Gender       Gender?       @relation(fields: [gender_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
@@ -72,8 +72,6 @@ model Gender {
   gender    String      @unique @db.VarChar(20)
   Client    Client[]
   Therapist Therapist[]
-
-  
 }
 
 model ModeOfPayment {
@@ -170,19 +168,19 @@ model ServiceType {
 }
 
 model Stockin {
+  id           Int       @id @default(autoincrement())
   supplier_id  Int
   therapist_id Int
   date         DateTime? @db.Date
-  id           Int       @id @default(autoincrement())
   Supplier     Supplier  @relation(fields: [supplier_id], references: [id])
   Therapist    Therapist @relation(fields: [therapist_id], references: [id])
 }
 
 model StockinProduct {
+  id             Int      @default(autoincrement())
   product_id     Int
   quantity       Int?
   purchase_price Decimal? @db.Decimal(10, 2)
-  id             Int      @default(autoincrement())
   Product        Product  @relation(fields: [product_id], references: [id])
 
   @@id([id, product_id])
