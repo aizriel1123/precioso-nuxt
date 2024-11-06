@@ -248,320 +248,320 @@ onMounted(() => {
 
 <template>
   
-  <div class="container mx-auto py-8 px-4">
-    <NavBar/>
-    <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-2xl font-bold">All Therapists</h1>
-      <div class="flex gap-4">
-        <Input 
-          v-model="searchTerm"
-          placeholder="Search therapist" 
-          class="w-64" 
-        />
-        <Select v-model="sortOrder">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="id-asc">ID: Ascending</SelectItem>
-            <SelectItem value="id-desc">ID: Descending</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button @click="showNewTherapistDialog = true">Add New Therapist</Button>
-      </div>
+  
+  <NavBar/>
+  <div class="flex justify-between items-center mt-8 mb-8">
+    <h1 class="text-2xl font-bold">All Therapists</h1>
+    <div class="flex gap-4">
+      <Input 
+        v-model="searchTerm"
+        placeholder="Search therapist" 
+        class="w-64" 
+      />
+      <Select v-model="sortOrder">
+        <SelectTrigger class="w-48">
+          <SelectValue placeholder="Sort by..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="id-asc">ID: Ascending</SelectItem>
+          <SelectItem value="id-desc">ID: Descending</SelectItem>
+          <SelectItem value="name-asc">Name: A to Z</SelectItem>
+          <SelectItem value="name-desc">Name: Z to A</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button @click="showNewTherapistDialog = true">Add New Therapist</Button>
     </div>
+  </div>
 
-    <div class="grid grid-cols-3 gap-6">
-      <!-- Therapists Table -->
-      <div class="col-span-2">
-        <div class="bg-white rounded-lg shadow">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Therapist ID</TableHead>
-                <TableHead>Last Name</TableHead>
-                <TableHead>First Name</TableHead>
-                <TableHead>Schedule</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Contact Information</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow 
-                v-for="therapist in paginatedTherapists" 
-                :key="therapist.id"
-                :class="{ 'bg-amber-100': selectedTherapist?.id === therapist.id }"
-                @click="selectTherapist(therapist)"
-                class="cursor-pointer hover:bg-gray-100"
-              >
-                <TableCell>{{ therapist.id }}</TableCell>
-                <TableCell>{{ therapist.last_name }}</TableCell>
-                <TableCell>{{ therapist.first_name }}</TableCell>
-                <TableCell>{{ therapist.schedule }}</TableCell>
-                <TableCell>{{ therapist.TherapistStatus?.status }}</TableCell>
-                <TableCell>{{ therapist.contactinfo }}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Therapists Table -->
+    <div class="col-span-2">
+      <div class="bg-white rounded-lg shadow">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Therapist ID</TableHead>
+              <TableHead>Last Name</TableHead>
+              <TableHead>First Name</TableHead>
+              <TableHead>Schedule</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Contact Information</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow 
+              v-for="therapist in paginatedTherapists" 
+              :key="therapist.id"
+              :class="{ 'bg-amber-100': selectedTherapist?.id === therapist.id }"
+              @click="selectTherapist(therapist)"
+              class="cursor-pointer hover:bg-gray-100"
+            >
+              <TableCell>{{ therapist.id }}</TableCell>
+              <TableCell>{{ therapist.last_name }}</TableCell>
+              <TableCell>{{ therapist.first_name }}</TableCell>
+              <TableCell>{{ therapist.schedule }}</TableCell>
+              <TableCell>{{ therapist.TherapistStatus?.status }}</TableCell>
+              <TableCell>{{ therapist.contactinfo }}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
 
-          <!-- Pagination -->
-          <div class="flex items-center justify-between px-4 py-4 border-t">
-            <div class="text-sm text-gray-500">
-              Page {{ currentPage }} of {{ totalPages }}
-            </div>
-            <div class="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                @click="previousPage"
-                :disabled="currentPage === 1"
-              >
-                Previous
-              </Button>
-              <Button 
-                variant="outline"
-                size="sm"
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-              >
-                Next
-              </Button>
-            </div>
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-4 py-4 border-t">
+          <div class="text-sm text-gray-500">
+            Page {{ currentPage }} of {{ totalPages }}
           </div>
-        </div>
-      </div>
-
-      <!-- Therapist Info Panel -->
-      <div v-if="selectedTherapist" class="border rounded-lg p-6 bg-white shadow">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold">Therapist Info</h2>
           <div class="flex gap-2">
-            <Button @click="startEditing" v-if="!isEditing">Edit</Button>
             <Button 
-              variant="destructive" 
-              @click="deleteTherapist"
-              v-if="!isEditing"
+              variant="outline" 
+              size="sm"
+              @click="previousPage"
+              :disabled="currentPage === 1"
             >
-              Delete Therapist
+              Previous
             </Button>
-          </div>
-        </div>
-
-        <!-- Therapist Details -->
-        <div class="space-y-4">
-          <div v-if="!isEditing">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="font-medium">First Name</p>
-                <p>{{ selectedTherapist.first_name }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Last Name</p>
-                <p>{{ selectedTherapist.last_name }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Schedule</p>
-                <p>{{ selectedTherapist.schedule }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Status</p>
-                <p>{{ selectedTherapist.TherapistStatus?.status }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Gender</p>
-                <p>{{ selectedTherapist.Gender?.gender }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Contact Information</p>
-                <p>{{ selectedTherapist.contactinfo }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="font-medium">First Name</label>
-                <Input v-model="selectedTherapist.first_name" />
-              </div>
-              <div>
-                <label class="font-medium">Last Name</label>
-                <Input v-model="selectedTherapist.last_name" />
-              </div>
-              <div>
-                <label class="font-medium">Schedule</label>
-                <Input v-model="selectedTherapist.schedule" />
-              </div>
-              <div>
-                <label class="font-medium">Status</label>
-                <Select v-model="selectedTherapist.status_id">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem :value="1">Available</SelectItem>
-                    <SelectItem :value="2">Unavailable</SelectItem>
-                    <SelectItem :value="3">Occupied</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label class="font-medium">Gender</label>
-                <Select v-model="selectedTherapist.gender_id">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem :value="1">Male</SelectItem>
-                    <SelectItem :value="2">Female</SelectItem>
-                    <SelectItem :value="3">N/A</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label class="font-medium">Contact Information</label>
-                <Input v-model="selectedTherapist.contactinfo" />
-              </div>
-            </div>
-
-            <div class="flex justify-end gap-4">
-              <Button @click="isEditing = false" variant="outline">Cancel</Button>
-              <Button @click="saveChanges">Save changes</Button>
-            </div>
-          </div>
-
-          <div class="mt-4">
             <Button 
-              @click="showTransactions = true" 
               variant="outline"
-              class="w-full"
+              size="sm"
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
             >
-              View Booking History
+              Next
             </Button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- New Therapist Dialog -->
-    <Dialog :open="showNewTherapistDialog" @update:open="showNewTherapistDialog = false">
-      <DialogContent class="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Therapist</DialogTitle>
-        </DialogHeader>
-        <div class="grid gap-4 py-4">
+    <!-- Therapist Info Panel -->
+    <div v-if="selectedTherapist" class="border rounded-lg p-6 bg-white shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Therapist Info</h2>
+        <div class="flex gap-2">
+          <Button @click="startEditing" v-if="!isEditing">Edit</Button>
+          <Button 
+            variant="destructive" 
+            @click="deleteTherapist"
+            v-if="!isEditing"
+          >
+            Delete Therapist
+          </Button>
+        </div>
+      </div>
+
+      <!-- Therapist Details -->
+      <div class="space-y-4">
+        <div v-if="!isEditing">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="font-medium">First Name</p>
+              <p>{{ selectedTherapist.first_name }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Last Name</p>
+              <p>{{ selectedTherapist.last_name }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Schedule</p>
+              <p>{{ selectedTherapist.schedule }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Status</p>
+              <p>{{ selectedTherapist.TherapistStatus?.status }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Gender</p>
+              <p>{{ selectedTherapist.Gender?.gender }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Contact Information</p>
+              <p>{{ selectedTherapist.contactinfo }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="font-medium">First Name</label>
-              <Input v-model="newTherapist.first_name" />
+              <Input v-model="selectedTherapist.first_name" />
             </div>
             <div>
               <label class="font-medium">Last Name</label>
-              <Input v-model="newTherapist.last_name" />
+              <Input v-model="selectedTherapist.last_name" />
+            </div>
+            <div>
+              <label class="font-medium">Schedule</label>
+              <Input v-model="selectedTherapist.schedule" />
+            </div>
+            <div>
+              <label class="font-medium">Status</label>
+              <Select v-model="selectedTherapist.status_id">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="1">Available</SelectItem>
+                  <SelectItem :value="2">Unavailable</SelectItem>
+                  <SelectItem :value="3">Occupied</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label class="font-medium">Gender</label>
+              <Select v-model="selectedTherapist.gender_id">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="1">Male</SelectItem>
+                  <SelectItem :value="2">Female</SelectItem>
+                  <SelectItem :value="3">N/A</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label class="font-medium">Contact Information</label>
+              <Input v-model="selectedTherapist.contactinfo" />
             </div>
           </div>
-          <div>
-            <label class="font-medium">Date of Birth</label>
-            <Input 
-              type="date" 
-              placeholder="Enter Date of Birth" 
-              v-bind="componentField" 
-              v-model="newTherapist.dob" 
-              class="thin-input" 
-            />
-          </div>
-          <div>
-            <label class="font-medium">Schedule</label>
-            <Input v-model="newTherapist.schedule" />
-          </div>
-          <div>
-            <label class="font-medium">Contact Information</label>
-            <Input v-model="newTherapist.contactinfo" />
-          </div>
-          <div>
-            <label class="font-medium">Gender</label>
-            <Select v-model="newTherapist.gender_id">
-              <SelectTrigger>
-                <SelectValue placeholder="Select Gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem :value="1">Male</SelectItem>
-                <SelectItem :value="2">Female</SelectItem>
-                <SelectItem :value="3">N/A</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label class="font-medium">Status</label>
-            <Select v-model="newTherapist.status_id">
-              <SelectTrigger>
-                <SelectValue placeholder="Select Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem :value="1">Available</SelectItem>
-                <SelectItem :value="2">Unavailable</SelectItem>
-                <SelectItem :value="3">Busy</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div class="flex justify-end gap-4">
-          <Button @click="showNewTherapistDialog = false" variant="outline">Cancel</Button>
-          <Button @click="addNewTherapist">Add Therapist</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
 
-    <!-- Transaction History Dialog -->
-    <Dialog :open="showTransactions" @update:open="showTransactions = false">
-      <DialogContent class="sm:max-w-[800px]">
-        <DialogHeader>
-          <DialogTitle>
-            Booking History for {{ selectedTherapist?.first_name }} {{ selectedTherapist?.last_name }}
-          </DialogTitle>
-        </DialogHeader>
+          <div class="flex justify-end gap-4">
+            <Button @click="isEditing = false" variant="outline">Cancel</Button>
+            <Button @click="saveChanges">Save changes</Button>
+          </div>
+        </div>
+
         <div class="mt-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Services</TableHead>
-                <TableHead>Payment Mode</TableHead>
-                <TableHead>Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="transaction in formatTransactionHistory(selectedTherapist?.Transaction || [])" :key="transaction.date">
-                <TableCell>{{ transaction.date }}</TableCell>
-                <TableCell>{{ transaction.time }}</TableCell>
-                <TableCell>{{ transaction.client }}</TableCell>
-                <TableCell>{{ transaction.servicesProvided }}</TableCell>
-                <TableCell>{{ transaction.modeOfPayment }}</TableCell>
-                <TableCell>₱{{ transaction.totalSale.toFixed(2) }}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <Button 
+            @click="showTransactions = true" 
+            variant="outline"
+            class="w-full"
+          >
+            View Booking History
+          </Button>
         </div>
-      </DialogContent>
-    </Dialog>
-
-    <!-- Success Dialog -->
-    <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog = false">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Success</DialogTitle>
-        </DialogHeader>
-        <p>Operation completed successfully!</p>
-        <div class="flex justify-end mt-4">
-          <Button @click="showSuccessDialog = false">Close</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   </div>
+
+  <!-- New Therapist Dialog -->
+  <Dialog :open="showNewTherapistDialog" @update:open="showNewTherapistDialog = false">
+    <DialogContent class="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add New Therapist</DialogTitle>
+      </DialogHeader>
+      <div class="grid gap-4 py-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="font-medium">First Name</label>
+            <Input v-model="newTherapist.first_name" />
+          </div>
+          <div>
+            <label class="font-medium">Last Name</label>
+            <Input v-model="newTherapist.last_name" />
+          </div>
+        </div>
+        <div>
+          <label class="font-medium">Date of Birth</label>
+          <Input 
+            type="date" 
+            placeholder="Enter Date of Birth" 
+            v-bind="componentField" 
+            v-model="newTherapist.dob" 
+            class="thin-input" 
+          />
+        </div>
+        <div>
+          <label class="font-medium">Schedule</label>
+          <Input v-model="newTherapist.schedule" />
+        </div>
+        <div>
+          <label class="font-medium">Contact Information</label>
+          <Input v-model="newTherapist.contactinfo" />
+        </div>
+        <div>
+          <label class="font-medium">Gender</label>
+          <Select v-model="newTherapist.gender_id">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem :value="1">Male</SelectItem>
+              <SelectItem :value="2">Female</SelectItem>
+              <SelectItem :value="3">N/A</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label class="font-medium">Status</label>
+          <Select v-model="newTherapist.status_id">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem :value="1">Available</SelectItem>
+              <SelectItem :value="2">Unavailable</SelectItem>
+              <SelectItem :value="3">Busy</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-4">
+        <Button @click="showNewTherapistDialog = false" variant="outline">Cancel</Button>
+        <Button @click="addNewTherapist">Add Therapist</Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  <!-- Transaction History Dialog -->
+  <Dialog :open="showTransactions" @update:open="showTransactions = false">
+    <DialogContent class="sm:max-w-[800px]">
+      <DialogHeader>
+        <DialogTitle>
+          Booking History for {{ selectedTherapist?.first_name }} {{ selectedTherapist?.last_name }}
+        </DialogTitle>
+      </DialogHeader>
+      <div class="mt-4">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Services</TableHead>
+              <TableHead>Payment Mode</TableHead>
+              <TableHead>Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="transaction in formatTransactionHistory(selectedTherapist?.Transaction || [])" :key="transaction.date">
+              <TableCell>{{ transaction.date }}</TableCell>
+              <TableCell>{{ transaction.time }}</TableCell>
+              <TableCell>{{ transaction.client }}</TableCell>
+              <TableCell>{{ transaction.servicesProvided }}</TableCell>
+              <TableCell>{{ transaction.modeOfPayment }}</TableCell>
+              <TableCell>₱{{ transaction.totalSale.toFixed(2) }}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  <!-- Success Dialog -->
+  <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog = false">
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Success</DialogTitle>
+      </DialogHeader>
+      <p>Operation completed successfully!</p>
+      <div class="flex justify-end mt-4">
+        <Button @click="showSuccessDialog = false">Close</Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+ 
 </template>
 
 <style scoped>
