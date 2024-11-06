@@ -35,7 +35,7 @@
     </div> 
     
     -->
-
+    
     <form @submit.prevent="addNewTherapist" class="form" noValidate>
       <FormField v-slot="{ componentField }" name="first_name">
         <FormItem>
@@ -134,7 +134,8 @@
       </FormField>
 
       <div class="action-buttons">
-      <Button variant="ghost" type="submit">Add Therapist</button>
+      <Button variant="ghost" type="submit">Add Therapist</Button>
+
       </div>
     </form>
   </div>
@@ -156,13 +157,16 @@ const newTherapist = ref({
 
 const form = useForm()
 
+
+
 const addNewTherapist = form.handleSubmit(async (values) => {
   try {
     const response = await $fetch('/api/therapist/therapist', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: values,
+      body: JSON.stringify(values),
     });
+    location.reload();
   } catch (error) {
     console.error('Add Therapist failed:', error);
   }

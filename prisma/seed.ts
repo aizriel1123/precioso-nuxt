@@ -17,6 +17,8 @@ const tStatus = [
   { status: "Available" },
   { status: "Unavailable" },
   { status: "Occupied" },
+  { status: "Busy" },
+  { status: "Not Busy" }
 ];
 
 const tType = [
