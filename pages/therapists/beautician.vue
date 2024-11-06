@@ -63,7 +63,7 @@ const addNewTherapist = async () => {
     const payload = {
       first_name: newTherapist.value.first_name.trim(),
       last_name: newTherapist.value.last_name.trim(),
-      dob: formattedDateOfBirth,
+      dob: newTherapist.value.dob.trim(),
       contactinfo: newTherapist.value.contactinfo.trim(),
       schedule: newTherapist.value.schedule.trim(),
       gender_id: newTherapist.value.gender_id,
@@ -464,7 +464,13 @@ onMounted(() => {
           </div>
           <div>
             <label class="font-medium">Date of Birth</label>
-            <Input type="date" v-model="newTherapist.dob" />
+            <Input 
+              type="date" 
+              placeholder="Enter Date of Birth" 
+              v-bind="componentField" 
+              v-model="newTherapist.dob" 
+              class="thin-input" 
+            />
           </div>
           <div>
             <label class="font-medium">Schedule</label>
@@ -484,6 +490,19 @@ onMounted(() => {
                 <SelectItem :value="1">Male</SelectItem>
                 <SelectItem :value="2">Female</SelectItem>
                 <SelectItem :value="3">N/A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label class="font-medium">Status</label>
+            <Select v-model="newTherapist.status_id">
+              <SelectTrigger>
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem :value="1">Available</SelectItem>
+                <SelectItem :value="2">Unavailable</SelectItem>
+                <SelectItem :value="3">Busy</SelectItem>
               </SelectContent>
             </Select>
           </div>
