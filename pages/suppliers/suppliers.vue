@@ -223,10 +223,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto py-8 px-4">
+  <div class="flex flex-col h-screen w-screen">
     <NavBar/>
     <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-2xl font-bold">All Suppliers</h1>
+      <h1 class="text-5xl font-bold ml-14">All Suppliers</h1>
       <div class="flex gap-4">
         <Input 
           v-model="searchTerm"
@@ -244,12 +244,12 @@ onMounted(() => {
             <SelectItem value="name-desc">Name: Z to A</SelectItem>
           </SelectContent>
         </Select>
-        <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
+        <Button @click="showNewSupplierDialog = true" class="mr-14">Add New Supplier</Button>
         <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-3 gap-6 ml-14">
       <!-- Suppliers Table -->
       <div class="col-span-2">
         <div class="bg-white rounded-lg shadow">
@@ -293,7 +293,7 @@ onMounted(() => {
       </div>
 
       <!-- Supplier Info Panel -->
-      <div v-if="selectedSupplier" class="border rounded-lg p-6 bg-white shadow">
+      <div v-if="selectedSupplier" class="border rounded-lg p-6 bg-white shadow mr-14">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Supplier Info</h2>
           <Button @click="startEditing" v-if="!isEditing">Edit</Button>
