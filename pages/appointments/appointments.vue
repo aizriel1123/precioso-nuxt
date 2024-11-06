@@ -180,7 +180,7 @@
       <form @submit.prevent="submitAppointmentForm">
         <FormField v-slot="{ componentField }" name="client_name">
           <FormLabel>Select client</FormLabel>
-          <input list="clients" v-model="selectedClient" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search Client..." />
+          <input list="clients" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search Client..." />
           <datalist id="clients">
             <option value="Alice Johnson"></option>
             <option value="Bob Brown"></option>
@@ -198,7 +198,7 @@
 
         <FormField v-slot="{ componentField }" name="therapist_name">
             <FormLabel>Select Therapist</FormLabel>
-            <input list="therapists" v-model="selectedTherapist" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
+            <input list="therapists" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
             <datalist id="therapists">
               <option value="Anna Lee"></option>
               <option value="Ben Wong"></option>
@@ -225,7 +225,7 @@
 
         <FormField v-slot="{ componentField }" name="time">
           <FormLabel>Select Time</FormLabel>
-          <input list="time" v-model="selectedTimeofAppointment" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Select Time..." />
+          <input list="time" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Select Time..." />
           <datalist id="time">
             <option value="9:00AM"></option>
             <option value="9:30AM"></option>
