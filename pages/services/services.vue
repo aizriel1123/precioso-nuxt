@@ -29,7 +29,7 @@
           </Select>
   
           <!-- Search input -->
-          <Input placeholder="Search Product Name..." class="input_search" v-model="searchQuery"/>
+          <Input placeholder="Search Service Name..." class="input_search" v-model="searchQuery"/>
           <Select v-model="selectedFilter">
           <SelectTrigger class="w-[auto]">
             <SelectValue placeholder="Select filter" />
@@ -57,14 +57,14 @@
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product ID</TableHead>
-                  <TableHead>Product Name</TableHead>
+                  <TableHead>Service ID</TableHead>
+                  <TableHead>Service Name</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Cost</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Stock(Remove)</TableHead>
+                  <TableHead>Status(Remove)</TableHead>
                   <TableHead>Commission Rate</TableHead>
-                  <TableHead>Supplier Name</TableHead>
+                  <TableHead>Supplier Name(Remove)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -137,17 +137,17 @@
   
         <!-- Edit Selected Product container -->
         <div class="container-selectedproduct">
-          <h2 class="selected-product-title">Edit Selected Product</h2>
+          <h2 class="selected-product-title">Edit Selected Service</h2>
   
           <form id="update_product_panel"  >
             <FormField v-slot="{ componentField }" name="update_id">
               <FormItem>
-                <FormLabel>Product ID</FormLabel>
+                <FormLabel>Service ID</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
                     min="0" 
-                    placeholder="Product ID" 
+                    placeholder="Service ID" 
                     v-bind="componentField" 
                     v-model="selectedProductId" 
                     disabled
@@ -158,7 +158,7 @@
   
             <FormField v-slot="{ componentField }" name="update_product_name">
               <FormItem>
-                <FormLabel>Product Name</FormLabel>
+                <FormLabel>Service Name</FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  />
                 </FormControl>
@@ -168,7 +168,7 @@
             <!-- Remember this 1 -->
             <FormField v-slot="{ componentField }" name="update_product_type">
               <FormItem>
-                <FormLabel>Product Type</FormLabel>
+                <FormLabel>Service Type</FormLabel>
                 <FormControl>
                   <Select v-bind="componentField" v-model="selectedProductType" >
                     <SelectTrigger class="dropdown-trigger" >
@@ -194,7 +194,7 @@
   
             <FormField v-slot="{ componentField }" name="update_product_cost">
               <FormItem>
-                <FormLabel>Product Cost</FormLabel>
+                <FormLabel>Service Cost</FormLabel>
                 <FormControl>
                   <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost"/>
                 </FormControl>
@@ -271,7 +271,7 @@
           <form @submit.prevent="editExistingProduct">
             <FormField v-slot="{ componentField }" name="edited_product_name">
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>Service Name</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="selectedProductName" />
                   </FormControl>
@@ -281,7 +281,7 @@
             <!-- Dynamic Drop Down For Product Type -->
             <FormField v-slot="{ componentField }" name="edited_product_type">
               <FormItem>
-                <FormLabel>Product Type</FormLabel>
+                <FormLabel>Service Type</FormLabel>
                 <FormControl>
                   <Select v-bind="componentField" v-model="selectedProductType" >
                     <SelectTrigger class="dropdown-trigger" >
@@ -307,9 +307,9 @@
   
             <FormField v-slot="{ componentField }" name="edited_product_cost">
                 <FormItem>
-                  <FormLabel>Product Cost</FormLabel>
+                  <FormLabel>Service Cost</FormLabel>
                   <FormControl>
-                    <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="selectedCost"/>
+                    <Input type="number" min = "0" placeholder="Enter Service Cost" v-bind="componentField" v-model="selectedCost"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -326,7 +326,7 @@
   
             <FormField v-slot="{ componentField }" name="supplier_name">
               <FormItem>
-                  <FormLabel>Supplier Name</FormLabel>
+                  <FormLabel>Service Name</FormLabel>
                   <FormControl>
                     <Select>
                       <SelectTrigger class="dropdown-trigger">
@@ -369,7 +369,7 @@
   
             <div class="modal-action-buttons">
               <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
-              <Button variant="ghost" type="submit" >Edit Product</Button>
+              <Button variant="ghost" type="submit" >Edit Service</Button>
             </div>
           </form>
         </div>
@@ -451,7 +451,7 @@
     <!-- Popup to Add New Product -->
     <div v-if="isProductModalOpen" class="modal-overlay">
       <div class="modal-content">
-        <h2 class="selected-product-title">Add New Product</h2>
+        <h2 class="selected-product-title">Add New Service</h2>
   
         <form @submit.prevent="addNewProduct">
           <!-- <FormField v-slot="{ componentField }" name="product-id">
@@ -465,16 +465,16 @@
   
           <FormField v-slot="{ componentField }" name="new_product_name">
               <FormItem>
-                <FormLabel>Product Name</FormLabel>
+                <FormLabel>Service Name</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Enter Product Name" v-bind="componentField" />
+                  <Input type="text" placeholder="Enter Service Name" v-bind="componentField" />
                 </FormControl>
               </FormItem>
           </FormField>
   
           <FormField v-slot="{ componentField }" name="product_type">
             <FormItem>
-                <FormLabel>Product Type</FormLabel>
+                <FormLabel>Service Type</FormLabel>
                 <FormControl>
                   <Select v-bind="componentField">
                     <SelectTrigger class="dropdown-trigger">
@@ -500,9 +500,9 @@
   
           <FormField v-slot="{ componentField }" name="new_product_cost">
               <FormItem>
-                <FormLabel>Product Cost</FormLabel>
+                <FormLabel>Service Cost</FormLabel>
                 <FormControl>
-                  <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
+                  <Input type="number" min = "0" placeholder="Enter Service Cost" v-bind="componentField" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -562,7 +562,7 @@
   
           <div class="modal-action-buttons">
             <Button variant="ghost" @click="closeModal">Cancel</Button>
-            <Button variant="ghost" type="submit">Add Product</Button>
+            <Button variant="ghost" type="submit">Add Service</Button>
           </div>
         </form>
       </div>
@@ -610,10 +610,10 @@
     const isSupplierModalOpen = ref(false);
     // Set up the filter options
     const filterOptions = [
-    { value: 'id-asc', label: 'Product ID: Ascending' },
-    { value: 'id-desc', label: 'Product ID: Descending' },
-    { value: 'name-asc', label: 'Product Name: A to Z' },
-    { value: 'name-desc', label: 'Product Name: Z to A' },
+    { value: 'id-asc', label: 'Service ID: Ascending' },
+    { value: 'id-desc', label: 'Service ID: Descending' },
+    { value: 'name-asc', label: 'Service Name: A to Z' },
+    { value: 'name-desc', label: 'Service Name: Z to A' },
   
     ];
   
@@ -720,7 +720,7 @@
           body: values,
         });
       } catch (error) {
-        console.error('Add Product failed:', error);
+        console.error('Add Service failed:', error);
       }
       fetchProductDetails()
       closeProductModal();
@@ -774,12 +774,12 @@
       let missingFields = [];
   
       // Check if any field is still blank after checking both sources (values and v-models)
-      if (!updatedValues.update_product_name) missingFields.push("Product Name");
-      if (!updatedValues.update_product_type) missingFields.push("Product Type");
-      if (!updatedValues.update_product_cost) missingFields.push("Product Cost");
-      if (!updatedValues.update_product_stock) missingFields.push("Product Stock");
-      if (!updatedValues.update_product_warning_level) missingFields.push("Product Warning Level");
-      if (!updatedValues.update_product_commission_rate) missingFields.push("Product Commission Rate");
+      if (!updatedValues.update_product_name) missingFields.push("Service Name");
+      if (!updatedValues.update_product_type) missingFields.push("Service Type");
+      if (!updatedValues.update_product_cost) missingFields.push("Service Cost");
+      if (!updatedValues.update_product_stock) missingFields.push("Service Stock");
+      if (!updatedValues.update_product_warning_level) missingFields.push("Service Warning Level");
+      if (!updatedValues.update_product_commission_rate) missingFields.push("Service Commission Rate");
   
       // If any required fields are missing, prompt the user and do not send the request
       if (missingFields.length > 0) {
@@ -798,7 +798,7 @@
         console.log("This is the response");
         console.log(response);
       } catch (error) {
-        console.error('Update Product failed:', error);
+        console.error('Update Service failed:', error);
       }
       
       fetchProductDetails();
@@ -833,7 +833,7 @@
         console.log(response)
         return response
       } catch (error) {
-        console.error('Get Product Type failed:', error);
+        console.error('Get Service Type failed:', error);
         return {}
       }
     }
