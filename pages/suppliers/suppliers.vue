@@ -224,35 +224,35 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col h-screen w-screen">
-    <NavBar/>
-    <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-5xl font-bold ml-11">All Suppliers</h1>
-      <div class="flex gap-4">
-        <Input 
-          v-model="searchTerm"
-          placeholder="Find supplier" 
-          class="w-64" 
-        />
-        <Select v-model="sortOrder">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="id-asc">ID: Ascending</SelectItem>
-            <SelectItem value="id-desc">ID: Descending</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button @click="showNewSupplierDialog = true" class="mr-14">Add New Supplier</Button>
-        <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
-      </div>
+  <NavBar/>
+  <div class="flex flex-col mt-8 mb-8 ml-11">
+    <h1 class="text-5xl font-bold">All Suppliers</h1>
+    <div class="flex gap-4 mt-4">
+      <Input 
+        v-model="searchTerm"
+        placeholder="Find supplier" 
+        class="w-64" 
+      />
+      <Select v-model="sortOrder">
+        <SelectTrigger class="w-48">
+          <SelectValue placeholder="Sort by..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="id-asc">ID: Ascending</SelectItem>
+          <SelectItem value="id-desc">ID: Descending</SelectItem>
+          <SelectItem value="name-asc">Name: A to Z</SelectItem>
+          <SelectItem value="name-desc">Name: Z to A</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button @click="showNewSupplierDialog = true" class="ml-auto mr-14">Add New Supplier</Button>
+      <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
     </div>
+  </div>
 
     <div class="grid grid-cols-3 gap-6 ml-14">
       <!-- Suppliers Table -->
       <div class="col-span-2">
-        <div class="bg-white rounded-lg shadow">
+        <div class="bg-white rounded-lg shadow border border-black">
           <Table>
             <TableHeader>
               <TableRow>
@@ -287,7 +287,24 @@ onMounted(() => {
             <div class="text-sm text-gray-500">
               Page {{ currentPage }} of {{ totalPages }}
             </div>
-            <Button variant="secondary">Next Page</Button>
+            <div class="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                @click="previousPage"
+                :disabled="currentPage === 1"
+              >
+                Previous
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm"
+                @click="nextPage"
+                :disabled="currentPage === totalPages"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>

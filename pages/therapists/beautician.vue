@@ -249,34 +249,34 @@ onMounted(() => {
 <template>
   
   <div class="flex flex-col h-screen w-screen">
-    <NavBar/>
-    <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-5xl font-bold ml-11">All Therapists</h1>
-      <div class="flex gap-4">
-        <Input 
-          v-model="searchTerm"
-          placeholder="Search therapist" 
-          class="w-64" 
-        />
-        <Select v-model="sortOrder">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="id-asc">ID: Ascending</SelectItem>
-            <SelectItem value="id-desc">ID: Descending</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button @click="showNewTherapistDialog = true" class="mr-14">Add New Therapist</Button>
-      </div>
+  <NavBar/>
+  <div class="flex flex-col mt-8 mb-8 ml-11">
+    <h1 class="text-5xl font-bold">All Therapists</h1>
+    <div class="flex gap-4 mt-4">
+      <Input 
+        v-model="searchTerm"
+        placeholder="Search therapist" 
+        class="w-64" 
+      />
+      <Select v-model="sortOrder">
+        <SelectTrigger class="w-48">
+          <SelectValue placeholder="Sort by..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="id-asc">ID: Ascending</SelectItem>
+          <SelectItem value="id-desc">ID: Descending</SelectItem>
+          <SelectItem value="name-asc">Name: A to Z</SelectItem>
+          <SelectItem value="name-desc">Name: Z to A</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button @click="showNewTherapistDialog = true" class="ml-auto mr-14">Add New Therapist</Button>
     </div>
+  </div>
 
     <div class="grid grid-cols-3 gap-6 ml-14">
       <!-- Therapists Table -->
       <div class="col-span-2">
-        <div class="bg-white rounded-lg shadow">
+        <div class="bg-white rounded-lg shadow border border-black">
           <Table>
             <TableHeader>
               <TableRow>

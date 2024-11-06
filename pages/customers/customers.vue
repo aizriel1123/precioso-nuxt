@@ -258,9 +258,9 @@ onMounted(() => {
 <template>
 <div class="flex flex-col h-screen w-screen">
   <NavBar/>
-  <div class="flex justify-between items-center mt-8 mb-8">
-    <h1 class="text-5xl font-bold ml-11">All Clients</h1>
-    <div class="flex gap-4">
+  <div class="flex flex-col mt-8 mb-8 ml-11">
+    <h1 class="text-5xl font-bold">All Clients</h1>
+    <div class="flex gap-4 mt-4">
       <Input 
         v-model="searchTerm"
         placeholder="Search clients..." 
@@ -277,14 +277,15 @@ onMounted(() => {
           <SelectItem value="name-desc">Name: Z to A</SelectItem>
         </SelectContent>
       </Select>
-      <Button @click="showNewClientDialog = true" class="mr-14">Add New Client</Button>
+      <Button @click="showNewClientDialog = true" class="ml-auto mr-14">Add New Client</Button>
     </div>
   </div>
+
 
   <div class="grid grid-cols-3 gap-6 ml-14">
     <!-- Clients Table -->
     <div class="col-span-2">
-      <div class="bg-white rounded-lg shadow">
+      <div class="bg-white rounded-lg shadow border border-black">
         <Table>
           <TableHeader>
             <TableRow>
