@@ -223,194 +223,194 @@ onMounted(() => {
 </script>
 
 <template>
-  
-  <NavBar/>
-  <div class="center-components">
-    <h1 class="text-2xl font-bold">All Suppliers</h1>
-    <div class="flex-components">
-      <Input 
-        v-model="searchTerm"
-        placeholder="Find supplier" 
-        class="w-64" 
-      />
-      <Select v-model="sortOrder">
-        <SelectTrigger class="w-48">
-          <SelectValue placeholder="Sort by..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="id-asc">ID: Ascending</SelectItem>
-          <SelectItem value="id-desc">ID: Descending</SelectItem>
-          <SelectItem value="name-asc">Name: A to Z</SelectItem>
-          <SelectItem value="name-desc">Name: Z to A</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
-      <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
+  <div class="flex flex-col h-screen w-screen">
+    <NavBar/>
+    <div class="flex justify-between items-center mt-8 mb-8">
+      <h1 class="text-5xl font-bold ml-11">All Suppliers</h1>
+      <div class="flex gap-4">
+        <Input 
+          v-model="searchTerm"
+          placeholder="Find supplier" 
+          class="w-64" 
+        />
+        <Select v-model="sortOrder">
+          <SelectTrigger class="w-48">
+            <SelectValue placeholder="Sort by..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="id-asc">ID: Ascending</SelectItem>
+            <SelectItem value="id-desc">ID: Descending</SelectItem>
+            <SelectItem value="name-asc">Name: A to Z</SelectItem>
+            <SelectItem value="name-desc">Name: Z to A</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button @click="showNewSupplierDialog = true" class="mr-14">Add New Supplier</Button>
+        <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
+      </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-3 gap-6">
-    <!-- Suppliers Table -->
-    <div class="col-span-2">
-      <div class="bg-white rounded-lg shadow">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Supplier ID</TableHead>
-              <TableHead>Last Name</TableHead>
-              <TableHead>First Name</TableHead>
-              <TableHead>Date of Birth</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Product</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow 
-              v-for="supplier in paginatedSuppliers" 
-              :key="supplier.id"
-              :class="{ 'bg-amber-100': selectedSupplier?.id === supplier.id }"
-              @click="selectSupplier(supplier)"
-              class="cursor-pointer hover:bg-gray-100"
-            >
-              <TableCell>{{ supplier.id }}</TableCell>
-              <TableCell>{{ supplier.last_name }}</TableCell>
-              <TableCell>{{ supplier.first_name }}</TableCell>
-              <TableCell>{{ supplier.dob }}</TableCell>
-              <TableCell>{{ supplier.address }}</TableCell>
-              <TableCell>{{ supplier.product }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+    <div class="grid grid-cols-3 gap-6 ml-14">
+      <!-- Suppliers Table -->
+      <div class="col-span-2">
+        <div class="bg-white rounded-lg shadow">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Supplier ID</TableHead>
+                <TableHead>Last Name</TableHead>
+                <TableHead>First Name</TableHead>
+                <TableHead>Date of Birth</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Product</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow 
+                v-for="supplier in paginatedSuppliers" 
+                :key="supplier.id"
+                :class="{ 'bg-amber-100': selectedSupplier?.id === supplier.id }"
+                @click="selectSupplier(supplier)"
+                class="cursor-pointer hover:bg-gray-100"
+              >
+                <TableCell>{{ supplier.id }}</TableCell>
+                <TableCell>{{ supplier.last_name }}</TableCell>
+                <TableCell>{{ supplier.first_name }}</TableCell>
+                <TableCell>{{ supplier.dob }}</TableCell>
+                <TableCell>{{ supplier.address }}</TableCell>
+                <TableCell>{{ supplier.product }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between px-4 py-4 border-t">
-          <div class="text-sm text-gray-500">
-            Page {{ currentPage }} of {{ totalPages }}
+          <!-- Pagination -->
+          <div class="flex items-center justify-between px-4 py-4 border-t">
+            <div class="text-sm text-gray-500">
+              Page {{ currentPage }} of {{ totalPages }}
+            </div>
+            <Button variant="secondary">Next Page</Button>
           </div>
-          <Button variant="secondary">Next Page</Button>
+        </div>
+      </div>
+
+      <!-- Supplier Info Panel -->
+      <div v-if="selectedSupplier" class="border rounded-lg p-6 bg-white shadow mr-14">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Supplier Info</h2>
+          <Button @click="startEditing" v-if="!isEditing">Edit</Button>
+        </div>
+
+        <!-- Supplier Details -->
+        <div class="space-y-4">
+          <p class="text-lg font-semibold mb-2">{{ selectedSupplier.first_name }} {{ selectedSupplier.last_name }}</p>
+          <p class="text-gray-600 mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+
+          <div class="space-y-4">
+            <h3 class="font-semibold">Full Information</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="font-medium">First Name</p>
+                <Input v-if="isEditing" v-model="selectedSupplier.first_name" />
+                <p v-else>{{ selectedSupplier.first_name }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Last Name</p>
+                <Input v-if="isEditing" v-model="selectedSupplier.last_name" />
+                <p v-else>{{ selectedSupplier.last_name }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Birthdate</p>
+                <Input v-if="isEditing" type="date" v-model="selectedSupplier.dob" />
+                <p v-else>{{ selectedSupplier.dob }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Email</p>
+                <Input v-if="isEditing" v-model="selectedSupplier.email" />
+                <p v-else>{{ selectedSupplier.email }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Contact Information</p>
+                <Input v-if="isEditing" v-model="selectedSupplier.contact_information" />
+                <p v-else>{{ selectedSupplier.contact_information }}</p>
+              </div>
+            </div>
+
+            <div v-if="isEditing" class="flex justify-end gap-4 mt-4">
+              <Button @click="isEditing = false" variant="outline">Cancel</Button>
+              <Button @click="saveChanges">Save changes</Button>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <Button 
+              @click="showProducts = true" 
+              variant="outline"
+              class="w-full"
+            >
+              Supplier Product List
+            </Button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Supplier Info Panel -->
-    <div v-if="selectedSupplier" class="border rounded-lg p-6 bg-white shadow">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">Supplier Info</h2>
-        <Button @click="startEditing" v-if="!isEditing">Edit</Button>
-      </div>
-
-      <!-- Supplier Details -->
-      <div class="space-y-4">
-        <p class="text-lg font-semibold mb-2">{{ selectedSupplier.first_name }} {{ selectedSupplier.last_name }}</p>
-        <p class="text-gray-600 mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
-
-        <div class="space-y-4">
-          <h3 class="font-semibold">Full Information</h3>
+    <!-- New Supplier Dialog -->
+    <Dialog :open="showNewSupplierDialog" @update:open="showNewSupplierDialog = false">
+      <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add New Supplier</DialogTitle>
+        </DialogHeader>
+        <div class="grid gap-4 py-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <p class="font-medium">First Name</p>
-              <Input v-if="isEditing" v-model="selectedSupplier.first_name" />
-              <p v-else>{{ selectedSupplier.first_name }}</p>
+              <label class="font-medium">First Name</label>
+              <Input v-model="newSupplier.first_name" />
             </div>
             <div>
-              <p class="font-medium">Last Name</p>
-              <Input v-if="isEditing" v-model="selectedSupplier.last_name" />
-              <p v-else>{{ selectedSupplier.last_name }}</p>
-            </div>
-            <div>
-              <p class="font-medium">Birthdate</p>
-              <Input v-if="isEditing" type="date" v-model="selectedSupplier.dob" />
-              <p v-else>{{ selectedSupplier.dob }}</p>
-            </div>
-            <div>
-              <p class="font-medium">Email</p>
-              <Input v-if="isEditing" v-model="selectedSupplier.email" />
-              <p v-else>{{ selectedSupplier.email }}</p>
-            </div>
-            <div>
-              <p class="font-medium">Contact Information</p>
-              <Input v-if="isEditing" v-model="selectedSupplier.contact_information" />
-              <p v-else>{{ selectedSupplier.contact_information }}</p>
+              <label class="font-medium">Last Name</label>
+              <Input v-model="newSupplier.last_name" />
             </div>
           </div>
-
-          <div v-if="isEditing" class="flex justify-end gap-4 mt-4">
-            <Button @click="isEditing = false" variant="outline">Cancel</Button>
-            <Button @click="saveChanges">Save changes</Button>
+          <div>
+            <label class="font-medium">Date of Birth</label>
+            <Input type="date" v-model="newSupplier.dob" />
+          </div>
+          <div>
+            <label class="font-medium">Address</label>
+            <Input v-model="newSupplier.address" />
+          </div>
+          <div>
+            <label class="font-medium">Product</label>
+            <Input v-model="newSupplier.product" />
+          </div>
+          <div>
+            <label class="font-medium">Email</label>
+            <Input v-model="newSupplier.email" />
+          </div>
+          <div>
+            <label class="font-medium">Contact Information</label>
+            <Input v-model="newSupplier.contact_information" />
           </div>
         </div>
-
-        <div class="mt-4">
-          <Button 
-            @click="showProducts = true" 
-            variant="outline"
-            class="w-full"
-          >
-            Supplier Product List
-          </Button>
+        <div class="flex justify-end gap-4">
+          <Button @click="showNewSupplierDialog = false" variant="outline">Cancel</Button>
+          <Button @click="addNewSupplier">Add Supplier</Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Success Dialog -->
+    <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog = false">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Success</DialogTitle>
+        </DialogHeader>
+        <p>Operation completed successfully!</p>
+        <div class="flex justify-end mt-4">
+          <Button @click="showSuccessDialog = false">Close</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
-
-  <!-- New Supplier Dialog -->
-  <Dialog :open="showNewSupplierDialog" @update:open="showNewSupplierDialog = false">
-    <DialogContent class="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle>Add New Supplier</DialogTitle>
-      </DialogHeader>
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="font-medium">First Name</label>
-            <Input v-model="newSupplier.first_name" />
-          </div>
-          <div>
-            <label class="font-medium">Last Name</label>
-            <Input v-model="newSupplier.last_name" />
-          </div>
-        </div>
-        <div>
-          <label class="font-medium">Date of Birth</label>
-          <Input type="date" v-model="newSupplier.dob" />
-        </div>
-        <div>
-          <label class="font-medium">Address</label>
-          <Input v-model="newSupplier.address" />
-        </div>
-        <div>
-          <label class="font-medium">Product</label>
-          <Input v-model="newSupplier.product" />
-        </div>
-        <div>
-          <label class="font-medium">Email</label>
-          <Input v-model="newSupplier.email" />
-        </div>
-        <div>
-          <label class="font-medium">Contact Information</label>
-          <Input v-model="newSupplier.contact_information" />
-        </div>
-      </div>
-      <div class="flex justify-end gap-4">
-        <Button @click="showNewSupplierDialog = false" variant="outline">Cancel</Button>
-        <Button @click="addNewSupplier">Add Supplier</Button>
-      </div>
-    </DialogContent>
-  </Dialog>
-
-  <!-- Success Dialog -->
-  <Dialog :open="showSuccessDialog" @update:open="showSuccessDialog = false">
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Success</DialogTitle>
-      </DialogHeader>
-      <p>Operation completed successfully!</p>
-      <div class="flex justify-end mt-4">
-        <Button @click="showSuccessDialog = false">Close</Button>
-      </div>
-    </DialogContent>
-  </Dialog>
-  
 </template>
 
 <style scoped>
