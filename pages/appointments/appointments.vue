@@ -7,19 +7,18 @@
     <!-- Flex container for dropdown, input, filter and buttons -->
     <div class="flex-components">
       <div class="left-side">
-        <!-- Search input -->
-        <h2>{{ dateToday }}</h2>
-        <Input placeholder="Search Client..." class="input_search" v-model="searchQuery"/>
         <Select v-model="selectedFilter">
-        <SelectTrigger class="w-[auto]">
-          <SelectValue placeholder="Select filter" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem v-for="option in filterOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
+          <SelectTrigger class="w-[auto]">
+            <SelectValue placeholder="Select filter" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem v-for="option in filterOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <!-- Search input -->
+        <Input placeholder="Search Client..." class="input_search" v-model="searchClient"/>
       </div>
 
       <div class="right-side">
@@ -38,6 +37,7 @@
                 <TableHead>Appointment ID</TableHead>
                 <TableHead>Client Name</TableHead>
                 <TableHead>Therapist Name</TableHead>
+                <TableHead>Date</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Services/Promos</TableHead>
               </TableRow>
@@ -51,11 +51,13 @@
                 <TableCell>{{ appointment.id }}</TableCell>
                 <TableCell>{{ appointment.clientname }}</TableCell>
                 <TableCell>{{ appointment.therapistname }}</TableCell>
+                <TableCell>{{ appointment.date }}</TableCell>
                 <TableCell>{{ appointment.time }}</TableCell>
                 <TableCell>{{ appointment.servicespromos }}</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
+                <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -137,6 +139,15 @@
 
         <FormField v-slot="{ componentField }" name="update_time">
           <FormItem>
+            <FormLabel>Appointment Date</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Select Date" v-bind="componentField" v-model="selectedDate" disabled/>
+            </FormControl>
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="update_time">
+          <FormItem>
             <FormLabel>Appointment Time</FormLabel>
             <FormControl>
               <Input type="text" placeholder="Select Time" v-bind="componentField" v-model="selectedTime" disabled/>
@@ -171,9 +182,17 @@
           <FormLabel>Select client</FormLabel>
           <input list="clients" v-model="selectedClient" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search Client..." />
           <datalist id="clients">
-            <option value="Client A"></option>
-            <option value="Client B"></option>
-            <option value="Client C"></option>
+            <option value="Alice Johnson"></option>
+            <option value="Bob Brown"></option>
+            <option value="Charlie Davis"></option>
+            <option value="Dana Evans"></option>
+            <option value="Eli Fox"></option>
+            <option value="Fiona Green"></option>
+            <option value="George Harris"></option>
+            <option value="Holly Irwin"></option>
+            <option value="Ian James"></option>
+            <option value="Jill Kelly"></option>
+
           </datalist>
         </FormField>
 
@@ -181,9 +200,9 @@
             <FormLabel>Select Therapist</FormLabel>
             <input list="therapists" v-model="selectedTherapist" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
             <datalist id="therapists">
-              <option value="Therapist A"></option>
-              <option value="Therapist B"></option>
-              <option value="Therapist C"></option>
+              <option value="Anna Lee"></option>
+              <option value="Ben Wong"></option>
+              <option value="Chris Taylor"></option>
             </datalist>
         </FormField>
 
@@ -321,9 +340,9 @@
                   <FormLabel>Select Therapist</FormLabel>
                   <input list="therapists" v-model="selectedTherapist" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
                   <datalist id="therapists">
-                    <option value="Therapist A"></option>
-                    <option value="Therapist B"></option>
-                    <option value="Therapist C"></option>
+                    <option value="Anna Lee"></option>
+                    <option value="Ben Wong"></option>
+                    <option value="Chris Taylor"></option>
                   </datalist>
         </FormField>
 
@@ -464,9 +483,11 @@ import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
 
 const form = useForm()
 
-  // Set up For the search filtering 
-  const searchQuery = ref('');
-  const selectedFilter = ref(null)
+  // Search inputs
+  const searchClient = ref('');
+  const searchTherapist = ref('');
+
+  const selectedFilter = ref('today')
   //ID, Name and type of chosen row from table
   const selectedAppointmentId = ref(null); 
   const selectedClientName = ref('');
@@ -482,82 +503,85 @@ const form = useForm()
   const isEditModalOpen = ref(false)
   const isAppointmentModalOpen = ref(false);
 
-  //Date today
-  const date = new Date();
-  let day = date.getDate();
-  let year = date.getFullYear();
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const dateToday = `${months[date.getMonth()]} ${day},${year}`;
-
   //Sample data
   const appointments = ref([
   {
     id: 1,
     clientname: "Alice Johnson",
-    therapistname: "Dr. Smith",
+    therapistname: "Anna Lee",
+    date: "December 20, 2024",
     time: "11:00AM",
     servicespromos: "Massage Therapy",
   },
   {
     id: 2,
     clientname: "Bob Brown",
-    therapistname: "Dr. Adams",
+    therapistname: "Anna Lee",
+    date: "December 11, 2024",
     time: "10:00AM",
     servicespromos: "Acupuncture",
   },
   {
     id: 3,
     clientname: "Charlie Davis",
-    therapistname: "Dr. Lee",
+    therapistname: "Ben Wong",
+    date: "November 21, 2024",
     time: "9:00AM",
     servicespromos: "Physical Therapy",
   },
   {
     id: 4,
     clientname: "Dana Evans",
-    therapistname: "Dr. Thompson",
+    therapistname: "Anna Lee",
+    date: "November 29, 2024",
     time: "1:00PM",
     servicespromos: "Chiropractic Care",
   },
   {
     id: 5,
     clientname: "Eli Fox",
-    therapistname: "Dr. Young",
+    therapistname: "Ben Wong",
+    date: "November 23, 2024",
     time: "5:00PM",
     servicespromos: "Massage Therapy",
   },
   {
     id: 6,
     clientname: "Fiona Green",
-    therapistname: "Dr. White",
+    therapistname: "Chris Taylor",
+    date: "November 20, 2024",
     time: "6:00PM",
     servicespromos: "Reflexology",
   },
   {
     id: 7,
     clientname: "George Harris",
-    therapistname: "Dr. Clark",
+    therapistname: "Chris Taylor",
+    date: "November 18, 2024",
     time: "12:00PM",
     servicespromos: "Reiki",
   },
   {
     id: 8,
     clientname: "Holly Irwin",
-    therapistname: "Dr. Walker",
+    therapistname: "Chris Taylor",
+    date: "November 20, 2024",
     time: "7:30PM",
     servicespromos: "Hot Stone Massage",
   },
   {
     id: 9,
     clientname: "Ian James",
-    therapistname: "Dr. King",
+    therapistname: "Ben Wong",
+    date: "November 7, 2024",
     time: "1:00PM",
     servicespromos: "Massage Therapy",
   },
   {
     id: 10,
     clientname: "Jill Kelly",
-    therapistname: "Dr. Harris",
+    therapistname: "Ben Wong",
+    date: "November 7, 2024",
     time: "1:00PM",
     servicespromos: "Acupuncture",
   },
@@ -568,48 +592,68 @@ const form = useForm()
     selectedAppointmentId.value = appointment.id;
     selectedClientName.value = appointment.clientname;
     selectedTherapistName.value = appointment.therapistname;
+    selectedDate.value = appointment.date;
     selectedTime.value = appointment.time;
     servicespromos.value = appointment.servicespromos;
   };
-  
-  // Set up the filter options
-  const filterOptions = [
-  { value: 'time-asc', label: 'Time: Ascending' },
-  { value: 'time-desc', label: 'Time: Descending' },
-  { value: 'client-asc', label: 'Client Name: A to Z' },
-  { value: 'client-desc', label: 'Client Name: Z to A' },
-  { value: 'therapist-asc', label: 'Therapist Name: A to Z' },
-  { value: 'therapist-desc', label: 'Therapist Name: Z to A' },
-];
 
-  // Filter Function
-  const filteredAppointments = computed(() => {
-  // Initialize the filtered appointments array with all appointments
-  let filtered = appointments.value;
-
-  // Filter based on the search query
-  if (searchQuery.value) {
-    filtered = filtered.filter(appointment =>
-      appointment.clientname.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
-  }
-
-  // Sort the filtered appointments based on the selected filter
-  if (selectedFilter.value === 'time-asc') {
-    filtered.sort((a, b) => new Date(a.time) - new Date(b.time));
-  } else if (selectedFilter.value === 'time-desc') {
-    filtered.sort((a, b) => new Date(b.time) - new Date(a.time));
-  } else if (selectedFilter.value === 'client-asc') {
-    filtered.sort((a, b) => a.clientname.localeCompare(b.clientname));
-  } else if (selectedFilter.value === 'client-desc') {
-    filtered.sort((a, b) => b.clientname.localeCompare(a.clientname));
-  } else if (selectedFilter.value === 'therapist-asc') {
-    filtered.sort((a, b) => a.therapistname.localeCompare(b.therapistname));
-  } else if (selectedFilter.value === 'therapist-desc') {
-    filtered.sort((a, b) => b.therapistname.localeCompare(a.therapistname));
-  }
-  return filtered;
+  //Options for filter
+  const filterOptions = computed(() => {
+  return [
+    { value: 'today', label: 'Today' },
+    { value: 'thisWeek', label: 'This Week' },
+    { value: 'thisMonth', label: 'This Month' },
+    { value: 'all', label: 'All' }
+  ];
 });
+
+  //Filter logic
+  function parseDate(dateString) {
+    const [month, day, year] = dateString.split(' ');
+    return new Date(`${year}-${month}-${day}`);
+  }
+
+  const filteredAppointments = computed(() => {
+  const currentDate = new Date();
+
+  return appointments.value.filter(appointment => {
+    // Apply date filter
+    let passesDateFilter = true;
+    switch (selectedFilter.value) {
+      case 'today':
+        passesDateFilter = parseDate(appointment.date).toDateString() === currentDate.toDateString();
+        break;
+      case 'thisWeek':
+        const weekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
+        const weekEnd = new Date(currentDate.setDate(currentDate.getDate() + (6 - currentDate.getDay())));
+        passesDateFilter = parseDate(appointment.date) >= weekStart && parseDate(appointment.date) <= weekEnd;
+        break;
+      case 'thisMonth':
+        passesDateFilter = parseDate(appointment.date).getFullYear() === currentDate.getFullYear()
+          && parseDate(appointment.date).getMonth() === currentDate.getMonth();
+        break;
+    }
+
+// Apply client search
+const passesClientSearch = !searchClient.value.trim() || appointment.clientname.toLowerCase().includes(searchClient.value.toLowerCase());
+
+// Apply therapist search
+const passesTherapistSearch = !searchTherapist.value.trim() || appointment.therapistname.toLowerCase().includes(searchTherapist.value.toLowerCase());
+
+return passesDateFilter && passesClientSearch && passesTherapistSearch;
+});
+});
+
+// Function to handle filter changes
+const handleFilterChange = (newValue) => {
+  selectedFilter.value = newValue;
+};
+
+// Helper function to format dates consistently
+const formatDate = (dateString) => {
+  const date = parseDate(dateString);
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+};
 
 
   const onPageChange = newPage => {
@@ -646,7 +690,7 @@ const form = useForm()
       return (
         selectedClient.value.trim() !== '' &&
         selectedTherapist.value.trim() !== '' &&
-        selectedDate.value !== null &&
+        selectedDate2.value !== null &&
         selectedTimeofAppointment.value.trim() !== '' &&
         (selectedServices.value.some(service => service.trim() !== '') || selectedPromos.value.some(promo => promo.trim() !== ''))
       );
@@ -661,6 +705,13 @@ const submitAppointmentForm = () => {
     alert('Please fill out all required fields');
   }
 
+};
+
+//
+const searchQuery = (query) => {
+  return appointments.value.filter(appointment => 
+    appointment.clientname.toLowerCase().includes(query.toLowerCase())
+  );
 };
 
 // Function to add a new service input
