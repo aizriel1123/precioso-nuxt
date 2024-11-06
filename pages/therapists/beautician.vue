@@ -63,7 +63,7 @@ const addNewTherapist = async () => {
     const payload = {
       first_name: newTherapist.value.first_name.trim(),
       last_name: newTherapist.value.last_name.trim(),
-      dob: newTherapist.value.dob.trim(),
+      dob: formattedDateOfBirth,
       contactinfo: newTherapist.value.contactinfo.trim(),
       schedule: newTherapist.value.schedule.trim(),
       gender_id: newTherapist.value.gender_id,
