@@ -15,10 +15,6 @@
             </SelectContent>
           </Select>
           <Input v-model="searchQuery" placeholder="Search..." />
-          <Button variant="outline">
-            <Search class="h-4 w-4 mr-2" />
-            Search
-          </Button>
 
           <Select v-model="selectedFilter">
             <SelectTrigger class="w-[180px]">
@@ -30,10 +26,6 @@
               </SelectItem>
             </SelectContent>
           </Select>
-          <Button @click="applyFilters">
-            <Filter class="h-4 w-4" />
-            Apply Filters
-          </Button>
         </div>
         <div class="flex space-x-2">
           <Select v-model="selectedReservationId" @update:modelValue="handleReservationSelect">
@@ -61,7 +53,6 @@
             <h3 class="font-bold">{{ product.name }}</h3>
             <p>₱{{ parseFloat(product.cost || product.price)}}</p>
             <div class="flex items-center mt-2 justify-between">
-              <Button @click="addToCart(product)" class="bg-navy-blue text-white">Add</Button>
               <div class="flex items-center">
                 <Button @click="decreaseQuantity(product)" variant="outline" class="p-1">
                   <Minus class="h-4 w-4" />
