@@ -287,6 +287,8 @@ onMounted(() => {
                 <TableHead>Schedule</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Contact Information</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Password</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -303,6 +305,8 @@ onMounted(() => {
                 <TableCell>{{ therapist.schedule }}</TableCell>
                 <TableCell>{{ therapist.TherapistStatus?.status }}</TableCell>
                 <TableCell>{{ therapist.contactinfo }}</TableCell>
+                <TableCell>{{ therapist.username }}</TableCell>
+                <TableCell>{{ therapist.password }}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -377,6 +381,14 @@ onMounted(() => {
               <div>
                 <p class="font-medium">Contact Information</p>
                 <p>{{ selectedTherapist.contactinfo }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Username</p>
+                <p>{{ selectedTherapist.username }}</p>
+              </div>
+              <div>
+                <p class="font-medium">Password</p>
+                <p>{{ selectedTherapist.password }}</p>
               </div>
             </div>
           </div>
@@ -500,6 +512,14 @@ onMounted(() => {
                 <SelectItem :value="3">Busy</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <label class="font-medium">Username</label>
+            <Input v-model="newTherapist.username" />
+          </div>
+          <div>
+            <label class="font-medium">Password</label>
+            <Input v-model="newTherapist.password" />
           </div>
         </div>
         <div class="flex justify-end gap-4">
