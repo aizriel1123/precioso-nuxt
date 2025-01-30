@@ -9,6 +9,7 @@
         <Button variant="ghost" @click="goToRoute('/main/pos/')">Counter</Button>
         <Button variant="ghost" @click="goToRoute('/sales/sales-report')">Sales</Button>
         <Button variant="ghost" @click="goToRoute('/inventory/inventory')">Inventory</Button>
+        <Button variant="ghost" @click="goToRoute('/expenses/expenses')">Expenses</Button>
         <Button variant="ghost" @click="goToRoute('/services/services')">Services</Button>
         <Button variant="ghost" @click="goToRoute('/customers/customers')">Client</Button>
         <Button variant="ghost" @click="goToRoute('/therapists/beautician')">Therapist</Button>

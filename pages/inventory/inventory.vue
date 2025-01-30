@@ -63,6 +63,7 @@
                 <TableHead>Product Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Cost</TableHead>
+                <TableHead>Selling Price</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Commission Rate</TableHead>
@@ -80,6 +81,7 @@
                 <TableCell>{{ product.name }}</TableCell>
                 <TableCell>{{ product.ProductType }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
+                <TableCell>{{ product.sellingPrice }}</TableCell>
                 <TableCell>{{ product.StockinProduct }}</TableCell>
                 <TableCell>{{ getStockStatus(product) }}</TableCell>
                 <TableCell>{{ product.commission }}%</TableCell>
@@ -87,6 +89,7 @@
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
+                <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -162,7 +165,7 @@
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedProductName"  />
+                <Input type="text" v-bind="componentField" v-model="selectedProductName" disabled />
               </FormControl>
             </FormItem>
           </FormField>
@@ -172,24 +175,7 @@
             <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
-                <Select v-bind="componentField" v-model="selectedProductType" >
-                  <SelectTrigger class="dropdown-trigger" >
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <!-- Dynamically create SelectItem for each product -->
-                      <SelectItem 
-                        v-for="productType in product_types" 
-                        :key="productType.type" 
-                        :value="productType.type"
-                      >
-                        
-                        {{ productType.type }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Input type="text" v-bind="componentField" v-model="selectedProductType" disabled />
               </FormControl>
             </FormItem>
           </FormField>
@@ -198,8 +184,17 @@
             <FormItem>
               <FormLabel>Product Cost</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost"/>
+                <Input type="number" min="0" placeholder="Enter Cost" v-bind="componentField" v-model="selectedCost" disabled/>
               </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="edited_selling_price">
+            <FormItem>
+                <FormLabel>Selling Price</FormLabel>
+                <FormControl>
+                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" v-model="selectedSellingPrice" disabled/>
+                </FormControl>
             </FormItem>
           </FormField>
 
@@ -207,7 +202,7 @@
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock"/>
+                <Input type="number" min="0" placeholder="Enter Stock-in Value" v-bind="componentField" v-model="selectedStock" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -217,23 +212,7 @@
           <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="dropdown-trigger">
-                    <SelectValue placeholder="Supplier Name" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                    <!-- Dynamically create SelectItem for each supplier -->
-                      <SelectItem 
-                        v-for="supplier in supplier_names" 
-                        :key="supplier.supplier_name" 
-                        :value="supplier.supplier_name"
-                      >
-                        {{ supplier.supplier_name }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Input type="text" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate" disabled/>
               </FormControl>
             </FormItem>
         </FormField>
@@ -242,7 +221,7 @@
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" />
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="selectedCritical" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -251,7 +230,7 @@
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate"/>
+                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -265,7 +244,7 @@
     </div>
   </div>
 
-    <!-- Popup to Add New Product Tyoe -->
+    <!-- Popup to Edit Product -->
     <div v-if="isEditModalOpen" class="modal-overlay">
       <div class="modal-content">
         <h2 class="selected-product-title">Edit Existing Product</h2>
@@ -315,6 +294,15 @@
                 </FormControl>
                 <FormMessage />
               </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="new_selling_price">
+            <FormItem>
+                <FormLabel>Selling Price</FormLabel>
+                <FormControl>
+                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" />
+                </FormControl>
+            </FormItem>
           </FormField>
           
           <FormField v-slot="{ componentField }" name="edited_stock_level">
@@ -371,7 +359,7 @@
 
           <div class="modal-action-buttons">
             <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
-            <Button variant="ghost" type="submit" >Edit Product</Button>
+            <Button type="submit" >Edit Product</Button>
           </div>
         </form>
       </div>
@@ -387,7 +375,7 @@
           <FormItem>
             <FormLabel>New Type</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Type" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Type" v-bind="componentField" v-model="newProductType"/>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -419,7 +407,7 @@
           <FormItem>
             <FormLabel>Supplier Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" v-model="NS_SupplierName"/>
             </FormControl>
           </FormItem>
         </FormField>
@@ -428,7 +416,7 @@
           <FormItem>
             <FormLabel>Supplier Address</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Supplier Address" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Supplier Address" v-bind="componentField" v-model="NS_SupplierAddress"/>
             </FormControl>
           </FormItem>
         </FormField>
@@ -437,7 +425,7 @@
           <FormItem>
             <FormLabel>Contact Number</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Contact Number" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Contact Number" v-bind="componentField" v-model="NS_ContactNumber"/>
             </FormControl>
           </FormItem>
         </FormField>
@@ -469,7 +457,7 @@
             <FormItem>
               <FormLabel>Product Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Product Name" v-bind="componentField" />
+                <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="NP_ProductName"/>
               </FormControl>
             </FormItem>
         </FormField>
@@ -478,7 +466,7 @@
           <FormItem>
               <FormLabel>Product Type</FormLabel>
               <FormControl>
-                <Select v-bind="componentField">
+                <Select v-bind="componentField" v-model="NP_ProductType">
                   <SelectTrigger class="dropdown-trigger">
                     <SelectValue placeholder="Product Type" />
                   </SelectTrigger>
@@ -504,9 +492,18 @@
             <FormItem>
               <FormLabel>Product Cost</FormLabel>
               <FormControl>
-                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" />
+                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="NP_ProductCost"/>
               </FormControl>
               <FormMessage />
+            </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="edited_selling_price">
+            <FormItem>
+                <FormLabel>Selling Price</FormLabel>
+                <FormControl>
+                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" v-model="NP_SellingPrice" />
+                </FormControl>
             </FormItem>
         </FormField>
         
@@ -514,7 +511,7 @@
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="NP_Stock"/>
               </FormControl>
             </FormItem>
         </FormField>
@@ -523,7 +520,7 @@
           <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Select v-bind="componentField">
+                <Select v-bind="componentField" v-model="NP_SupplierName">
                   <SelectTrigger class="dropdown-trigger">
                     <SelectValue placeholder="Supplier Name" />
                   </SelectTrigger>
@@ -548,7 +545,7 @@
             <FormItem>
               <FormLabel>Warning Level</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="NP_WarningLevel"/>
               </FormControl>
             </FormItem>
           </FormField>
@@ -557,13 +554,13 @@
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" />
+                <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" v-model="NP_CommissionRate"/>
               </FormControl>
             </FormItem>
         </FormField>
 
         <div class="modal-action-buttons">
-          <Button variant="ghost" @click="closeModal">Cancel</Button>
+          <Button variant="ghost" @click="isProductModalOpen=false">Cancel</Button>
           <Button variant="ghost" type="submit">Add Product</Button>
         </div>
       </form>
@@ -579,9 +576,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-import { ArrowDownWideNarrow } from 'lucide-vue-next';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
-// SAMPLE FORM (NOTE: BOTBOT RA NI)
 import { useForm } from 'vee-validate'
   const form = useForm()
   let products = ref([]);
@@ -594,9 +589,11 @@ import { useForm } from 'vee-validate'
   const selectedProductName = ref('');
   const selectedProductType = ref('');
   const selectedCost = ref('');
+  const selectedSellingPrice = ref('');
   const selectedStock = ref('');
   const selectedCritical = ref('');
   const selectedCommissionRate = ref('');
+  const selectedSupplier=ref('')
   const selectedType = ref('all'); //default
   //Variable for Drop Down Variables
   const supplier_names = ref([]);
@@ -604,7 +601,21 @@ import { useForm } from 'vee-validate'
   //For pagination (may delete later)
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
-
+  //inputs (new type popup)
+  const newProductType=ref('')
+  //inputs (new supplier popup)
+  const NS_SupplierName=ref('')
+  const NS_SupplierAddress=ref('')
+  const NS_ContactNumber=ref('')
+  //inputs (new product popup)
+  const NP_ProductName=ref('')
+  const NP_ProductType=ref('')
+  const NP_ProductCost=ref('')
+  const NP_SellingPrice=ref('')
+  const NP_SupplierName=ref('')
+  const NP_Stock=ref('')
+  const NP_WarningLevel=ref('')
+  const NP_CommissionRate=ref('')
   //For pop ups
   const isEditModalOpen = ref(false)
   const isTypeModalOpen = ref(false);
@@ -678,19 +689,9 @@ import { useForm } from 'vee-validate'
     isEditModalOpen.value = true;
   };
 
-  //Close popup
-  const closeEditModal = () => {
-    isEditModalOpen.value = false;
-  };
-
   //Open popup for adding new products
   const openProductModal = () => {
     isProductModalOpen.value = true;
-  };
-
-  //Close popup
-  const closeProductModal = () => {
-    isProductModalOpen.value = false;
   };
 
   //Open popup for adding new supplier
@@ -698,23 +699,48 @@ import { useForm } from 'vee-validate'
     isSupplierModalOpen.value = true;
   };
 
-  //Close popup
-  const closeSupplierModal = () => {
-    isSupplierModalOpen.value = false;
-  };
   //Open popup for adding new products
   const openTypeModal = () => {
     isTypeModalOpen.value = true;
   };
-  //Close popup
-    const closeTypeModal = () => {
-    isTypeModalOpen.value = false;
-  };
 
-
+  const validateForm = () => {
+  if (isEditModalOpen.value === true) {
+    return (
+      selectedProductName.value.trim() !== '' &&
+      selectedProductType.value.trim() !== '' &&
+      (selectedCost.value !== '' && !isNaN(selectedCost.value)) &&
+      (selectedStock.value !== '' && !isNaN(selectedStock.value)) &&
+      (selectedCritical.value !== '' && !isNaN(selectedCritical.value)) &&
+      (selectedCommissionRate.value !== '' && !isNaN(selectedCommissionRate.value)) &&
+      supplier.value.trim() !== ''
+    );
+  } else if (isTypeModalOpen.value === true) {
+    return newProductType.value.trim() !== '';
+  } else if (isSupplierModalOpen.value === true) {
+    return (
+      NS_SupplierName.value.trim() !== '' &&
+      NS_SupplierAddress.value.trim() !== '' &&
+      (NS_ContactNumber.value !== '' && !isNaN(NS_ContactNumber.value))
+    );
+  } else if (isProductModalOpen.value === true) {
+    return (
+      NP_ProductName.value.trim() !=='' &&
+      NP_ProductType.value.trim() !=='' &&
+      NP_ProductCost.value !== '' && !isNaN(NS_ContactNumber.value)) &&
+      (NP_SellingPrice.value !== '' && !isNaN(NS_ContactNumber.value)) &&
+      NP_SupplierName.value.trim() !== '' &&
+      (NP_Stock.value !== '' && !isNaN(NS_ContactNumber.value)) &&
+      (NP_WarningLevel.value !== '' && !isNaN(NS_ContactNumber.value)) &&
+      (NP_CommissionRate.value !== '' && !isNaN(NS_ContactNumber.value))
+      
+  }
+  return false;
+};
 
   // Add New Product
   const addNewProduct = form.handleSubmit(async (values) => {
+    if (validateForm()) {
     try {
       const response = await $fetch('/api/inventory/product', {
         method: 'POST',
@@ -725,10 +751,24 @@ import { useForm } from 'vee-validate'
       console.error('Add Product failed:', error);
     }
     fetchProductDetails()
-    closeProductModal();
+    alert('Product added successfully.');
+    isProductModalOpen.value=false
+    NP_ProductName.value=''
+      NP_ProductType.value=''
+      NP_ProductCost.value=''
+      NP_SellingPrice.value =''
+      NP_SupplierName.value=''
+      NP_Stock.value=''
+      NP_WarningLevel.value=''
+      NP_CommissionRate.value=''
+    } else {
+      alert('Fill all necessary information first.');
+    }
   });
+
   // Add New Product Type addNewProductType ?
   const addNewType = form.handleSubmit(async (values) => {
+    if (validateForm()){
     try {
       const response = await $fetch('/api/inventory/product_type', {
         method: 'POST',
@@ -739,10 +779,17 @@ import { useForm } from 'vee-validate'
       console.error('Add Supplier failed:', error);
     }
     fetchProducts();
-    closeTypeModal()
+    alert('Type added successfully.')
+    newProductType.value=''
+    isTypeModalOpen.value=false
+  }else {
+    alert('Fill all necessary information first.');
+  }
   });
+
   // Add New Supplier
   const addNewSupplier = form.handleSubmit(async (values) => {
+    if (validateForm()){
     try {
       const response = await $fetch('/api/inventory/supplier', {
         method: 'POST',
@@ -754,7 +801,15 @@ import { useForm } from 'vee-validate'
     }
     fetchSuppliers();
     fetchProductDetails();
-    closeSupplierModal();
+    alert('Supplier added successfully.')
+    isSupplierModalOpen.value=false
+    NS_SupplierName.value=''
+    NS_SupplierAddress.value=''
+    NS_ContactNumber.value =''
+
+  } else {
+    alert('Fill all necessary information first.');
+  }
   });
   
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
@@ -802,7 +857,7 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-    
+    closeEditModal();
     fetchProductDetails();
     closeProductModal();
     resetSelected();
@@ -873,11 +928,12 @@ import { useForm } from 'vee-validate'
   const selectProduct = (product) => {
     selectedProductId.value = product.id;
     selectedProductName.value = product.name;
-    selectedProductType.value = product.type;
+    selectedProductType.value = product.ProductType;
     selectedCost.value = product.cost
     selectedStock.value = product.StockinProduct
     selectedCritical.value = product.critical_level
     selectedCommissionRate.value = product.commission
+    selectedSupplier.value= product.supplierName
     console.log("New Select")
     console.log(selectedProductId.value)
     console.log(selectedProductName.value)
@@ -942,7 +998,6 @@ import { useForm } from 'vee-validate'
     gap: 8px;
     justify-content: flex-end;
     width: 33.33%;
-
   }
 
   /* Table div and Edit Selected Product div */
