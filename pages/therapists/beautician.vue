@@ -249,7 +249,7 @@ onMounted(() => {
 
 <template>
   
-  <div class="container mx-auto py-8 px-4">
+  <div class="min-h-screen bg-background">
     <NavBar/>
     <div class="flex justify-between items-center mt-8 mb-8">
       <h1 class="text-2xl font-bold">All Therapists</h1>

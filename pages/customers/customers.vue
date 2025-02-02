@@ -256,8 +256,8 @@ onMounted(() => {
 </script>
 
 <template>
-<div class="container mx-auto py-8 px-4">
-  <NavBar/>
+ <div class="min-h-screen bg-background">
+  <NavBar />
   <div class="flex justify-between items-center mt-8 mb-8">
     <h1 class="text-2xl font-bold">All Clients</h1>
     <div class="flex gap-4">

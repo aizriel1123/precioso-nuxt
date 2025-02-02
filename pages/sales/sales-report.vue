@@ -1,473 +1,554 @@
 <template>
-  <NavBar/>
-    <div class="center-components">
-        <h1 class="title">Sales</h1>
-      <!-- Flex container for dropdown, input, filter and buttons -->
-      <div class="flex-components">
-        <div class="left-side">
-          <!-- Dropdown for selecting sales -->
-          <Select v-model="selectedPeriod">
-            <SelectTrigger class="dropdown-trigger">
-              <SelectValue placeholder="Past 24 hours" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="past-24-hours">Past 24 hours</SelectItem>
-                <SelectItem value="past-7-days">Past 7 days</SelectItem>
-                <SelectItem value="past-30-days">Past 30 days</SelectItem>
-                <SelectItem value="all-transactions">All Transactions</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <!-- Search input -->
-          <Input placeholder="Find Report by Goods/Client/Therapist" v-model="searchQuery" class="input-search" />
+  <div class="min-h-screen bg-background">
+    <NavBar />
+    <div class="p-6">
+      <!-- Date Range Selector -->
+      <span class="ml-1">
+        <span v-if="direction === 'asc'">↑</span>
+        <span v-else-if="direction === 'desc'">↓</span>
+        <span v-else class="invisible">↕</span>
+      </span>
+      <div class="mb-6 flex justify-between items-center">
+        <div v-if="isLoading" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
+        <h1 class="text-3xl font-bold">Dashboard</h1>
+        <Popover v-model:open="isCalendarOpen">
+          <PopoverTrigger as-child>
+            <Button variant="outline" class="w-[280px] justify-start text-left font-normal">
+              <CalendarIcon class="mr-2 h-4 w-4" />
+              {{ formattedDateRange }}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-auto p-0 z-50" align="end">
+            <div class="flex flex-col gap-2">
+              <Calendar
+                mode="range"
+                v-model:from="tempDateRange.from"
+                v-model:to="tempDateRange.to"
+                :number-of-months="2"
+                class="rounded-md border"
+              />
+              <div class="flex justify-end gap-2 p-2 border-t">
+                <Button variant="outline" size="sm" @click="handleCancel">
+                  Cancel
+                </Button>
+                <Button 
+                  size="sm" 
+                  @click="handleApply"
+                  :disabled="!isDateRangeValid"
+                >
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
-      <div class="table-product-container">
-      <div class="container-table">
-        <div class="table-content">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Goods Availed</TableHead>
-                <TableHead>Client Name</TableHead>
-                <TableHead>Therapist Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Sales</TableHead>
-                <TableHead>MOP</TableHead>
-                <TableHead>Commission</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow 
-                v-for="(report,index) in paginatedReports" 
-                :key="`${report.date}-${index}`"  
-              >
-                <TableCell>{{ report.date }}</TableCell>
-                <TableCell>{{ report['goods-availed'] }}</TableCell>
-                <TableCell>{{ report['client-name'] }}</TableCell>
-                <TableCell>{{ report['therapist-name'] }}</TableCell>
-                <TableCell>{{ report.type }}</TableCell>
-                <TableCell>{{ report.sales }}</TableCell>
-                <TableCell>{{ report.mop }}</TableCell>
-                <TableCell>{{ report.commission }}%</TableCell>
-              </TableRow>
-              <!-- Populate empty rows if current row count is les than 10 -->
-              <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
+      <!-- Tabs Navigation -->
+      <Tabs defaultValue="overview" class="mb-6">
+        <TabsList>
+          <TabsTrigger value="overview">Sales Overview</TabsTrigger>
+          <TabsTrigger value="history"> Sales History</TabsTrigger>
+        </TabsList>
 
-        <!-- Pagination controls -->
-        <div class="pagination-wrapper">
-          <div class="mt-4 flex justify-center items-center">
-      <Pagination 
-        v-slot="{ page }" 
-        :total="totalPages" 
-        :sibling-count="1" 
-        show-edges 
-        :default-page="currentPage"
-        :per-page="itemsPerPage"
-        @update:page="handlePageChange"
-      >
-        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-          <PaginationFirst />
-          <PaginationPrev />
-          <template v-for="(item, index) in items">
-            <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-              <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                {{ item.value }}
-              </Button>
-            </PaginationListItem>
-            <PaginationEllipsis v-else :key="item.type" :index="index" />
-          </template>
-          <PaginationNext />
-          <PaginationLast />
-        </PaginationList>
-      </Pagination>
-    </div>
-        </div>
-      </div>
-
-      <!-- Edit Selected Product container -->
-      <div class="container-selectedtransaction">
-          <h2>Sales Chart</h2>
-
-          <div class="chart-container">
-            <template v-if="DisplayChart">
-              <AreaChart :data="chartData" index="day" :categories="['Revenue']" />
-            </template>
-            <template v-else>
-              <p>Cannot Display Sales Chart for Daily Transactions</p>
-            </template>
+        <!-- Sales Overview Tab -->
+        <TabsContent value="overview">
+          <!-- Top Metrics Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card v-for="metric in metrics" :key="metric.title">
+              <CardHeader>
+                <CardTitle class="text-sm font-medium">{{ metric.title }}</CardTitle>
+                <CardDescription class="text-2xl font-bold">{{ metric.value }}</CardDescription>
+                <!-- Add trend data from API -->
+                <p class="text-xs" :class="metric.trend > 0 ? 'text-green-600' : 'text-red-600'">
+                  {{ metric.trend > 0 ? '↑' : '↓' }} {{ Math.abs(metric.trend) }}% From last month
+                </p>
+              </CardHeader>
+            </Card>
           </div>
 
-          <h3> Summary </h3>
-          <div class="summary-table">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Total Revenue</TableHead>
-                  <TableCell>₱ {{ totalRevenue }}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableHead>Total Bookings</TableHead>
-                  <TableCell>{{ totalBookings }}</TableCell>
-                </TableRow>  
-                <TableRow>
-                  <TableHead>Top Product</TableHead>
-                  <TableCell>{{ topProduct }}</TableCell>
-                </TableRow> 
-                <TableRow>
-                  <TableHead>Top Service</TableHead>
-                  <TableCell>{{ topService }}</TableCell>
-                </TableRow> 
-              </TableHeader>
-            </Table>
+          <!-- Main Content Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Left Column - Chart -->
+            <div class="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Financial Overview</CardTitle>
+                </CardHeader>
+                <CardContent class="h-[400px]">
+                  <AreaChart
+                    :data="chartData"
+                    :categories="['revenue', 'net_profit', 'gross_profit', 'expenses']"
+                    index="date"
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            <!-- Right Column - Stats -->
+            <div class="space-y-4">
+              <Card class="mt-4">
+                <CardHeader>
+                  <CardTitle>Recent Transactions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="space-y-4">
+                    <div v-for="sale in recentSales" :key="sale.id" 
+                        class="flex justify-between items-center p-3 hover:bg-muted/50 rounded-lg">
+                      <div class="flex flex-col">
+                        <p class="font-medium">{{ sale.service }}</p>
+                        <p class="text-sm text-muted-foreground">{{ sale.client }}</p>
+                      </div>
+                      <p class="font-medium">₱{{ sale.amount }}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card> 
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Performing</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div class="space-y-4">
+                    <div v-for="item in topItems" :key="item.title" class="flex justify-between items-center">
+                      <div>
+                        <p class="font-medium">{{ item.title }}</p>
+                        <p class="text-sm text-muted-foreground">{{ item.subtitle }}</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="font-medium">{{ item.value }}</p>
+                        <p class="text-xs text-muted-foreground">{{ item.metric }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      </div>
+
+          
+        </TabsContent>
+
+        <!-- History Tab -->
+        <TabsContent value="history">
+          <Card>
+            <CardHeader>
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <CardTitle>Sales History</CardTitle>
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                  <div class="relative w-full">
+                    <input
+                      v-model="searchQuery"
+                      placeholder="Search transactions..."
+                      class="pl-10 pr-4 py-2 w-full rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                    <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <Select v-model="selectedFilter">
+                    <SelectTrigger class="w-[180px]">
+                      <SelectValue placeholder="Filter by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Filters</SelectLabel>
+                        <SelectItem value="all">All Transactions</SelectItem>
+                        <SelectItem value="service">Service</SelectItem>
+                        <SelectItem value="product">Product</SelectItem>
+                        <SelectItem value="cash">Cash Payments</SelectItem>
+                        <SelectItem value="card">Card Payments</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="rounded-md border">
+                <Table>
+                  <TableHeader class="bg-muted/50">
+                    <TableRow>
+                      <TableHead class="w-[100px] cursor-pointer" @click="sortBy('date')">
+                        Date
+                        <SortIndicator :direction="sortConfig.column === 'date' ? sortConfig.direction : null" />
+                      </TableHead>
+                      <TableHead class="min-w-[150px]">Service/Product</TableHead>
+                      <TableHead class="min-w-[120px]">Client</TableHead>
+                      <TableHead class="min-w-[120px]">Therapist</TableHead>
+                      <TableHead class="w-[100px]">Type</TableHead>
+                      <TableHead class="w-[100px] cursor-pointer" @click="sortBy('sales')">
+                        Sales
+                        <SortIndicator :direction="sortConfig.column === 'sales' ? sortConfig.direction : null" />
+                      </TableHead>
+                      <TableHead class="w-[100px]">MOP</TableHead>
+                      <TableHead class="w-[130px]">Commission</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <template v-if="filteredTransactions.length">
+                      <TableRow
+                        v-for="transaction in paginatedTransactions"
+                        :key="transaction.id"
+                        class="hover:bg-muted/50"
+                      >
+                        <TableCell class="font-medium">{{ formatDate(transaction.date) }}</TableCell>
+                        <TableCell>{{ transaction.service }}</TableCell>
+                        <TableCell>{{ transaction.client }}</TableCell>
+                        <TableCell>{{ transaction.therapist }}</TableCell>
+                        <TableCell>
+                          <Badge :variant="transaction.type === 'Service' ? 'default' : 'secondary'">
+                            {{ transaction.type }}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>₱{{ formatCurrency(transaction.sales) }}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {{ transaction.mop }}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>₱{{ formatCurrency(transaction.commission) }}</TableCell>
+                      </TableRow>
+                    </template>
+                    <template v-else>
+                      <TableRow>
+                        <TableCell colspan="8" class="h-24 text-center text-muted-foreground">
+                          No transactions found
+                        </TableCell>
+                      </TableRow>
+                    </template>
+                  </TableBody>
+                </Table>
+              </div>
+              
+              <!-- Pagination -->
+              <div class="flex items-center justify-between px-2 py-4">
+                <div class="text-sm text-muted-foreground">
+                  Showing {{ paginationRange }} of {{ filteredTransactions.length }} transactions
+                </div>
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        @click.prevent="currentPage--"
+                        :disabled="currentPage === 1"
+                      />
+                    </PaginationItem>
+                    <PaginationItem v-for="page in totalPages" :key="page">
+                      <PaginationLink 
+                        href="#" 
+                        @click.prevent="currentPage = page"
+                        :is-active="currentPage === page"
+                      >
+                        {{ page }}
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        @click.prevent="currentPage++"
+                        :disabled="currentPage === totalPages"
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
+  </div>
 </template>
 
 <script setup>
-import NavBar from '~/components/Navbar.vue';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import { Input } from '@/components/ui/input'
+import { ref, computed, watch } from 'vue'
+import { format, parseISO, isWithinInterval } from 'date-fns'
+import { CalendarIcon } from 'lucide-vue-next'
+import NavBar from '~/components/Navbar.vue'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AreaChart } from '@/components/ui/chart-area'
-import {ref, computed } from 'vue'
 
+// Reactive state
+const isLoading = ref(false)
+const searchQuery = ref('')
+const selectedFilter = ref('all')
+const currentPage = ref(1)
+const itemsPerPage = 10
+const sortConfig = ref({ column: 'date', direction: 'desc' })
+const isCalendarOpen = ref(false)
+const tempDateRange = ref({ from: null, to: null })
+const dateRange = ref({ from: null, to: null })
 
-//Sample data for Individual Sales
-const salesReport = ref([
-{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-9', 'goods-availed': 'Massage Therapy', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-19', 'goods-availed': 'Serum', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-19', 'goods-availed': 'Cleansing Gel', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-9-30', 'goods-availed': 'Serum', 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-1', 'goods-availed': 'Toner', 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-9-18', 'goods-availed': 'Manicure', 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-9-17', 'goods-availed': 'Cleansing Gel', 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-14', 'goods-availed': 'Serum, Cleansing Gel', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-14', 'goods-availed': 'Serum', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-14', 'goods-availed': 'Serum', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2024-10-15', 'goods-availed': 'Serum, Cleansing Gel', 'client-name': 'Mary Joy', 'therapist-name': 'Abdul Khan', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2022-10-11', 'goods-availed': 'Skin Consultation', 'client-name': 'Maddie Lim', 'therapist-name': 'Merry Sy', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2022-10-12', 'goods-availed': 'Skin Consultation', 'client-name': 'Tina Go', 'therapist-name': 'Kenny Lao', type: 'Service', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2022-10-1', 'goods-availed': 'Moisturizing Lotion', 'client-name': 'Andy Lim', 'therapist-name': 'Kenny Lao', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-3-20', 'goods-availed': 'Serum', 'client-name': 'Cora Tan', 'therapist-name': 'Merry Sy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 },
-{ date: '2023-6-30', 'goods-availed': 'Moisturizing Lotion', 'client-name': 'Eva Yan', 'therapist-name': 'Bob Uy', type: 'Product', sales: 500, mop: 'Cash', commission: 15 }
-]);
+// Data placeholders based on Prisma models
+const transactions = ref([])
+const appointments = ref([])
+const productsSold = ref([])
+const defects = ref([])
+const stockins = ref([])
 
-//Defauls values for inputs/selects
-const searchQuery = ref('');
-const selectedPeriod = ref('past-24-hours');
-
-//Filter by time period
-const filteredReports = computed(() => {
-  const now = new Date(); // Current date and time
-
-  // Calculat start date based on selected period
-  let startDate;
-  if (selectedPeriod.value === 'past-24-hours') {
-    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // Subtract 24 hours
-  } else if (selectedPeriod.value === 'past-7-days') {
-    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // Subtract 7 days
-  } else if (selectedPeriod.value === 'past-30-days') {
-    startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Subtract 30 days
+// Computed data
+const metrics = computed(() => ({
+  revenue: {
+    title: 'Total Revenue',
+    value: formatCurrency(transactions.value.reduce((sum, t) => sum + t.totalAmount, 0)),
+    trend: 0 // TODO: Calculate from previous period
+  },
+  appointments: {
+    title: 'Total Appointments',
+    value: appointments.value.filter(a => a.status === 'Completed').length.toString(),
+    trend: 0 // TODO: Calculate from previous period
+  },
+  averageSales: {
+    title: 'Average Sales',
+    value: formatCurrency(
+      transactions.value.length > 0 
+        ? transactions.value.reduce((sum, t) => sum + t.totalAmount, 0) / transactions.value.length
+        : 0
+    ),
+    trend: 0 // TODO: Calculate from previous period
   }
-
-  // Filter reports based on date
-  let reports = salesReport.value;
-  if (startDate) {
-    reports = reports.filter(report => new Date(report.date) >= startDate);
-  }
-
-  // Filter reports based on the search query
-  return reports.filter(report =>
-    ['goods-availed', 'client-name', 'therapist-name']
-      .some(key => report[key].toLowerCase().includes(searchQuery.value.toLowerCase()))
-  );
-});
-
-
-//For pagination
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
-
-// Pagination
-const paginatedReports = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  return filteredReports.value.slice(startIndex, startIndex + itemsPerPage.value);
-});
-
-const emptyRows = computed(() => Math.max(0, itemsPerPage.value - paginatedReports.value.length));
-const totalPages = computed(() => Math.ceil(filteredReports.value.length / itemsPerPage));
-
-function handlePageChange(newPage) {
-  currentPage.value = newPage
-}
-
-//Chart
-const DisplayChart = computed(() => {
-  return selectedPeriod.value !== 'past-24-hours';
-});
+}))
 
 const chartData = computed(() => {
-  const dailyData = {};
-
-  filteredReports.value.forEach((report) => {
-    const reportDate = new Date(report.date);
-    const day = reportDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-    // Initialize the day if not yet present
-    if (!dailyData[day]) {
-      dailyData[day] = {
-        day: day,
-        Revenue: 0,
-      };
+  const dailyData = transactions.value.reduce((acc, transaction) => {
+    const date = format(transaction.date, 'yyyy-MM-dd')
+    if (!acc[date]) {
+      acc[date] = {
+        date,
+        revenue: 0,
+        expenses: calculateDailyExpenses(date),
+        net_profit: 0,
+        gross_profit: 0
+      }
     }
+    acc[date].revenue += transaction.totalAmount
+    acc[date].gross_profit += transaction.totalAmount - calculateCOGS(transaction)
+    return acc
+  }, {})
 
-    // Add to the revenue and booking count for this day
-    dailyData[day].Revenue += report.sales;
-  });
+  return Object.values(dailyData).map(day => ({
+    ...day,
+    net_profit: day.revenue - day.expenses
+  }))
+})
 
-  // Convert the object to an array for the chart component
-  return Object.values(dailyData);
+const topItems = computed(() => [
+  {
+    title: 'Top Service',
+    subtitle: getTopService().name,
+    value: formatCurrency(getTopService().revenue),
+    metric: `${getTopService().count} appointments`
+  },
+  {
+    title: 'Top Product',
+    subtitle: getTopProduct().name,
+    value: formatCurrency(getTopProduct().revenue),
+    metric: `${getTopProduct().quantity} sold`
+  }
+])
 
-});
+const recentSales = computed(() => 
+  transactions.value
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5)
+    .map(t => ({
+      id: t.id,
+      date: format(t.date, 'MMM dd, yyyy'),
+      type: t.services.length > 0 ? 'Service' : 'Product',
+      client: t.clientName,
+      amount: formatCurrency(t.totalAmount),
+      mop: t.modeOfPayment
+    }))
+)
 
+const footTraffic = computed(() => 
+  appointments.value.filter(a => a.status === 'Completed').length
+)
 
+// Transaction filtering and sorting
+const filteredTransactions = computed(() => {
+  return transactions.value
+    .filter(t => {
+      const searchMatch = Object.values(t).some(value =>
+        String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
+      )
+      const filterMatch = selectedFilter.value === 'all' ||
+        (selectedFilter.value === 'service' && t.services.length > 0) ||
+        (selectedFilter.value === 'product' && t.products.length > 0) ||
+        (selectedFilter.value === 'cash' && t.modeOfPayment === 'Cash') ||
+        (selectedFilter.value === 'card' && t.modeOfPayment === 'Card')
+      return searchMatch && filterMatch
+    })
+    .sort((a, b) => {
+      const modifier = sortConfig.value.direction === 'asc' ? 1 : -1
+      return a[sortConfig.value.column] > b[sortConfig.value.column] ? modifier : -modifier
+    })
+})
 
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredTransactions.value.slice(start, start + itemsPerPage)
+})
 
+const totalPages = computed(() => 
+  Math.ceil(filteredTransactions.value.length / itemsPerPage)
+)
 
-//Summary Table
-//Total Revenue
-const totalRevenue = computed(() => {
-  return filteredReports.value.reduce((acc, report) => acc + report.sales, 0);
-});
+const paginationRange = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage + 1
+  const end = Math.min(currentPage.value * itemsPerPage, filteredTransactions.value.length)
+  return `${start}-${end}`
+})
 
-//Total Bookings
-const totalBookings = computed(() => {
-  return filteredReports.value.length;
-});
+// Date handling
+const formattedDateRange = computed(() => {
+  if (!dateRange.value.from) return 'Select date range'
+  if (!dateRange.value.to) return format(dateRange.value.from, 'MMM dd, yyyy')
+  return `${format(dateRange.value.from, 'MMM dd, yyyy')} - ${format(dateRange.value.to, 'MMM dd, yyyy')}`
+})
 
-//Top Product
-const topProduct = computed(() => {
-  const productCount = {};
-  filteredReports.value.forEach((report) => {
-    if (report.type === 'Product') {
-      productCount[report['goods-availed']] = (productCount[report['goods-availed']] || 0) + 1;
-    }
-  });
-  return Object.keys(productCount).reduce((a, b) => (productCount[a] > productCount[b] ? a : b), '');
-});
+const isDateRangeValid = computed(() => 
+  tempDateRange.value.from && tempDateRange.value.to
+)
 
-//Top Service
-const topService = computed(() => {
-  const serviceCount = {};
-  filteredReports.value.forEach((report) => {
-    if (report.type === 'Service') {
-      serviceCount[report['goods-availed']] = (serviceCount[report['goods-availed']] || 0) + 1;
-    }
-  });
-  return Object.keys(serviceCount).reduce((a, b) => (serviceCount[a] > serviceCount[b] ? a : b), '');
-});
+// Data functions
+const calculateCommission = (transaction) => {
+  let commission = 0
+  // Service commissions
+  commission += transaction.services.reduce((sum, service) => 
+    sum + (service.price * service.commissionRate), 0)
+  // Product commissions
+  commission += transaction.products.reduce((sum, product) => 
+    sum + (product.quantity * product.price * product.commissionRate), 0)
+  return commission
+}
+
+const calculateCOGS = (transaction) => {
+  return transaction.products.reduce((sum, product) => 
+    sum + (product.quantity * product.cost), 0)
+}
+
+const calculateDailyExpenses = (date) => {
+  const stockCost = stockins.value
+    .filter(s => format(s.date, 'yyyy-MM-dd') === date)
+    .reduce((sum, s) => sum + s.totalCost, 0)
+  
+  const defectCost = defects.value
+    .filter(d => format(d.date, 'yyyy-MM-dd') === date)
+    .reduce((sum, d) => sum + (d.quantity * d.product.cost), 0)
+  
+  return stockCost + defectCost
+}
+
+const getTopService = () => {
+  const serviceMap = transactions.value
+    .flatMap(t => t.services)
+    .reduce((acc, service) => {
+      acc[service.id] = acc[service.id] || { ...service, count: 0, revenue: 0 }
+      acc[service.id].count++
+      acc[service.id].revenue += service.price
+      return acc
+    }, {})
+  return Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue)[0] || { name: 'N/A', revenue: 0, count: 0 }
+}
+
+const getTopProduct = () => {
+  const productMap = transactions.value
+    .flatMap(t => t.products)
+    .reduce((acc, product) => {
+      acc[product.id] = acc[product.id] || { ...product, quantity: 0, revenue: 0 }
+      acc[product.id].quantity += product.quantity
+      acc[product.id].revenue += product.quantity * product.price
+      return acc
+    }, {})
+  return Object.values(productMap).sort((a, b) => b.revenue - a.revenue)[0] || { name: 'N/A', revenue: 0, quantity: 0 }
+}
+
+// Data fetching
+const fetchData = async () => {
+  isLoading.value = true
+  try {
+    // TODO: Replace with actual API calls
+    // Example structure matching Prisma relationships
+    const mockTransactions = [
+      {
+        id: 1,
+        date: new Date(),
+        clientName: 'John Doe',
+        therapistName: 'Jane Smith',
+        modeOfPayment: 'Cash',
+        totalAmount: 2500,
+        services: [
+          { id: 1, name: 'Body Massage', price: 1500, commissionRate: 0.2 }
+        ],
+        products: [
+          { id: 1, name: 'Massage Oil', quantity: 2, price: 500, cost: 300, commissionRate: 0.1 }
+        ]
+      }
+    ]
+    
+    transactions.value = mockTransactions.map(t => ({
+      ...t,
+      commission: calculateCommission(t)
+    }))
+    
+    // TODO: Fetch other data (appointments, defects, stockins)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Event handlers
+const handleApply = async () => {
+  if (isDateRangeValid.value) {
+    dateRange.value = { ...tempDateRange.value }
+    isCalendarOpen.value = false
+    await fetchData()
+  }
+}
+
+const handleCancel = () => {
+  tempDateRange.value = { ...dateRange.value }
+  isCalendarOpen.value = false
+}
+
+const sortBy = (column) => {
+  if (sortConfig.value.column === column) {
+    sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortConfig.value.column = column
+    sortConfig.value.direction = 'asc'
+  }
+}
+
+// Formatters
+const formatCurrency = (value) => 
+  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value)
+
+const formatDate = (dateString) => 
+  format(new Date(dateString), 'MMM dd, yyyy')
+
+// Lifecycle hooks
+onMounted(fetchData)
+
+// Watchers
+watch([searchQuery, selectedFilter], () => currentPage.value = 1)
+watch(dateRange, fetchData, { deep: true })
+watch(isCalendarOpen, (newVal) => {
+  if (newVal) tempDateRange.value = { ...dateRange.value }
+})
+
+defineProps({
+  direction: {
+    type: String,
+    default: null
+  }
+})
 </script>
-
-<style>
-
-h1 {
-  font-size: 48px;
-  font-weight: bolder;
-}
-
-h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-  font-weight: bolder;
-}
-
-h3 {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.center-components {
-  margin-top: 10px;
-  margin-left: 2%;
-  margin-right: 2%;
-  margin-bottom: 30px;
-}
-
-/* Flexbox for dropdown, input, filter, and other buttons */
-.flex-components {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  margin-top: 10px;
-  width: 100%; 
-}
-
-/* Left side of table (dropdown, input and filter) */
-.left-side {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-start;
-  width: 66.66%;
-}
-
-/* Right side of table (buttons) */
-.right-side {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-end;
-  width: 33.33%;
-
-}
-
-/* Table div and Edit Selected Product div */
-.table-product-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-/* Table container */
-.container-table {
-  flex-basis: 66.66%; 
-  border: 1px solid #000000;
-  border-radius: 8px;
-  padding: 16px;
-}
-
-/* Edit Selected Product container */
-.container-selectedtransaction {
-  flex-basis: 33.33%;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  padding: 16px;
-
-}
-
-/* Dropdown select trigger */
-.dropdown-trigger {
-  width: 200px;
-}
-
-/* Search input */
-.input-search {
-  width: 400px;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-/* All black buttons  */
-.button {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  margin: 2px;
-  background-color: #000000;
-  color: #ffffff;
-}
-
-.icon-small {
-  width: 16px;
-  height: 16px;
-}
-
-
-.table-content {
-  flex-grow: 1;
-}
-
-/* Pagination
-.pagination-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px; 
-}
-
-/* Pagination (might remove)  */
-.pagination-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Pagination
-.pagination-button {
-  width: 40px;
-  height: 40px;
-}
-
-/* Cancel and Save Changes button */
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.cancel-button {
-  color: #ffffff;
-  background-color: #dc2626;
-}
-
-
-/* Popups */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-}
-
-.modal-action-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.chart-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  width: 100%;
-  margin-left: -20px;
-}
-</style>

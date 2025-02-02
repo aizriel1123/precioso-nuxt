@@ -1,8 +1,8 @@
 <!--New POS UI-->
 
 <template>
-  <div class="container mx-auto py-8 px-4">
-    <NavBar/>
+ <div class="min-h-screen bg-background">
+  <NavBar />
     <div class="container mx-auto p-4">
       <!-- Top Navigation Bar -->
       <div class="flex justify-between items-center mb-6">
@@ -21,14 +21,14 @@
           </Select>
 
           <!-- Search Input -->
-          <div class="relative">
+          <div class="relative mr=3">
             <Input v-model="searchQuery" placeholder="Search" class="pl-8 w-[200px]" />
             <Search class="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
 
         <!-- Reservation, Client, and Therapist Selection -->
-        <div class="flex space-x-3 items-center">
+        <div class="relative flex space-x-5 items-center">
           <Select v-model="selectedReservationId" class="w-[180px]">
             <SelectTrigger>
               <SelectValue placeholder="Select Reservation" />
@@ -41,15 +41,57 @@
           </Select>
 
           <!-- Client Select -->
-          <Select v-model="selectedClientName" class="w-[180px]">
-            <SelectTrigger>
-              <SelectValue placeholder="Client Name" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="client1">Client 1</SelectItem>
-              <SelectItem value="client2">Client 2</SelectItem>
-            </SelectContent>
-          </Select>
+          <div class="relative w-[600px]">
+    <div class="relative">
+      <Input
+        v-model="searchQueryClient"
+        placeholder="Search client..."
+        class="pr-8"
+        @focus="isClientSearchOpen = true"
+        @blur="setTimeout(() => { isClientSearchOpen = false }, 150)"
+      />
+      <div class="absolute right-2 top-1/2 -translate-y-1/2">
+        <Button
+          v-if="selectedClient"
+          variant="ghost"
+          size="icon"
+          class="h-5 w-5"
+          @click="clearClientSelection"
+        >
+          <X class="h-4 w-4" />
+        </Button>
+        <Search v-else class="h-4 w-4 text-muted-foreground" />
+      </div>
+    </div>
+
+    <div
+      v-if="isClientSearchOpen && filteredClients.length > 0"
+      class="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg"
+    >
+      <ScrollArea class="h-[200px]">
+        <div class="p-1">
+          <div
+            v-for="client in filteredClients"
+            :key="client.id"
+            class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent"
+            @mousedown="selectClient(client)"
+          >
+            <div>
+              <span class="font-medium">{{ client.first_name }} {{ client.last_name }}</span>
+              <p class="text-xs text-muted-foreground">{{ client.contact_info }}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              @mousedown.stop="selectClient(client)"
+            >
+              Select
+            </Button>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+</div>
 
           <!-- Therapist Select -->
           <Select v-model="selectedTherapist" class="w-[180px]">
@@ -343,9 +385,36 @@ const filteredProducts = computed(() => {
 })
 
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredProducts.value.length / itemsPerPage)
+// Client Search Functionality
+const searchQueryClient = ref('')
+const selectedClient = ref(null)
+const isClientSearchOpen = ref(false)
+const clients = ref([
+  { id: 1, first_name: 'John', last_name: 'Doe', contact_info: '09123456789' },
+  { id: 2, first_name: 'Jane', last_name: 'Smith', contact_info: '09876543210' },
+  // Add more mock clients based on your Prisma Client model
+])
+
+const filteredClients = computed(() => {
+  if (!searchQueryClient.value) return []
+  return clients.value.filter(client => 
+    `${client.first_name} ${client.last_name}`
+      .toLowerCase()
+      .includes(searchQueryClient.value.toLowerCase())
+  )
 })
+
+const selectClient = (client) => {
+  selectedClient.value = client
+  searchQueryClient.value = `${client.first_name} ${client.last_name}`
+  isClientSearchOpen.value = false
+}
+
+const clearClientSelection = () => {
+  selectedClient.value = null
+  searchQueryClient.value = ''
+}
+
 
 const subtotal = computed(() => {
   return cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
