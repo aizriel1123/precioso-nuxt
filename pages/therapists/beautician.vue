@@ -103,7 +103,9 @@ const resetNewTherapist = () => {
     contactinfo: '',
     schedule: '',
     gender_id: '',
-    status_id: ''
+    status_id: '',
+    username: '',
+    password: ''
   }
 }
 
@@ -144,7 +146,10 @@ const saveChanges = async () => {
         contactinfo: selectedTherapist.value.contactinfo,
         schedule: selectedTherapist.value.schedule,
         gender_id: selectedTherapist.value.gender_id,
-        status_id: selectedTherapist.value.status_id
+        status_id: selectedTherapist.value.status_id,
+        username: selectedTherapist.value.username,
+        password: selectedTherapist.value.password
+
       })
     });
 
