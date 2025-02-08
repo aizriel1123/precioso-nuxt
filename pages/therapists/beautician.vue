@@ -30,7 +30,9 @@ const newTherapist = ref({
   contactinfo: '',
   schedule: '',
   gender_id: '',
-  status_id: ''
+  status_id: '',
+  username: '',
+  password: ''
 })
 
 // Fetch therapists from API
