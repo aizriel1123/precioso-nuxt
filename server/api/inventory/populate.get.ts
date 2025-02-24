@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
         id: true,
         name: true,
         cost: true,
+        sell: true,
         critical_level: true,
         StockinProduct: {
           select: {
@@ -20,8 +21,16 @@ export default defineEventHandler(async (event) => {
             type: true, // Just select the type
           }
         },
-        
+        Supplier: {
+          select: {
+            id: true,
+            supplier_name: true,
+          }
+        }
       },
+      orderBy: {
+        id: "asc"
+      }
     });
 
     // Process the result to flatten the fields as desired

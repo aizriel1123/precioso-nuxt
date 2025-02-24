@@ -84,6 +84,7 @@ model Product {
   id              Int              @id @default(autoincrement())
   name            String           @db.VarChar(50)
   cost            Decimal          @db.Decimal(6, 2)
+  sell            Decimal          @db.Decimal(6, 2) @default(1)
   commission      Decimal          @db.Decimal(6, 2)
   product_type_id Int
   critical_level  Int?

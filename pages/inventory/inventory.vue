@@ -81,11 +81,11 @@
                 <TableCell>{{ product.name }}</TableCell>
                 <TableCell>{{ product.ProductType }}</TableCell>
                 <TableCell>{{ product.cost }}</TableCell>
-                <TableCell>{{ product.sellingPrice }}</TableCell>
+                <TableCell>{{ product.sell }}</TableCell>
                 <TableCell>{{ product.StockinProduct }}</TableCell>
                 <TableCell>{{ getStockStatus(product) }}</TableCell>
                 <TableCell>{{ product.commission }}%</TableCell>
-                <TableCell>{{ product.supplierName }}</TableCell>
+                <TableCell>{{ product.Supplier.supplier_name }}</TableCell>
               </TableRow>
               <!-- Populate empty rows if current row count is les than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
@@ -189,7 +189,7 @@
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="edited_selling_price">
+          <FormField v-slot="{ componentField }" name="update_selling_price">
             <FormItem>
                 <FormLabel>Selling Price</FormLabel>
                 <FormControl>
@@ -208,11 +208,11 @@
           </FormField>
 
           <!-- Remember this 2 -->
-          <FormField v-slot="{ componentField }" name="update_product_supplier_name">
+          <FormField v-slot="{ componentField }" name="update_product_supplier_id">
           <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate" disabled/>
+                <Input type="text" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedSupplier" disabled/>
               </FormControl>
             </FormItem>
         </FormField>
@@ -296,11 +296,11 @@
               </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="new_selling_price">
+          <FormField v-slot="{ componentField }" name="edited_selling_price">
             <FormItem>
                 <FormLabel>Selling Price</FormLabel>
                 <FormControl>
-                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" />
+                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" v-model="selectedSellingPrice" />
                 </FormControl>
             </FormItem>
           </FormField>
@@ -314,11 +314,11 @@
               </FormItem>
           </FormField>
 
-          <FormField v-slot="{ componentField }" name="supplier_name">
+          <FormField v-slot="{ componentField }" name="edited_product_supplier_id">
             <FormItem>
                 <FormLabel>Supplier Name</FormLabel>
                 <FormControl>
-                  <Select>
+                  <Select v-bind="componentField" v-model="selectedSupplier">
                     <SelectTrigger class="dropdown-trigger">
                       <SelectValue placeholder="Supplier Name" />
                     </SelectTrigger>
@@ -328,7 +328,7 @@
                         <SelectItem 
                           v-for="supplier in supplier_names" 
                           :key="supplier.supplier_name" 
-                          :value="supplier.supplier_name"
+                          :value="supplier.id.toString()"
                         >
                           {{ supplier.supplier_name }}
                         </SelectItem>
@@ -498,7 +498,7 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="edited_selling_price">
+        <FormField v-slot="{ componentField }" name="new_selling_price">
             <FormItem>
                 <FormLabel>Selling Price</FormLabel>
                 <FormControl>
@@ -516,7 +516,7 @@
             </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="supplier_name">
+        <FormField v-slot="{ componentField }" name="supplier_id">
           <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
@@ -527,10 +527,11 @@
                   <SelectContent>
                     <SelectGroup>
                     <!-- Dynamically create SelectItem for each supplier -->
+                    <!-- Changed the value from supplier name to id for insertion -->
                       <SelectItem 
                         v-for="supplier in supplier_names" 
                         :key="supplier.supplier_name" 
-                        :value="supplier.supplier_name"
+                        :value="supplier.id.toString()"
                       >
                         {{ supplier.supplier_name }}
                       </SelectItem>
@@ -684,8 +685,8 @@ import { useForm } from 'vee-validate'
     if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
   };
 
-    //Open popup for editing existing products
-    const openEditModal = () => {
+  //Open popup for editing existing products
+  const openEditModal = () => {
     isEditModalOpen.value = true;
   };
 
@@ -822,8 +823,9 @@ import { useForm } from 'vee-validate'
       update_product_name: values.edited_product_name || selectedProductName.value, 
       update_product_type: values.edited_product_type || selectedProductType.value,
       update_product_cost: values.edited_product_cost || selectedCost.value,
+      update_product_selling_price: values.edited_selling_price || selectedSellingPrice.value,
       update_product_stock: values.edited_product_stock || selectedStock.value,
-      update_product_supplier_name: values.edited_product_supplier_name,
+      update_product_supplier_id: values.edited_product_supplier_id || selectedSupplier.value,
       update_product_warning_level: values.edited_product_warning_level || selectedCritical.value,
       update_product_commission_rate: values.edited_product_commission_rate || selectedCommissionRate.value,
     };
@@ -834,6 +836,7 @@ import { useForm } from 'vee-validate'
     if (!updatedValues.update_product_name) missingFields.push("Product Name");
     if (!updatedValues.update_product_type) missingFields.push("Product Type");
     if (!updatedValues.update_product_cost) missingFields.push("Product Cost");
+    if (!updatedValues.update_product_selling_price) missingFields.push("Selling Price");
     if (!updatedValues.update_product_stock) missingFields.push("Product Stock");
     if (!updatedValues.update_product_warning_level) missingFields.push("Product Warning Level");
     if (!updatedValues.update_product_commission_rate) missingFields.push("Product Commission Rate");
@@ -844,7 +847,6 @@ import { useForm } from 'vee-validate'
       return;  // Stop the function here to prevent sending the request
     }
 
-    console.log("BRO WHAT THE HECK");
     try {
       const response = await $fetch('/api/inventory/product', {
         method: 'PUT',
@@ -857,9 +859,11 @@ import { useForm } from 'vee-validate'
     } catch (error) {
       console.error('Update Product failed:', error);
     }
-    closeEditModal();
+    console.log("BRO WHAT THE HECK");
+    isEditModalOpen.value = false
+    // closeEditModal();
     fetchProductDetails();
-    closeProductModal();
+    // closeProductModal();
     resetSelected();
   });
 
@@ -930,10 +934,11 @@ import { useForm } from 'vee-validate'
     selectedProductName.value = product.name;
     selectedProductType.value = product.ProductType;
     selectedCost.value = product.cost
+    selectedSellingPrice.value = product.sell
     selectedStock.value = product.StockinProduct
     selectedCritical.value = product.critical_level
     selectedCommissionRate.value = product.commission
-    selectedSupplier.value= product.supplierName
+    selectedSupplier.value = product.Supplier.id.toString()
     console.log("New Select")
     console.log(selectedProductId.value)
     console.log(selectedProductName.value)
@@ -949,9 +954,11 @@ import { useForm } from 'vee-validate'
     selectedProductName.value = "";
     selectedProductType.value = "";
     selectedCost.value = "";
+    selectedSellingPrice.value = "";
     selectedStock.value = "";
     selectedCritical.value = "";
     selectedCommissionRate.value = "";
+    selectedSupplier.value = "";
   }
   
 </script>

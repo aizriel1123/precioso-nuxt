@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     try {
         // Fetch supplier names from the Supplier table
         const supplier_names = await prisma.supplier.findMany({
-          select: { supplier_name: true }, // Only select the supplier_name column
+          select: { supplier_name: true, id: true }, // Only select the supplier_name column
         });
         
         // Return the data as a JSON response

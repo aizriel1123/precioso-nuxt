@@ -3,7 +3,7 @@ import prisma from "~/lib/prisma";
 export default defineEventHandler(async (event) => {
     // Get data form body
 	const body = await readBody(event);
-    // console.log(body)
+    console.log(body)
 
     // Implement Validation
 
@@ -13,16 +13,23 @@ export default defineEventHandler(async (event) => {
         data: {
             name: body.new_product_name,
             cost: body.new_product_cost,
+            sell: body.new_selling_price,
             commission: body.new_commission_rate,
             ProductType:{
                 connect:{
-                    type: body.product_type
+                    type: body.product_type,
                 }
             },
             critical_level: body.warning_level,
             StockinProduct:{
                 create:{
                     quantity: body.new_stock_level,
+                }
+            },
+            Supplier:{
+                connect:{
+                    // Should change supplier name to id
+                    id: parseInt(body.supplier_id),
                 }
             }
             
