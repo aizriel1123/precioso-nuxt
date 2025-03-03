@@ -155,7 +155,7 @@ const seed = async () => {
   }
 
   // Seed clients with gender lookup
-  for (const client of clientData) {
+  /*for (const client of clientData) {
     const genderRecord = await prisma.gender.findUnique({
       where: {
         gender: client.gender,
@@ -185,7 +185,7 @@ const seed = async () => {
         contact_info: client.contact_info,
       },
     });
-  }
+  }*/
 
   // Seed therapists
   for (const therapist of therapists) {
