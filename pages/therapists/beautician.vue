@@ -103,32 +103,36 @@ const resetNewTherapist = () => {
     contactinfo: '',
     schedule: '',
     gender_id: '',
-    status_id: '',
-    username: '',
-    password: ''
+    status_id: ''
   }
 }
 
 // Delete therapist
 const deleteTherapist = async () => {
-  if (!selectedTherapist.value) return
+  if (!selectedTherapist.value) return;
   
   try {
-    const response = await fetch(`/api/therapist/therapist/${selectedTherapist.value.id}`, {
-      method: 'DELETE'
+    const response = await fetch('/api/therapist/therapist', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: selectedTherapist.value.id })
     });
 
     if (!response.ok) throw new Error('Failed to delete therapist');
     
     await fetchTherapists();
     selectedTherapist.value = null;
-    alert('Therapist deleted successfully!'); // Success alert
+    alert('Therapist deleted successfully!');
     showSuccessDialog.value = true;
   } catch (error) {
     console.error('Error deleting therapist:', error);
     alert('Failed to delete therapist. Please try again.');
   }
-}
+};
+
+
 
 // Update therapist
 const saveChanges = async () => {
@@ -146,10 +150,7 @@ const saveChanges = async () => {
         contactinfo: selectedTherapist.value.contactinfo,
         schedule: selectedTherapist.value.schedule,
         gender_id: selectedTherapist.value.gender_id,
-        status_id: selectedTherapist.value.status_id,
-        username: selectedTherapist.value.username,
-        password: selectedTherapist.value.password
-
+        status_id: selectedTherapist.value.status_id
       })
     });
 
@@ -254,35 +255,35 @@ onMounted(() => {
 
 <template>
   
-  <div class="flex flex-col h-screen w-screen">
-  <NavBar/>
-  <div class="flex flex-col mt-8 mb-8 ml-11">
-    <h1 class="text-5xl font-bold">All Therapists</h1>
-    <div class="flex gap-4 mt-4">
-      <Input 
-        v-model="searchTerm"
-        placeholder="Search therapist" 
-        class="w-64" 
-      />
-      <Select v-model="sortOrder">
-        <SelectTrigger class="w-48">
-          <SelectValue placeholder="Sort by..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="id-asc">ID: Ascending</SelectItem>
-          <SelectItem value="id-desc">ID: Descending</SelectItem>
-          <SelectItem value="name-asc">Name: A to Z</SelectItem>
-          <SelectItem value="name-desc">Name: Z to A</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button @click="showNewTherapistDialog = true" class="ml-auto mr-14">Add New Therapist</Button>
+  <div class="min-h-screen bg-background">
+    <NavBar/>
+    <div class="flex justify-between items-center mt-8 mb-8">
+      <h1 class="text-2xl font-bold">All Therapists</h1>
+      <div class="flex gap-4">
+        <Input 
+          v-model="searchTerm"
+          placeholder="Search therapist" 
+          class="w-64" 
+        />
+        <Select v-model="sortOrder">
+          <SelectTrigger class="w-48">
+            <SelectValue placeholder="Sort by..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="id-asc">ID: Ascending</SelectItem>
+            <SelectItem value="id-desc">ID: Descending</SelectItem>
+            <SelectItem value="name-asc">Name: A to Z</SelectItem>
+            <SelectItem value="name-desc">Name: Z to A</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button @click="showNewTherapistDialog = true">Add New Therapist</Button>
+      </div>
     </div>
-  </div>
 
-    <div class="grid grid-cols-3 gap-6 ml-14">
+    <div class="grid grid-cols-3 gap-6">
       <!-- Therapists Table -->
       <div class="col-span-2">
-        <div class="bg-white rounded-lg shadow border border-black">
+        <div class="bg-white rounded-lg shadow">
           <Table>
             <TableHeader>
               <TableRow>
@@ -292,8 +293,6 @@ onMounted(() => {
                 <TableHead>Schedule</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Contact Information</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Password</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -310,8 +309,6 @@ onMounted(() => {
                 <TableCell>{{ therapist.schedule }}</TableCell>
                 <TableCell>{{ therapist.TherapistStatus?.status }}</TableCell>
                 <TableCell>{{ therapist.contactinfo }}</TableCell>
-                <TableCell>{{ therapist.username }}</TableCell>
-                <TableCell>{{ therapist.password }}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -344,7 +341,7 @@ onMounted(() => {
       </div>
 
       <!-- Therapist Info Panel -->
-      <div v-if="selectedTherapist" class="border rounded-lg p-6 bg-white shadow mr-14">
+      <div v-if="selectedTherapist" class="border rounded-lg p-6 bg-white shadow">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Therapist Info</h2>
           <div class="flex gap-2">
@@ -386,14 +383,6 @@ onMounted(() => {
               <div>
                 <p class="font-medium">Contact Information</p>
                 <p>{{ selectedTherapist.contactinfo }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Username</p>
-                <p>{{ selectedTherapist.username }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Password</p>
-                <p>{{ selectedTherapist.password }}</p>
               </div>
             </div>
           </div>
@@ -515,16 +504,10 @@ onMounted(() => {
                 <SelectItem :value="1">Available</SelectItem>
                 <SelectItem :value="2">Unavailable</SelectItem>
                 <SelectItem :value="3">Busy</SelectItem>
+                <SelectItem :value="4">Not Busy</SelectItem>
+                <SelectItem :value="5">Occupied</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <label class="font-medium">Username</label>
-            <Input v-model="newTherapist.username" />
-          </div>
-          <div>
-            <label class="font-medium">Password</label>
-            <Input v-model="newTherapist.password" />
           </div>
         </div>
         <div class="flex justify-end gap-4">
@@ -587,5 +570,14 @@ onMounted(() => {
 <style scoped>
 .container {
   max-width: 1400px;
+  width: 100%;
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 </style>

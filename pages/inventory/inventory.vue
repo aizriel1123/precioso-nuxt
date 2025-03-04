@@ -48,7 +48,6 @@
         <!-- Buttons for adding new product/supplier and enable editing in form 'edit selected product' -->
         <Button variant="ghost" class="button" @click="openTypeModal">Add New Type</Button>
         <Button variant="ghost" class="button" @click="openProductModal">Add New Product</Button>
-        <Button variant="ghost" class="button" @click="openSupplierModal">Add New Supplier</Button>
       </div>
     </div>
 
@@ -209,13 +208,13 @@
 
           <!-- Remember this 2 -->
           <FormField v-slot="{ componentField }" name="update_product_supplier_name">
-          <FormItem>
+            <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Commission Rate" v-bind="componentField" v-model="selectedCommissionRate" disabled/>
+                <Input type="text" placeholder="Supplier Name" v-bind="componentField" v-model="selectedSupplier" disabled/>
               </FormControl>
             </FormItem>
-        </FormField>
+          </FormField>
 
           <FormField v-slot="{ componentField }" name="update_product_warning_level">
             <FormItem>
@@ -315,29 +314,29 @@
           </FormField>
 
           <FormField v-slot="{ componentField }" name="supplier_name">
-            <FormItem>
-                <FormLabel>Supplier Name</FormLabel>
-                <FormControl>
-                  <Select>
-                    <SelectTrigger class="dropdown-trigger">
-                      <SelectValue placeholder="Supplier Name" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                      <!-- Dynamically create SelectItem for each supplier -->
-                        <SelectItem 
-                          v-for="supplier in supplier_names" 
-                          :key="supplier.supplier_name" 
-                          :value="supplier.supplier_name"
-                        >
-                          {{ supplier.supplier_name }}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItem>
-          </FormField>
+  <FormItem>
+    <FormLabel>Supplier Name</FormLabel>
+    <FormControl>
+      <Select v-bind="componentField" v-model="selectedSupplier">
+        <SelectTrigger class="dropdown-trigger">
+          <SelectValue placeholder="Supplier Name" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+          <!-- Dynamically create SelectItem for each supplier -->
+            <SelectItem 
+              v-for="supplier in supplier_names" 
+              :key="supplier.supplier_name" 
+              :value="supplier.supplier_name"
+            >
+              {{ supplier.supplier_name }}
+            </SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </FormControl>
+  </FormItem>
+</FormField>
 
           <FormField v-slot="{ componentField }" name="edited_warning_level">
               <FormItem>
@@ -388,184 +387,191 @@
     </div>
   </div>
 
-  <!-- Popup to Add New Supplier -->
-  <div v-if="isSupplierModalOpen" class="modal-overlay">
-    <div class="modal-content">
-      <h2 class="selected-product-title">Add New Supplier</h2>
+  
 
-      <form @submit.prevent="addNewSupplier">
-        <!-- <FormField v-slot="{ componentField }" name="supplier_id">
-          <FormItem>
-            <FormLabel>Supplier ID</FormLabel>
-            <FormControl>
-              <Input type="text" v-bind="componentField" />
-            </FormControl>
-          </FormItem>
-        </FormField> -->
-
-        <FormField v-slot="{ componentField }" name="new_supplier_name">
-          <FormItem>
-            <FormLabel>Supplier Name</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Supplier Name" v-bind="componentField" v-model="NS_SupplierName"/>
-            </FormControl>
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="supplier_address">
-          <FormItem>
-            <FormLabel>Supplier Address</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Supplier Address" v-bind="componentField" v-model="NS_SupplierAddress"/>
-            </FormControl>
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="contact_number">
-          <FormItem>
-            <FormLabel>Contact Number</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Contact Number" v-bind="componentField" v-model="NS_ContactNumber"/>
-            </FormControl>
-          </FormItem>
-        </FormField>
-
-        <div class="action-buttons">
-          <Button variant="ghost" type="button" @click="isSupplierModalOpen = false">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Add Supplier</Button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Popup to Add New Product -->
-  <div v-if="isProductModalOpen" class="modal-overlay">
+ <!-- Popup to Add New Product -->
+ <div v-if="isProductModalOpen" class="modal-overlay">
     <div class="modal-content">
       <h2 class="selected-product-title">Add New Product</h2>
 
       <form @submit.prevent="addNewProduct">
-        <!-- <FormField v-slot="{ componentField }" name="product-id">
-          <FormItem>
-            <FormLabel>Product ID</FormLabel>
-            <FormControl>
-              <Input type="text" v-bind="componentField" />
-            </FormControl>
-          </FormItem>
-        </FormField> -->
-
+        <!-- Product Name -->
         <FormField v-slot="{ componentField }" name="new_product_name">
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="Enter Product Name" v-bind="componentField" v-model="NP_ProductName"/>
-              </FormControl>
-            </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="product_type">
           <FormItem>
-              <FormLabel>Product Type</FormLabel>
-              <FormControl>
-                <Select v-bind="componentField" v-model="NP_ProductType">
-                  <SelectTrigger class="dropdown-trigger">
-                    <SelectValue placeholder="Product Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                    <!-- Dynamically create SelectItem for each product -->
-                      <SelectItem 
-                        v-for="productType in product_types" 
-                        :key="productType.type" 
-                        :value="productType.type"
-                      >
-                        
-                        {{ productType.type }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItem>
+            <FormLabel>Product Name</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Enter Product Name"
+                v-bind="componentField"
+                v-model="NP_ProductName"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         </FormField>
 
+<!-- Product Type Dropdown -->
+<FormField v-slot="{ componentField }" name="product_type">
+        <FormItem>
+          <FormLabel>Product Type</FormLabel>
+          <FormControl>
+            <Select v-model="NP_ProductType">
+              <SelectTrigger>
+                <SelectValue placeholder="Select Product Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem 
+                  v-for="productType in product_types"
+                  :key="productType.id"  
+                  :value="productType.id" 
+                >
+                  {{ productType.type }}
+                </SelectItem>
+                <SelectItem 
+                  v-if="product_types.length === 0" 
+                  disabled 
+                  value="null"
+                >
+                  No product types available
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+        <!-- Product Cost -->
         <FormField v-slot="{ componentField }" name="new_product_cost">
-            <FormItem>
-              <FormLabel>Product Cost</FormLabel>
-              <FormControl>
-                <Input type="number" min = "0" placeholder="Enter Product Cost" v-bind="componentField" v-model="NP_ProductCost"/>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          <FormItem>
+            <FormLabel>Product Cost</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                placeholder="Enter Product Cost"
+                v-bind="componentField"
+                v-model="NP_ProductCost"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         </FormField>
 
+        <!-- Selling Price -->
         <FormField v-slot="{ componentField }" name="edited_selling_price">
-            <FormItem>
-                <FormLabel>Selling Price</FormLabel>
-                <FormControl>
-                    <Input type="number" min="0" placeholder="Enter Selling Price" v-bind="componentField" v-model="NP_SellingPrice" />
-                </FormControl>
-            </FormItem>
-        </FormField>
-        
-        <FormField v-slot="{ componentField }" name="new_stock_level">
-            <FormItem>
-              <FormLabel>Stock</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="NP_Stock"/>
-              </FormControl>
-            </FormItem>
+          <FormItem>
+            <FormLabel>Selling Price</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                placeholder="Enter Selling Price"
+                v-bind="componentField"
+                v-model="NP_SellingPrice"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         </FormField>
 
+        <!-- Stock Level -->
+        <FormField v-slot="{ componentField }" name="new_stock_level">
+          <FormItem>
+            <FormLabel>Stock</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                placeholder="Enter Stock"
+                v-bind="componentField"
+                v-model="NP_Stock"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <!-- Supplier Name Dropdown -->
         <FormField v-slot="{ componentField }" name="supplier_name">
           <FormItem>
-              <FormLabel>Supplier Name</FormLabel>
-              <FormControl>
-                <Select v-bind="componentField" v-model="NP_SupplierName">
-                  <SelectTrigger class="dropdown-trigger">
-                    <SelectValue placeholder="Supplier Name" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                    <!-- Dynamically create SelectItem for each supplier -->
-                      <SelectItem 
-                        v-for="supplier in supplier_names" 
-                        :key="supplier.supplier_name" 
-                        :value="supplier.supplier_name"
-                      >
-                        {{ supplier.supplier_name }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItem>
+            <FormLabel>Supplier Name</FormLabel>
+            <FormControl>
+              <Select v-bind="componentField" v-model="NP_SupplierName" required>
+                <SelectTrigger class="dropdown-trigger">
+                  <SelectValue placeholder="Select Supplier" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="supplier in supplier_names"
+                      :key="supplier.id"
+                      :value="supplier.supplier_name"
+                    >
+                      {{ supplier.supplier_name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         </FormField>
 
+        <!-- Warning Level -->
         <FormField v-slot="{ componentField }" name="warning_level">
-            <FormItem>
-              <FormLabel>Warning Level</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Warning Level" v-bind="componentField" v-model="NP_WarningLevel"/>
-              </FormControl>
-            </FormItem>
-          </FormField>
-
-        <FormField v-slot="{ componentField }" name="new_commission_rate">
-            <FormItem>
-              <FormLabel>Commission Rate</FormLabel>
-              <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField" v-model="NP_CommissionRate"/>
-              </FormControl>
-            </FormItem>
+          <FormItem>
+            <FormLabel>Warning Level</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                placeholder="Enter Warning Level"
+                v-bind="componentField"
+                v-model="NP_WarningLevel"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         </FormField>
 
+        <!-- Commission Rate -->
+        <FormField v-slot="{ componentField }" name="new_commission_rate">
+          <FormItem>
+            <FormLabel>Commission Rate (%)</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0"
+                placeholder="Enter Commission Rate"
+                v-bind="componentField"
+                v-model="NP_CommissionRate"
+                required
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <!-- Modal Action Buttons -->
         <div class="modal-action-buttons">
-          <Button variant="ghost" @click="isProductModalOpen=false">Cancel</Button>
+          <Button variant="ghost" @click="isProductModalOpen = false">
+            Cancel
+          </Button>
           <Button variant="ghost" type="submit">Add Product</Button>
         </div>
       </form>
     </div>
   </div>
+
+
 </template>
 
 <script setup>
@@ -627,6 +633,8 @@ import { useForm } from 'vee-validate'
   { value: 'id-desc', label: 'Product ID: Descending' },
   { value: 'name-asc', label: 'Product Name: A to Z' },
   { value: 'name-desc', label: 'Product Name: Z to A' },
+  { value: 'supplier-asc', label: 'Supplier Name: A to Z' },
+  { value: 'supplier-desc', label: 'Supplier Name: Z to A' },
 
   ];
 
@@ -713,7 +721,7 @@ import { useForm } from 'vee-validate'
       (selectedStock.value !== '' && !isNaN(selectedStock.value)) &&
       (selectedCritical.value !== '' && !isNaN(selectedCritical.value)) &&
       (selectedCommissionRate.value !== '' && !isNaN(selectedCommissionRate.value)) &&
-      supplier.value.trim() !== ''
+      selectedSupplier.value.trim() !== ''
     );
   } else if (isTypeModalOpen.value === true) {
     return newProductType.value.trim() !== '';
@@ -724,93 +732,84 @@ import { useForm } from 'vee-validate'
       (NS_ContactNumber.value !== '' && !isNaN(NS_ContactNumber.value))
     );
   } else if (isProductModalOpen.value === true) {
-    return (
-      NP_ProductName.value.trim() !=='' &&
-      NP_ProductType.value.trim() !=='' &&
-      NP_ProductCost.value !== '' && !isNaN(NS_ContactNumber.value)) &&
-      (NP_SellingPrice.value !== '' && !isNaN(NS_ContactNumber.value)) &&
-      NP_SupplierName.value.trim() !== '' &&
-      (NP_Stock.value !== '' && !isNaN(NS_ContactNumber.value)) &&
-      (NP_WarningLevel.value !== '' && !isNaN(NS_ContactNumber.value)) &&
-      (NP_CommissionRate.value !== '' && !isNaN(NS_ContactNumber.value))
-      
-  }
+  return (
+    NP_ProductName.value.trim() !== '' &&
+    NP_ProductType.value !== '' &&
+    NP_ProductCost.value !== '' &&
+    NP_CommissionRate.value !== '' &&
+    NP_WarningLevel.value !== '' &&
+    NP_Stock.value !== '' &&
+    NP_SupplierName.value.trim() !== ''
+  );
+}
   return false;
 };
 
   // Add New Product
-  const addNewProduct = form.handleSubmit(async (values) => {
+  const addNewProduct = form.handleSubmit(async () => {
+  try {
+    const payload = {
+      new_product_name: NP_ProductName.value, // Keep consistent naming
+      product_type: NP_ProductType.value, // Should be the ID from dropdown
+      cost: parseFloat(NP_ProductCost.value),
+      selling_price: parseFloat(NP_SellingPrice.value),
+      stock: parseInt(NP_Stock.value),
+      critical_level: parseInt(NP_WarningLevel.value),
+      commission: parseFloat(NP_CommissionRate.value),
+      supplier_name: NP_SupplierName.value
+    };
+
+    const response = await $fetch('/api/inventory/product', {
+      method: 'POST',
+      body: payload
+    });
+
+    // Reset form
+    NP_ProductName.value = '';
+    NP_ProductType.value = '';
+    NP_ProductCost.value = '';
+    NP_SellingPrice.value = '';
+    NP_SupplierName.value = '';
+    NP_Stock.value = '';
+    NP_WarningLevel.value = '';
+    NP_CommissionRate.value = '';
+    
+    // Refresh data
+    fetchProductDetails();
+    isProductModalOpen.value = false;
+    alert('Product added successfully!');
+    
+  } catch (error) {
+    console.error('Add Product failed:', error);
+    alert('Failed to add product. Please check the data and try again.');
+  }
+});
+
+  // Add New Product Type addNewProductType ?
+  const addNewType = form.handleSubmit(async (values) => {
     if (validateForm()) {
-    try {
-      const response = await $fetch('/api/inventory/product', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: values,
-      });
-    } catch (error) {
-      console.error('Add Product failed:', error);
-    }
-    fetchProductDetails()
-    alert('Product added successfully.');
-    isProductModalOpen.value=false
-    NP_ProductName.value=''
-      NP_ProductType.value=''
-      NP_ProductCost.value=''
-      NP_SellingPrice.value =''
-      NP_SupplierName.value=''
-      NP_Stock.value=''
-      NP_WarningLevel.value=''
-      NP_CommissionRate.value=''
+      try {
+        const response = await $fetch('/api/inventory/product_type', {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: { new_type: newProductType.value },
+        });
+        
+        // Refresh product types after adding new one
+        fetchProductTypes();
+        alert('Type added successfully.');
+        newProductType.value = '';
+        isTypeModalOpen.value = false;
+      } catch (error) {
+        console.error('Add Product Type failed:', error);
+        alert('Failed to add new product type.');
+      }
     } else {
       alert('Fill all necessary information first.');
     }
   });
 
-  // Add New Product Type addNewProductType ?
-  const addNewType = form.handleSubmit(async (values) => {
-    if (validateForm()){
-    try {
-      const response = await $fetch('/api/inventory/product_type', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: values,
-      });
-    } catch (error) {
-      console.error('Add Supplier failed:', error);
-    }
-    fetchProducts();
-    alert('Type added successfully.')
-    newProductType.value=''
-    isTypeModalOpen.value=false
-  }else {
-    alert('Fill all necessary information first.');
-  }
-  });
 
-  // Add New Supplier
-  const addNewSupplier = form.handleSubmit(async (values) => {
-    if (validateForm()){
-    try {
-      const response = await $fetch('/api/inventory/supplier', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: values,
-      });
-    } catch (error) {
-      console.error('Add Supplier failed:', error);
-    }
-    fetchSuppliers();
-    fetchProductDetails();
-    alert('Supplier added successfully.')
-    isSupplierModalOpen.value=false
-    NS_SupplierName.value=''
-    NS_SupplierAddress.value=''
-    NS_ContactNumber.value =''
-
-  } else {
-    alert('Fill all necessary information first.');
-  }
-  });
   
   // NEEDS A LOT OF FIXING IDK WHAT THE HELL IS HAPPENING HERE NGL
   // Define the function to handle the form submission
@@ -823,7 +822,7 @@ import { useForm } from 'vee-validate'
       update_product_type: values.edited_product_type || selectedProductType.value,
       update_product_cost: values.edited_product_cost || selectedCost.value,
       update_product_stock: values.edited_product_stock || selectedStock.value,
-      update_product_supplier_name: values.edited_product_supplier_name,
+      update_product_supplier_name: values.supplier_name || selectedSupplier.value,
       update_product_warning_level: values.edited_product_warning_level || selectedCritical.value,
       update_product_commission_rate: values.edited_product_commission_rate || selectedCommissionRate.value,
     };
@@ -835,6 +834,7 @@ import { useForm } from 'vee-validate'
     if (!updatedValues.update_product_type) missingFields.push("Product Type");
     if (!updatedValues.update_product_cost) missingFields.push("Product Cost");
     if (!updatedValues.update_product_stock) missingFields.push("Product Stock");
+    if (!updatedValues.update_product_supplier_name) missingFields.push("Supplier Name");
     if (!updatedValues.update_product_warning_level) missingFields.push("Product Warning Level");
     if (!updatedValues.update_product_commission_rate) missingFields.push("Product Commission Rate");
 
@@ -844,7 +844,6 @@ import { useForm } from 'vee-validate'
       return;  // Stop the function here to prevent sending the request
     }
 
-    console.log("BRO WHAT THE HECK");
     try {
       const response = await $fetch('/api/inventory/product', {
         method: 'PUT',
@@ -866,7 +865,7 @@ import { useForm } from 'vee-validate'
   // Fill up supplier names dropdown
   async function fetchSuppliers() {
     try {
-      const response = await $fetch('/api/inventory/supplier', {
+      const response = await $fetch('/api/supplier/supplier', {
         method: 'GET',
         headers: { "Content-Type": "application/json" },
       });
@@ -879,22 +878,27 @@ import { useForm } from 'vee-validate'
     }
   }
   fetchSuppliers();
-  // Fill up product type dropdown
-  async function fetchProducts() {
-    try {
-      const response = await $fetch('/api/inventory/product', {
-        method: 'GET',
-        
-      });
-      product_types.value = response;
-      console.log(response)
-      return response
-    } catch (error) {
-      console.error('Get Product Type failed:', error);
-      return {}
-    }
+  
+
+ // Fill up product types dropdown
+ async function fetchProductTypes() {
+  try {
+    const response = await $fetch('/api/inventory/product_type');
+    // Ensure proper data structure
+    product_types.value = response.data.map(pt => ({
+      id: pt.id,
+      type: pt.type
+    }));
+    console.log("Mapped Product Types:", product_types.value);
+    return response;
+  } catch (error) {
+    console.error('Error fetching product types:', error);
+    product_types.value = [];
+    return {};
   }
-  fetchProducts();
+}
+
+
   // To fetch product details
   async function fetchProductDetails() {
     try {
@@ -933,7 +937,7 @@ import { useForm } from 'vee-validate'
     selectedStock.value = product.StockinProduct
     selectedCritical.value = product.critical_level
     selectedCommissionRate.value = product.commission
-    selectedSupplier.value= product.supplierName
+    selectedSupplier.value = product.supplierName;
     console.log("New Select")
     console.log(selectedProductId.value)
     console.log(selectedProductName.value)
@@ -954,6 +958,12 @@ import { useForm } from 'vee-validate'
     selectedCommissionRate.value = "";
   }
   
+
+  // Make sure to call this when component mounts
+onMounted(async () => {
+  await fetchProductTypes();
+});
+
 </script>
 
 

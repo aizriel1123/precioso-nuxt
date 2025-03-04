@@ -2,47 +2,62 @@ import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   try {
-    // Fetch data for Product including name, cost, commission, product type, and stock quantity
+    // Fetch data for each product
     const products = await prisma.product.findMany({
       select: {
         id: true,
         name: true,
         cost: true,
+        commission: true,
+        sell: true,            // Include the selling price
         critical_level: true,
+        ProductType: {
+          select: { type: true }
+        },
+        // Get supplier info from Stockin
+        Stockin: {
+          select: {
+            Supplier: {
+              select: {
+                supplier_name: true
+              }
+            }
+          }
+        },
+        // Get stock quantity from StockinProduct
         StockinProduct: {
           select: {
-            quantity: true, // Just select quantity
+            quantity: true
           }
-        },
-        commission: true,
-        ProductType: {
-          select: {
-            type: true, // Just select the type
-          }
-        },
-        
+        }
       },
     });
 
-    // Process the result to flatten the fields as desired
-    const output = products.map(product => ({
-      ...product,
-      ProductType: product.ProductType.type, // Flatten ProductType to just its type
-      StockinProduct: product.StockinProduct.length > 0 
-        ? product.StockinProduct[0].quantity // Extract the first quantity if available
-        : null, // Handle case where there's no stock
+    // Flatten the data into a shape your front end expects
+    const output = products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      // Convert Decimals to string (or parseFloat if you prefer numeric)
+      cost: product.cost.toString(),
+      commission: product.commission.toString(),
+      // We'll call it `sellingPrice` on the front end
+      sellingPrice: product.sell.toString(),
+      critical_level: product.critical_level ?? 0,
+      // Flatten ProductType to just a string
+      ProductType: product.ProductType?.type ?? "",
+      // If you want to show just the first supplier
+      supplierName: product.Stockin.length > 0
+        ? product.Stockin[0].Supplier?.supplier_name ?? ""
+        : "",
+      // Show the first StockinProduct quantity (or sum them if you want total)
+      StockinProduct: product.StockinProduct.length > 0
+        ? product.StockinProduct[0].quantity
+        : 0,
     }));
 
-    // Log the structured output for debugging
-    // console.log("This is to separate the random gibberish beforehand.")
-    // console.log(output)
-
-    // Return the parsed and flattened output
     return output;
-
   } catch (error) {
-    // Handle any errors during the database query
-    console.error('Failed to fetch products:', error);
-    return { error: 'Failed to fetch products' };
+    console.error("Failed to fetch products:", error);
+    return { error: "Failed to fetch products" };
   }
 });

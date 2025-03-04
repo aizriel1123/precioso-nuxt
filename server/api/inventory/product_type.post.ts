@@ -1,21 +1,44 @@
 import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
-    // Get data form body
-	const body = await readBody(event);
-    console.log(body)
+    try {
+        const body = await readBody(event);
+        console.log("Received Data:", body);
 
-    // Implement Validation
-    // Need to add pa
+        let type = body.new_type?.trim();
 
-    // Create
-    const obj = await prisma.productType.create({
-        data: {
-            type: body.new_type,
+        // Default to predefined sample types if no type is provided
+        const sampleTypes = ["Oil", "Toner", "Serum", "Moisturizer", "Cleanser"];
+
+        if (!type) {
+            for (const sampleType of sampleTypes) {
+                await prisma.productType.upsert({
+                    where: { type: sampleType },
+                    update: {},
+                    create: { type: sampleType },
+                });
+            }
+            return {
+                success: true,
+                message: "Sample product types added successfully",
+                data: sampleTypes,
+            };
         }
-    })
-    
-    return {
-        hatdog: "hehe"
+
+        // Create new product type
+        const obj = await prisma.productType.create({
+            data: { type },
+        });
+
+        return {
+            success: true,
+            message: "Product type created successfully",
+            data: obj,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message:  "An error occurred while creating the product type",
+        };
     }
 });

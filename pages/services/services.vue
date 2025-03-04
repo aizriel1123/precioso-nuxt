@@ -51,12 +51,12 @@
           </TableHeader>
           <TableBody>
             <TableRow 
-              v-for="(item, index) in (selectedTab === 'service' ? services : promos)" 
+              v-for="(item, index) in filteredItems" 
               :key="item.id" 
               @click="selectGoods(item)"
-                >
+              >
               <TableCell>{{ item.id }}</TableCell>
-              <TableCell>{{ item.name }}</TableCell>
+              <TableCell>{{ item.name || item.promo }}</TableCell>
               <TableCell>{{ item.price }}</TableCell>
               <TableCell>{{ item.commission }}</TableCell>
               <TableCell v-if="selectedTab === 'service'">{{ item.type }}</TableCell>
@@ -67,24 +67,22 @@
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
+                <TableCell v-if="selectedTab === 'service'">&nbsp;</TableCell>
               </TableRow>
             </TableBody>
-          </Table>
+          </Table>  
           <div class="pagination-wrapper">
           <Pagination
-            v-slot="{ page }"
-            :total="totalPages"
-            :sibling-count="1"
-            show-edges
-            :default-page="currentPage"
-            @change="onPageChange"
-          >
+              v-model:page="currentPage"
+              :total="totalPages"
+              :sibling-count="1"
+              show-edges
+            >
             <PaginationList v-slot="{ items }" class="pagination-list">
               <PaginationFirst @click="onPageChange(1)" />
               <PaginationPrev @click="onPageChange(currentPage - 1)" />
               <template v-for="(item, index) in items">
-                <PaginationListItem
+                <PaginationListItem 
                   v-if="item.type === 'page'"
                   :key="index"
                   :value="item.value"
@@ -107,7 +105,7 @@
         </div>
         </div>
       </div>
-    <!-- Edit Selected Serivce/Promo container -->
+    <!-- Edit Selected Service/Promo container -->
     <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected {{tabTitle}}</h2>
 
@@ -256,6 +254,7 @@
 
           <div class="action-buttons">
             <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
+            <Button variant="ghost" class="button" type="button" @click="deleteItem">Delete</Button>
           </div>
         </form>
       </div>
@@ -302,16 +301,15 @@
           <FormItem>
             <FormLabel>Service Type</FormLabel>
             <FormControl>
-              <Input type="text" min="0.00" step="0.01" placeholder="Enter Service Type" v-bind="componentField" v-model="selectedServiceType"/>
+              <Input type="text" placeholder="Enter Service Type" v-bind="componentField" v-model="selectedServiceType"/>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Add Service</Button>
+          <Button variant="ghost" type="submit" class="button">Save Changes</Button>
         </div>
       </form>
     </div>
@@ -352,7 +350,7 @@
 
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Add Service</Button>
+          <Button variant="ghost" type="submit" class="button">Save Changes</Button>
         </div>
       </form>
     </div>
@@ -368,17 +366,17 @@
           <FormItem>
             <FormLabel>Service Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="newServiceName" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new_service_name">
+        <FormField v-slot="{ componentField }" name="new_service_price">
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" />
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newServicePrice" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -388,7 +386,7 @@
           <FormItem>
             <FormLabel>Commission</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" />
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="newServiceCommission" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -398,12 +396,11 @@
           <FormItem>
             <FormLabel>Service Type</FormLabel>
             <FormControl>
-              <Input type="text" min="0.00" step="0.01" placeholder="Enter Service Type" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Service Type" v-bind="componentField" v-model="newServiceType" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-
 
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closeServiceModal">Cancel</Button>
@@ -413,8 +410,8 @@
     </div>
   </div>
 
-    <!-- Popup to Add New Promo -->
-    <div v-if="isPromoModalOpen" class="modal-overlay">
+  <!-- Popup to Add New Promo -->
+  <div v-if="isPromoModalOpen" class="modal-overlay">
     <div class="modal-content">
       <h2 class="selected-product-title">Add New Promo</h2>
       <form @submit.prevent="addNewPromo">
@@ -423,32 +420,31 @@
           <FormItem>
             <FormLabel>Promo Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" />
+              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="newPromoName" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new_service_name">
+        <FormField v-slot="{ componentField }" name="new_promo_price">
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" />
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newPromoPrice" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new_service_commission">
+        <FormField v-slot="{ componentField }" name="new_promo_commission">
           <FormItem>
             <FormLabel>Commission</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" />
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="newPromoCommission" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-
 
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closePromoModal">Cancel</Button>
@@ -457,32 +453,24 @@
       </form>
     </div>
   </div>
-
-  
-  
-
-
-
 </template>
 
 <script setup>
 import NavBar from '~/components/Navbar.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-//Declare popups
-const isEditModalOpen = ref(false)
-const isServiceModalOpen = ref(false)
-const isPromoModalOpen = ref(false)
+// --- Popup states, selection, and form data ---
+const isEditModalOpen = ref(false);
+const isServiceModalOpen = ref(false);
+const isPromoModalOpen = ref(false);
 
-//Selected item from tabl
-const selectedServiceName = ref('');
 const selectedServiceId = ref('');
+const selectedServiceName = ref('');
 const selectedServicePrice = ref(0);
 const selectedServiceCommission = ref(0);
 const selectedServiceType = ref('');
@@ -492,71 +480,137 @@ const selectedPromoName = ref('');
 const selectedPromoPrice = ref(0);
 const selectedPromoCommission = ref(0);
 
+const newServiceName = ref('');
+const newServicePrice = ref('');
+const newServiceCommission = ref('');
+const newServiceType = ref('');
 
-//Change H1 depending on tab chosen
-const selectedTab = ref('service')
-const tabTitles = {
-  service: 'Services',
-  promo: 'Promos'
-}
-const tabTitle = computed(() => tabTitles[selectedTab.value])
+const newPromoName = ref('');
+const newPromoPrice = ref('');
+const newPromoCommission = ref('');
 
-//Change placeholder in input depending on tab chosen
-const inputPlaceholders = {
-  service: 'Search services...',
-  promo: 'Searcn promos...'
-}
-const inputPlaceholder = computed(() => inputPlaceholders[selectedTab.value])
+// --- API Data ---
+const services = ref([]);
+const promos = ref([]);
+const isLoading = ref(false);
+const error = ref(null);
+
+// --- Pagination & Filtering Setup ---
+const itemsPerPage = ref(10);
+const currentPage = ref(1);
+
+// Selected tab and search query
+const selectedTab = ref('service');
+const searchQuery = ref('');
+
+// 1. Compute filteredData from services or promos (apply search filter)
+const filteredData = computed(() => {
+  let items = selectedTab.value === 'service' ? services.value : promos.value;
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    items = items.filter(item => {
+      if (selectedTab.value === 'service') {
+        return (
+          item.name.toLowerCase().includes(query) ||
+          item.type.toLowerCase().includes(query) ||
+          item.id.toString().includes(query)
+        );
+      } else {
+        return (
+          (item.promo || '').toLowerCase().includes(query) ||
+          item.id.toString().includes(query)
+        );
+      }
+    });
+  }
+  return items;
+});
+
+// 2. Total pages based on filtered data
+const totalPages = computed(() => {
+  return Math.ceil(filteredData.value.length / itemsPerPage.value) || 1;
+});
+
+// 3. Compute filteredItems (the items to show on the current page)
+const filteredItems = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return filteredData.value.slice(start, start + itemsPerPage.value);
+});
+
+// 4. Compute empty rows for styling purposes
+const emptyRows = computed(() => {
+  return Math.max(0, itemsPerPage.value - filteredItems.value.length);
+});
+
+// 5. Ensure that onPageChange keeps currentPage within bounds
+const onPageChange = (page) => {
+  if (page < 1) {
+    currentPage.value = 1;
+  } else if (page > totalPages.value) {
+    currentPage.value = totalPages.value;
+  } else {
+    currentPage.value = page;
+  }
+};
 
 
+// Reset page when search query changes
+watch(searchQuery, () => {
+  currentPage.value = 1;
+});
 
-//Edit Service/Promo
-const openEditModal = () => {
-  isEditModalOpen.value = true
-}
+// --- Data Fetching ---
+const fetchData = async () => {
+  isLoading.value = true;
+  error.value = null;
+  
+  try {
+    if (selectedTab.value === 'service') {
+      const response = await fetch('/api/services/services');
+      if (!response.ok) {
+        throw new Error('Failed to fetch services');
+      }
+      const data = await response.json();
+      services.value = data.map(service => ({
+        id: service.id,
+        name: service.name,
+        price: service.price,
+        commission: service.CommissionRate ? service.CommissionRate.rate : 0,
+        type: service.ServiceType ? service.ServiceType.type : ''
+      }));
+    } else {
+      const response = await fetch('/api/promos/promos');
+      if (!response.ok) {
+        throw new Error('Failed to fetch promos');
+      }
+      const data = await response.json();
+      promos.value = data.map(promo => ({
+        id: promo.id,
+        promo: promo.promo,
+        price: promo.price,
+        commission: promo.CommissionRate ? promo.CommissionRate.rate : 0
+      }));
+    }
+  } catch (err) {
+    error.value = err.message;
+    console.error('Error fetching data:', err);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-const closeEditModal = () => {
-  isEditModalOpen.value = false
-}
+// Watch for tab changes to fetch the right data and reset page
+watch(selectedTab, () => {
+  fetchData();
+  currentPage.value = 1;
+});
 
-const editGoods = () => {
-  // Add logic for editng service/promo in db  
-  closeEditModal()
-}
+onMounted(() => {
+  fetchData();
+});
 
-//Add Service Popup
-const openServiceModal = () => {
-  isServiceModalOpen.value = true
-}
-
-const closeServiceModal = () => {
-  isServiceModalOpen.value = false
-}
-
-const addNewService = () => {
-  // Add logic for adding service to db  
-  closeServiceModal()
-}
-
-//Add Promo Popup
-const openPromoModal = () => {
-  isPromoModalOpen.value = true
-}
-
-const closePromoModal = () => {
-  isPromoModalOpen.value = false
-}
-
-const addNewPromo = () => {
-  // Add logic for adding service to db  
-  closePromoModal()
-}
-
-const searchQuery = ref('')
-
-// Display data depending on tab
+// --- Selection and Edit Functions (unchanged) ---
 const selectGoods = (item) => {
-
   if (selectedTab.value === 'service') {
     selectedServiceId.value = item.id;
     selectedServiceName.value = item.name;
@@ -565,32 +619,168 @@ const selectGoods = (item) => {
     selectedServiceType.value = item.type;
   } else {
     selectedPromoId.value = item.id;
-    selectedPromoName.value = item.name;
+    selectedPromoName.value = item.promo;
     selectedPromoPrice.value = item.price;
     selectedPromoCommission.value = item.commission;
   }
 };
 
-//Sample data
-const services = [
-  { id: 1, name: "Swedish Massage", price: 250, commission: 20, type: "Massage" },
-  { id: 2, name: "Hot Stone Massage", price: 500, commission: 50, type: "Massage" },
-  { id: 3, name: "Deep Tissue Massage", price: 300, commission: 30, type: "Massage" },
-  { id: 4, name: "Facial Treatment", price: 300, commission: 30, type: "Facial" },
-  { id: 5, name: "Aromatherapy Massage", price: 200, commission: 15, type: "Massage" },
-  { id: 6, name: "Manicure & Pedicure", price: 150, commission: 15, type: "Nail Care" },
-  { id: 7, name: "Body Scrub", price: 150, commission: 15, type: "Body Treatment" }
+const openEditModal = () => {
+  if (
+    (selectedTab.value === 'service' && selectedServiceId.value) || 
+    (selectedTab.value === 'promo' && selectedPromoId.value)
+  ) {
+    isEditModalOpen.value = true;
+  }
+};
 
-];
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+};
 
-const promos = [
-  { id: 1, name: "Summer Glow Package", price: 1200, commission: 120 },
-  { id: 2, name: "Relaxation Duo", price: 1500, commission: 150 },
-  { id: 3, name: "Skin Rejuvenation", price: 1100, commission: 110 },
-  { id: 4, name: "Couples Therapy", price: 3500, commission: 350 },
-  { id: 5, name: "Pamper Package", price: 1300, commission: 130 },
-];
+const editGoods = async () => {
+  try {
+    if (selectedTab.value === 'service') {
+      const response = await fetch(`/api/services/services`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: selectedServiceName.value,
+          price: selectedServicePrice.value,
+          commission: selectedServiceCommission.value,
+          type: selectedServiceType.value
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to update service');
+    } else {
+      const response = await fetch(`/api/promos/promos`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: selectedPromoName.value,
+          price: selectedPromoPrice.value,
+          commission: selectedPromoCommission.value
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to update promo');
+    }
+    await fetchData();
+    closeEditModal();
+  } catch (err) {
+    console.error('Error updating item:', err);
+  }
+};
+
+const deleteItem = async () => {
+  if (!confirm('Are you sure you want to delete this item?')) return;
+  
+  try {
+    if (selectedTab.value === 'service' && selectedServiceId.value) {
+      const response = await fetch('/api/services/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedServiceId.value }),
+      });
+      if (!response.ok) throw new Error('Failed to delete service');
+      
+      // Clear selection
+      selectedServiceId.value = '';
+      selectedServiceName.value = '';
+      selectedServicePrice.value = 0;
+      selectedServiceCommission.value = 0;
+      selectedServiceType.value = '';
+    } else if (selectedTab.value === 'promo' && selectedPromoId.value) {
+      const response = await fetch('/api/promos/promos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedPromoId.value }),
+      });
+      if (!response.ok) throw new Error('Failed to delete promo');
+      
+      // Clear selection
+      selectedPromoId.value = '';
+      selectedPromoName.value = '';
+      selectedPromoPrice.value = 0;
+      selectedPromoCommission.value = 0;
+    }
+    await fetchData();
+  } catch (err) {
+    console.error('Error deleting item:', err);
+  }
+};
+
+// --- Popup functions for Adding New Items (unchanged) ---
+const openServiceModal = () => {
+  newServiceName.value = '';
+  newServicePrice.value = '';
+  newServiceCommission.value = '';
+  newServiceType.value = '';
+  isServiceModalOpen.value = true;
+};
+
+const closeServiceModal = () => {
+  isServiceModalOpen.value = false;
+};
+
+const addNewService = async () => {
+  if (!newServiceName.value || !newServicePrice.value || !newServiceCommission.value || !newServiceType.value) {
+    alert('Please fill in all fields');
+    return;
+  }
+  try {
+    const response = await fetch('/api/services/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newServiceName.value,
+        price: newServicePrice.value,
+        commission: newServiceCommission.value,
+        type: newServiceType.value
+      }),
+    });
+    if (!response.ok) throw new Error('Failed to add service');
+    await fetchData();
+    closeServiceModal();
+  } catch (err) {
+    console.error('Error adding service:', err);
+  }
+};
+
+const openPromoModal = () => {
+  newPromoName.value = '';
+  newPromoPrice.value = '';
+  newPromoCommission.value = '';
+  isPromoModalOpen.value = true;
+};
+
+const closePromoModal = () => {
+  isPromoModalOpen.value = false;
+};
+
+const addNewPromo = async () => {
+  if (!newPromoName.value || !newPromoPrice.value || !newPromoCommission.value) {
+    alert('Please fill in all fields');
+    return;
+  }
+  try {
+    const response = await fetch('/api/promos/promos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newPromoName.value,
+        price: newPromoPrice.value,
+        commission: newPromoCommission.value
+      }),
+    });
+    if (!response.ok) throw new Error('Failed to add promo');
+    await fetchData();
+    closePromoModal();
+  } catch (err) {
+    console.error('Error adding promo:', err);
+  }
+};
 </script>
+
 
 
 <style scoped>

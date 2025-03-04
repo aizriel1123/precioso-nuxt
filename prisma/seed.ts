@@ -143,6 +143,15 @@ const seed = async () => {
     });
   }
 
+  // Seed therapist types
+  for (const type of therapistType) {
+    await prisma.therapistType.upsert({
+      where: { type: type.type },
+      update: {},
+      create: type,
+    });
+  }
+
   // Seed product types
   for (const type of productType) {
     await prisma.productType.upsert({
@@ -236,3 +245,5 @@ seed()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+  

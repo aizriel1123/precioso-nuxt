@@ -8,28 +8,25 @@ datasource db {
 }
 
 model Account {
-  id           Int       @id @default(autoincrement())
-  username     String    @db.VarChar(50)
-  password     String    @db.VarChar(50)
+  id           Int         @id @default(autoincrement())
+  username     String      @db.VarChar(50)
+  password     String      @db.VarChar(50)
   therapist_id Int
-  Therapist    Therapist @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
+  type_id      Int
+  Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
+  AccountType  AccountType @relation(fields: [type_id], references: [id], onUpdate: Restrict)
 }
 
 model Appointment {
+  transaction_id        Int
   service_id            Int
   appointment_status_id Int
-  id                    Int               @id @default(autoincrement())
-  client_id             Int
-  date                  DateTime          @db.Date
-  promo_id              Int
-  therapist_id          Int
-  time                  String            @db.VarChar(50)
+  quantity              Int               @default(1)
   AppointmentStatus     AppointmentStatus @relation(fields: [appointment_status_id], references: [id], onUpdate: Restrict)
-  Client                Client            @relation(fields: [client_id], references: [id])
-  Promo                 Promo             @relation(fields: [promo_id], references: [id])
   Service               Service           @relation(fields: [service_id], references: [id], onUpdate: Restrict)
-  Therapist             Therapist         @relation(fields: [therapist_id], references: [id])
-  Transaction           Transaction[]
+  Transaction           Transaction       @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+
+  @@id([transaction_id, service_id])
 }
 
 model AppointmentStatus {
@@ -43,9 +40,8 @@ model Client {
   first_name   String        @db.VarChar(255)
   last_name    String        @db.VarChar(255)
   dob          DateTime?     @default(now()) @db.Date
-  contact_info String?       @db.VarChar(20)
+  contact_info String?       @unique @db.VarChar(20)
   gender_id    Int?
-  Appointment  Appointment[]
   Gender       Gender?       @relation(fields: [gender_id], references: [id], onDelete: Restrict, onUpdate: Restrict)
   Transaction  Transaction[]
 }
@@ -85,14 +81,15 @@ model Product {
   name            String           @db.VarChar(50)
   cost            Decimal          @db.Decimal(6, 2)
   commission      Decimal          @db.Decimal(6, 2)
+  sell            Decimal          @db.Decimal(6, 2) @default(1)
   product_type_id Int
   critical_level  Int?
-  supplier_id     Int
   Defect          Defect[]
   ProductType     ProductType      @relation(fields: [product_type_id], references: [id], onUpdate: Restrict)
-  Supplier        Supplier         @relation(fields: [supplier_id], references: [id])
   ProductsSold    ProductsSold[]
   StockinProduct  StockinProduct[]
+  Stockin         Stockin[]
+  
 }
 
 model ProductType {
@@ -116,7 +113,6 @@ model Promo {
   promo              String             @db.VarChar(255)
   price              Decimal            @db.Decimal(6, 2)
   commission_rate_id Int
-  Appointment        Appointment[]
   CommissionRate     CommissionRate     @relation(fields: [commission_rate_id], references: [id], onUpdate: Restrict)
   PromoServices      PromoServices[]
   PromoTransaction   PromoTransaction[]
@@ -168,13 +164,18 @@ model ServiceType {
 }
 
 model Stockin {
-  id           Int       @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   supplier_id  Int
-  therapist_id Int
+  therapist_id Int?
+  product_id   Int
+  quantity     Int
   date         DateTime? @db.Date
-  Supplier     Supplier  @relation(fields: [supplier_id], references: [id])
-  Therapist    Therapist @relation(fields: [therapist_id], references: [id])
+
+  Supplier     Supplier @relation(fields: [supplier_id], references: [id], onDelete: Cascade)
+  Therapist    Therapist? @relation(fields: [therapist_id], references: [id])
+  Product      Product  @relation(fields: [product_id], references: [id])
 }
+
 
 model StockinProduct {
   id             Int      @default(autoincrement())
@@ -188,33 +189,33 @@ model StockinProduct {
 
 model Supplier {
   id                  Int       @id @default(autoincrement())
-  supplier_name       String    @db.VarChar(100)
+  supplier_name       String    @unique @db.VarChar(100)
   supplier_contactnum String    @db.VarChar(20)
   supplier_address    String    @db.VarChar(150)
-  Product             Product[]
   Stockin             Stockin[]
+  
 
   @@unique([supplier_name, supplier_address])
 }
 
+
 model Therapist {
   id              Int             @id @default(autoincrement())
-  first_name      String?         @db.VarChar(255)
-  last_name       String?         @db.VarChar(255)
-  dob             DateTime?       @default(now()) @db.Date
+  first_name      String?         @unique @db.VarChar(255)
+  last_name       String?         @unique @db.VarChar(255)
+  dob             DateTime?       @db.Date
   contactinfo     String?         @db.VarChar(50)
   schedule        String?         @db.VarChar(20)
   gender_id       Int
   status_id       Int
+  type_id         Int
   Account         Account[]
-  Appointment     Appointment[]
   Defect          Defect[]
   Stockin         Stockin[]
   Gender          Gender          @relation(fields: [gender_id], references: [id])
   TherapistStatus TherapistStatus @relation(fields: [status_id], references: [id])
+  TherapistType   TherapistType   @relation(fields: [type_id], references: [id])
   Transaction     Transaction[]
-
-  @@unique([first_name, last_name])
 }
 
 model TherapistStatus {
@@ -226,14 +227,26 @@ model TherapistStatus {
 model Transaction {
   id                 Int                @id @default(autoincrement())
   date               DateTime?          @db.Timestamptz(6)
-  mode_of_payment_id Int
-  appointment_id     Int
   client_id          Int
   therapist_id       Int
+  mode_of_payment_id Int
+  notes              String?
+  Appointment        Appointment[]
   ProductsSold       ProductsSold[]
   PromoTransaction   PromoTransaction[]
-  Appointment        Appointment        @relation(fields: [appointment_id], references: [id])
   Client             Client             @relation(fields: [client_id], references: [id])
   ModeOfPayment      ModeOfPayment      @relation(fields: [mode_of_payment_id], references: [id])
   Therapist          Therapist          @relation(fields: [therapist_id], references: [id])
+}
+
+model AccountType {
+  id      Int       @id @default(autoincrement())
+  type    String    @unique @db.VarChar(50)
+  Account Account[]
+}
+
+model TherapistType {
+  id        Int         @id @default(autoincrement())
+  type      String      @unique @db.VarChar(20)
+  Therapist Therapist[]
 }

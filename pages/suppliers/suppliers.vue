@@ -1,5 +1,3 @@
-<!--Suppliers Page-->
-
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -8,6 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import NavBar from '~/components/Navbar.vue'
+import { useRouter } from 'vue-router'
+
+// Router instance
+const router = useRouter()
 
 // State management
 const suppliers = ref([])
@@ -33,14 +35,42 @@ const newSupplier = ref({
   contact_information: ''
 })
 
+// Validation function for supplier data
+const validateSupplier = (supplier) => {
+  // Validate contact information: it should contain numbers only
+  const contact = supplier.contact_information.trim()
+  if (contact && !/^\d+$/.test(contact)) {
+    throw new Error('Contact information should contain only numbers')
+  }
+  // You can add additional validations here (e.g., email format, address not empty, etc.)
+}
+
 // Fetch suppliers from API
 const fetchSuppliers = async () => {
   try {
     isLoading.value = true
-    const response = await fetch('/api/supplier/all')
+    const response = await fetch('/api/supplier/supplier')
     if (!response.ok) throw new Error('Failed to fetch suppliers')
+
     const data = await response.json()
-    suppliers.value = data
+    console.log("Fetched Suppliers Data:", data)
+
+    // Map each supplier and preserve the Stockin array for product details
+    suppliers.value = data.map(supplier => {
+      const nameParts = supplier.supplier_name.split(' ')
+      return {
+        id: supplier.id,
+        first_name: nameParts[0] || '',
+        last_name: nameParts.slice(1).join(' ') || '',
+        address: supplier.supplier_address,
+        contact_information: supplier.supplier_contactnum,
+        product: supplier.Stockin?.map(stock => stock.Product.name).join(", ") || 'N/A',
+        email: supplier.email || 'N/A',
+        stockin: supplier.Stockin || [] // Preserve the full Stockin array for product details
+      }
+    })
+
+    console.log("Mapped Suppliers:", suppliers.value)
   } catch (error) {
     console.error('Error fetching suppliers:', error)
   } finally {
@@ -50,117 +80,98 @@ const fetchSuppliers = async () => {
 
 const addNewSupplier = async () => {
   try {
-    if (!newSupplier.value.first_name || !newSupplier.value.last_name) {
-      alert('First name and last name are required')
-      return
+    const firstName = newSupplier.value.first_name.trim()
+    const lastName = newSupplier.value.last_name.trim()
+
+    if (!firstName && !lastName) {
+      throw new Error('At least one name field is required')
     }
 
-    const formattedDateOfBirth = newSupplier.value.dob 
-      ? new Date(newSupplier.value.dob + 'T00:00:00.000Z').toISOString()
-      : null
+    // Validate the new supplier data
+    validateSupplier(newSupplier.value)
 
     const payload = {
-      first_name: newSupplier.value.first_name.trim(),
-      last_name: newSupplier.value.last_name.trim(),
-      dob: formattedDateOfBirth,
-      address: newSupplier.value.address.trim(),
-      product: newSupplier.value.product.trim(),
-      email: newSupplier.value.email.trim(),
-      contact_information: newSupplier.value.contact_information.trim()
+      supplier_name: `${firstName} ${lastName}`.trim(),
+      supplier_contactnum: newSupplier.value.contact_information.trim(),
+      supplier_address: newSupplier.value.address.trim(),
+      product: newSupplier.value.product,
+      email: newSupplier.value.email || null,
     }
 
-    const response = await fetch('/api/supplier/create', {
+    console.log("Payload being sent:", payload)
+
+    const response = await fetch('/api/supplier/supplier', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
 
-    if (!response.ok) throw new Error('Supplier added successfully!')
+    const result = await response.json()
+    console.log("API Response:", result)
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to add supplier')
+    }
+
     await fetchSuppliers()
     showNewSupplierDialog.value = false
     resetNewSupplier()
-    alert('Supplier added successfully!');
+    alert('Supplier added successfully!')
   } catch (error) {
-    console.error('Error adding new supplier:', error)
-    alert(error.message || 'Failed to add new supplier. Please try again.')
+    console.error('Error adding supplier:', error)
+    alert(error.message || 'Failed to add supplier')
   }
 }
 
-// Reset new supplier object
-const resetNewSupplier = () => {
-  newSupplier.value = {
-    first_name: '',
-    last_name: '',
-    dob: '',
-    address: '',
-    product: '',
-    email: '',
-    contact_information: ''
-  }
+const goToInventory = () => {
+  // Navigate to inventory page.
+  // If you want to pass supplier data, you can include query params or route params.
+  router.push({ path: '/inventory/inventory' })
 }
 
 // Delete supplier
 const deleteSupplier = async () => {
-  if (!selectedSupplier.value) return
-  
-  try {
-    const response = await fetch(`/api/supplier/${selectedSupplier.value.id}`, {
-      method: 'DELETE'
-    })
-
-    if (!response.ok) throw new Error('Failed to delete supplier')
-    
-    await fetchSuppliers()
-    selectedSupplier.value = null
-    alert('Supplier deleted successfully!');
-    showSuccessDialog.value = true
-  } catch (error) {
-    console.error('Error deleting supplier:', error)
-    alert('Failed to delete supplier. Please try again.')
+  if (!selectedSupplier.value || !selectedSupplier.value.id) {
+    console.error("No supplier selected or ID is missing")
+    alert("Please select a supplier before deleting.")
+    return
   }
-}
 
-// Update supplier
-const saveChanges = async () => {
   try {
-    const response = await fetch(`/api/supplier/${selectedSupplier.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        first_name: selectedSupplier.value.first_name,
-        last_name: selectedSupplier.value.last_name,
-        dob: selectedSupplier.value.dob,
-        address: selectedSupplier.value.address,
-        product: selectedSupplier.value.product,
-        email: selectedSupplier.value.email,
-        contact_information: selectedSupplier.value.contact_information
-      })
+    console.log('Attempting to delete supplier with ID:', selectedSupplier.value.id)
+    const payload = { delete_id: selectedSupplier.value.id }
+
+    const response = await fetch(`/api/supplier/supplier`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     })
 
-    if (!response.ok) throw new Error('Failed to update supplier')
-    
-    await fetchSuppliers()
-    isEditing.value = false
-    alert('Supplier updated successfully!');
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('API Error Response:', errorData)
+      throw new Error(`Failed to delete supplier: ${errorData.statusMessage || 'Unknown error'}`)
+    }
+
+    suppliers.value = suppliers.value.filter(supplier => supplier.id !== selectedSupplier.value.id)
+    selectedSupplier.value = null
+
+    alert('Supplier deleted successfully!')
     showSuccessDialog.value = true
   } catch (error) {
-    console.error('Error updating supplier:', error)
-    alert('Failed to update supplier. Please try again.')
+    console.error('Error deleting supplier:', error.message)
+    alert(error.message || 'Failed to delete supplier. Please try again.')
   }
 }
 
 // Computed properties for filtering and sorting
 const filteredAndSortedSuppliers = computed(() => {
   if (!suppliers.value.length) return []
-  
+
   let result = [...suppliers.value]
 
   if (searchTerm.value) {
-    result = result.filter(supplier => 
+    result = result.filter(supplier =>
       supplier.first_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       supplier.last_name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       supplier.id.toString().includes(searchTerm.value)
@@ -185,7 +196,7 @@ const filteredAndSortedSuppliers = computed(() => {
   return result
 })
 
-const totalPages = computed(() => 
+const totalPages = computed(() =>
   Math.ceil(filteredAndSortedSuppliers.value.length / itemsPerPage)
 )
 
@@ -209,16 +220,109 @@ const previousPage = () => {
 }
 
 const selectSupplier = (supplier) => {
-  selectedSupplier.value = supplier
+  console.log("Clicked Supplier:", supplier)
+  selectedSupplier.value = { ...supplier }
+  console.log("Updated selectedSupplier:", selectedSupplier.value)
 }
 
 const startEditing = () => {
   isEditing.value = true
 }
 
-// Fetch data on component mount
+const saveChanges = async () => {
+  if (!selectedSupplier.value || !selectedSupplier.value.id) {
+    console.error("No supplier selected or missing ID.")
+    alert("Please select a valid supplier before saving changes.")
+    return
+  }
+
+  try {
+    // Validate the edited supplier data
+    validateSupplier(selectedSupplier.value)
+
+    const payload = {
+      update_id: selectedSupplier.value.id,
+      update_supplier_name: `${selectedSupplier.value.first_name} ${selectedSupplier.value.last_name}`,
+      update_contact_information: selectedSupplier.value.contact_information,
+      update_supplier_address: selectedSupplier.value.address,
+    }
+
+    const response = await fetch('/api/supplier/supplier', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) throw new Error("Failed to update supplier")
+
+    const result = await response.json()
+    console.log("Updated Supplier:", result.data)
+
+    const index = suppliers.value.findIndex(s => s.id === selectedSupplier.value.id)
+    if (index !== -1) {
+      suppliers.value[index] = {
+        ...suppliers.value[index],
+        first_name: result.data.supplier_name.split(' ')[0] || '',
+        last_name: result.data.supplier_name.split(' ').slice(1).join(' '),
+        address: result.data.supplier_address,
+        contact_information: result.data.supplier_contactnum,
+      }
+    }
+
+    isEditing.value = false
+    showSuccessDialog.value = true
+  } catch (error) {
+    console.error("Error updating supplier:", error)
+    alert(error.message || "Failed to update supplier. Please try again.")
+  }
+}
+
+// Reset new supplier object
+const resetNewSupplier = () => {
+  newSupplier.value = {
+    first_name: '',
+    last_name: '',
+    dob: '',
+    address: '',
+    product: '',
+    email: '',
+    contact_information: ''
+  }
+}
+
+const products = ref([])
+
+const fetchProducts = async () => {
+  try {
+    const response = await fetch('/api/inventory/populate')
+    if (!response.ok) throw new Error('Failed to fetch products')
+
+    const data = await response.json()
+    console.log("Fetched Products:", data)
+    products.value = data || []
+  } catch (error) {
+    console.error("Error fetching products:", error)
+  }
+}
+
+console.log(products)
+
+// Computed property to extract unique products from selected supplier
+const selectedSupplierProducts = computed(() => {
+  if (!selectedSupplier.value || !selectedSupplier.value.stockin) return []
+  const unique = {}
+  selectedSupplier.value.stockin.forEach(stock => {
+    if (stock.Product && !unique[stock.Product.id]) {
+      unique[stock.Product.id] = stock.Product
+    }
+  })
+  return Object.values(unique)
+})
+
+// Fetch products and suppliers when component mounts
 onMounted(() => {
   fetchSuppliers()
+  fetchProducts()
 })
 </script>
 
@@ -246,7 +350,7 @@ onMounted(() => {
         </Select>
         <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
         <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
-      </div>
+      </div>  
     </div>
 
     <div class="grid grid-cols-3 gap-6">
@@ -259,7 +363,6 @@ onMounted(() => {
                 <TableHead>Supplier ID</TableHead>
                 <TableHead>Last Name</TableHead>
                 <TableHead>First Name</TableHead>
-                <TableHead>Date of Birth</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead>Product</TableHead>
               </TableRow>
@@ -268,14 +371,12 @@ onMounted(() => {
               <TableRow 
                 v-for="supplier in paginatedSuppliers" 
                 :key="supplier.id"
-                :class="{ 'bg-amber-100': selectedSupplier?.id === supplier.id }"
+                :class="{ 'white': selectedSupplier?.id === supplier.id }"
                 @click="selectSupplier(supplier)"
-                class="cursor-pointer hover:bg-gray-100"
-              >
+                class="cursor-pointer hover:bg-amber-100">
                 <TableCell>{{ supplier.id }}</TableCell>
                 <TableCell>{{ supplier.last_name }}</TableCell>
                 <TableCell>{{ supplier.first_name }}</TableCell>
-                <TableCell>{{ supplier.dob }}</TableCell>
                 <TableCell>{{ supplier.address }}</TableCell>
                 <TableCell>{{ supplier.product }}</TableCell>
               </TableRow>
@@ -283,11 +384,24 @@ onMounted(() => {
           </Table>
 
           <!-- Pagination -->
-          <div class="flex items-center justify-between px-4 py-4 border-t">
+          <div class="flex items-center px-4 py-4 border-t gap-4">
             <div class="text-sm text-gray-500">
               Page {{ currentPage }} of {{ totalPages }}
             </div>
-            <Button variant="secondary">Next Page</Button>
+            <Button
+              variant="secondary"
+              @click="previousPage"
+              :disabled="currentPage === 1"
+            >
+              Previous Page
+            </Button>
+            <Button
+              variant="secondary"
+              @click="nextPage"
+              :disabled="currentPage >= totalPages"
+            >
+              Next Page
+            </Button>
           </div>
         </div>
       </div>
@@ -301,8 +415,9 @@ onMounted(() => {
 
         <!-- Supplier Details -->
         <div class="space-y-4">
-          <p class="text-lg font-semibold mb-2">{{ selectedSupplier.first_name }} {{ selectedSupplier.last_name }}</p>
-          <p class="text-gray-600 mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+          <p class="text-lg font-semibold mb-2">
+            {{ selectedSupplier.first_name }} {{ selectedSupplier.last_name }}
+          </p>
 
           <div class="space-y-4">
             <h3 class="font-semibold">Full Information</h3>
@@ -318,14 +433,9 @@ onMounted(() => {
                 <p v-else>{{ selectedSupplier.last_name }}</p>
               </div>
               <div>
-                <p class="font-medium">Birthdate</p>
-                <Input v-if="isEditing" type="date" v-model="selectedSupplier.dob" />
-                <p v-else>{{ selectedSupplier.dob }}</p>
-              </div>
-              <div>
-                <p class="font-medium">Email</p>
-                <Input v-if="isEditing" v-model="selectedSupplier.email" />
-                <p v-else>{{ selectedSupplier.email }}</p>
+                <p class="font-medium">Address</p>
+                <Input v-if="isEditing" v-model="selectedSupplier.address" />
+                <p v-else>{{ selectedSupplier.address }}</p>
               </div>
               <div>
                 <p class="font-medium">Contact Information</p>
@@ -371,8 +481,8 @@ onMounted(() => {
             </div>
           </div>
           <div>
-            <label class="font-medium">Date of Birth</label>
-            <Input type="date" v-model="newSupplier.dob" />
+            <label class="font-medium">Contact Information</label>
+            <Input v-model="newSupplier.contact_information" />
           </div>
           <div>
             <label class="font-medium">Address</label>
@@ -380,15 +490,27 @@ onMounted(() => {
           </div>
           <div>
             <label class="font-medium">Product</label>
-            <Input v-model="newSupplier.product" />
+            <Select v-model="newSupplier.product">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a product" />
+              </SelectTrigger>
+              <SelectContent v-if="products.length">
+                <SelectItem 
+                  v-for="product in products" 
+                  :key="product.id" 
+                  :value="product.name"
+                >
+                  {{ product.name }}
+                </SelectItem>
+              </SelectContent>
+              <SelectContent v-else>
+                <SelectItem disabled>No products available</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label class="font-medium">Email</label>
             <Input v-model="newSupplier.email" />
-          </div>
-          <div>
-            <label class="font-medium">Contact Information</label>
-            <Input v-model="newSupplier.contact_information" />
           </div>
         </div>
         <div class="flex justify-end gap-4">
@@ -407,6 +529,44 @@ onMounted(() => {
         <p>Operation completed successfully!</p>
         <div class="flex justify-end mt-4">
           <Button @click="showSuccessDialog = false">Close</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Supplier Product List Dialog -->
+    <Dialog :open="showProducts" @update:open="showProducts = false">
+      <DialogContent class="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Supplier Products</DialogTitle>
+        </DialogHeader>
+
+        <div v-if="selectedSupplierProducts.length">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product ID</TableHead>
+                <TableHead>Name</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="product in selectedSupplierProducts" :key="product.id">
+                <TableCell>{{ product.id }}</TableCell>
+                <TableCell>{{ product.name }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+        <div v-else>
+          <p>No products associated with this supplier.</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end mt-4 gap-2">
+          <!-- Button to navigate to inventory page -->
+          <Button @click="goToInventory">
+            Add New Product
+          </Button>
+          <Button @click="showProducts = false">Close</Button>
         </div>
       </DialogContent>
     </Dialog>

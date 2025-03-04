@@ -1,67 +1,63 @@
 import prisma from "~/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export default defineEventHandler(async (event) => {
-    // Get data form body
-	const body = await readBody(event);
-    // console.log(body)
+  const body = await readBody(event);
+  console.log(body);
 
-    // Implement Validation
-
-
-    // Create
-    const obj = await prisma.product.create({
-        data: {
-            name: body.new_product_name,
-            cost: body.new_product_cost,
-            commission: body.new_commission_rate,
-            ProductType:{
-                connect:{
-                    type: body.product_type
-                }
-            },
-            critical_level: body.warning_level,
-            StockinProduct:{
-                create:{
-                    quantity: body.new_stock_level,
-                }
-            }
-            
+  try {
+    // Construct the data object (do not include a scalar "product_type" field)
+    const data: any = {
+      name: body.new_product_name,
+      cost: new Prisma.Decimal(String(body.cost)),
+      critical_level: body.critical_level,
+      StockinProduct: {
+        create: { quantity: body.stock }
+      },
+      ProductType: {
+        connectOrCreate: {
+          where: { type: String(body.product_type) }, // expects a string (e.g. "Serum")
+          create: { type: String(body.product_type) }
         }
-    })
-    // {
-    //     supplier_name: '15',
-    //     new_product_name: 'David',
-    //     category: 'services',
-    //     new_stock_level: 555,
-    //     new_commission_rate: 15 }
-    return {
-        hatdog: "hehe"
+      }
+    };
+
+    // Include sell if provided
+    if (body.selling_price !== null && body.selling_price !== undefined) {
+      data.sell = new Prisma.Decimal(String(body.selling_price));
     }
+    
+    // Include commission if provided
+    if (body.commission !== null && body.commission !== undefined) {
+      data.commission = new Prisma.Decimal(String(body.commission));
+    }
+
+    // Create the Product
+    const product = await prisma.product.create({ data });
+
+    // If supplier_name is provided, find the supplier and create a Stockin entry
+    if (body.supplier_name) {
+      const supplier = await prisma.supplier.findFirst({
+        where: { supplier_name: body.supplier_name }
+      });
+      
+      if (!supplier) {
+        throw new Error(`Supplier '${body.supplier_name}' not found.`);
+      }
+      
+      await prisma.stockin.create({
+        data: {
+          supplier_id: supplier.id,
+          product_id: product.id,
+          quantity: body.stock,
+          date: new Date()
+        }
+      });
+    }
+
+    return { message: "Product added successfully!", product };
+  } catch (error) {
+    console.error("Failed to add product:", error);
+    throw createError({ statusCode: 500, message: "Failed to add product." });
+  }
 });
-
-// Sample
-
-// export default defineEventHandler(async (event) => {
-// 	// Get data form body
-// 	const body = await readBody(event);
-
-// 	// validate
-// 	let { error } = BookSchema.validate(body);
-// 	if (error) {
-// 		throw createError({
-// 			message: error.message.replace(/"/g, ""),
-// 			statusCode: 400,
-// 			fatal: false,
-// 		});
-// 	}
-
-// 	// create book
-// 	try {
-// 		await BookModel.create(body);
-// 		return { message: "Book created" };
-// 	} catch (e) {
-// 		throw createError({
-// 			message: e.message,
-// 		});
-// 	}
-// });

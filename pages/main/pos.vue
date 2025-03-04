@@ -40,58 +40,56 @@
             </SelectContent>
           </Select>
 
-          <!-- Client Select -->
+          <!-- Client Search Section -->
           <div class="relative w-[600px]">
-    <div class="relative">
-      <Input
-        v-model="searchQueryClient"
-        placeholder="Search client..."
-        class="pr-8"
-        @focus="isClientSearchOpen = true"
-        @blur="setTimeout(() => { isClientSearchOpen = false }, 150)"
-      />
-      <div class="absolute right-2 top-1/2 -translate-y-1/2">
-        <Button
-          v-if="selectedClient"
-          variant="ghost"
-          size="icon"
-          class="h-5 w-5"
-          @click="clearClientSelection"
-        >
-          <X class="h-4 w-4" />
-        </Button>
-        <Search v-else class="h-4 w-4 text-muted-foreground" />
-      </div>
-    </div>
-
-    <div
-      v-if="isClientSearchOpen && filteredClients.length > 0"
-      class="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg"
-    >
-      <ScrollArea class="h-[200px]">
-        <div class="p-1">
-          <div
-            v-for="client in filteredClients"
-            :key="client.id"
-            class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent"
-            @mousedown="selectClient(client)"
-          >
-            <div>
-              <span class="font-medium">{{ client.first_name }} {{ client.last_name }}</span>
-              <p class="text-xs text-muted-foreground">{{ client.contact_info }}</p>
+            <div class="relative">
+              <Input
+                v-model="searchQueryClient"
+                placeholder="Search client..."
+                class="pr-8"
+                @focus="isClientSearchOpen = true"
+                @blur="setTimeout(() => { isClientSearchOpen = false }, 150)"
+              />
+              <div class="absolute right-2 top-1/2 -translate-y-1/2">
+                <Button
+                  v-if="selectedClient"
+                  variant="ghost"
+                  size="icon"
+                  class="h-5 w-5"
+                  @click="clearClientSelection"
+                >
+                  <X class="h-4 w-4" />
+                </Button>
+                <Search v-else class="h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              @mousedown.stop="selectClient(client)"
+
+            <div
+              v-if="isClientSearchOpen && filteredClients.length > 0"
+              class="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg"
             >
-              Select
-            </Button>
+              <ScrollArea class="h-[200px]">
+                <div class="p-1">
+                  <div
+                    v-for="client in filteredClients"
+                    :key="client.id"
+                    class="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent"
+                    @mousedown.prevent="selectClient(client)"
+                  >
+                    <div>
+                      <span class="font-medium">{{ client.first_name }} {{ client.last_name }}</span>
+                      <span class="ml-2 text-xs text-gray-500">
+                        {{ client.contact_info }}
+                      </span>
+                    </div>
+                    <span class="text-xs text-gray-500">
+                      {{ formatDate(client.dob) }}
+                    </span>
+                  </div>
+                </div>
+              </ScrollArea>
+            </div>
           </div>
-        </div>
-      </ScrollArea>
-    </div>
-</div>
 
           <!-- Therapist Select -->
           <Select v-model="selectedTherapist" class="w-[180px]">
@@ -104,7 +102,7 @@
             </SelectContent>
           </Select>
 
-          <Button variant="default" class="bg-gray-900">
+          <Button variant="default" class="bg-gray-900" @click="handleNewBookingClick">
             Add New Booking
           </Button>
         </div>
@@ -291,8 +289,8 @@ const selectedPromoDiscount = ref(null)
 const customDiscountValue = ref(null)
 const selectedFilter = ref(null)
 const selectedClientName = ref(null)
-const selectedTherapist = ref(null)
-
+const router = useRouter()
+const selectedTherapist = ref(null);
 
 
 const promoDiscounts = [
@@ -384,34 +382,56 @@ const filteredProducts = computed(() => {
   return filtered
 })
 
+const fetchClients = async () => {
+  const { data, error, refresh } = await useFetch('/api/client/client', { key: 'clients' })
+  if (!error.value && data.value?.success) {
+    clients.value = data.value.clients
+  }
+}
 
 // Client Search Functionality
 const searchQueryClient = ref('')
 const selectedClient = ref(null)
 const isClientSearchOpen = ref(false)
-const clients = ref([
-  { id: 1, first_name: 'John', last_name: 'Doe', contact_info: '09123456789' },
-  { id: 2, first_name: 'Jane', last_name: 'Smith', contact_info: '09876543210' },
-  // Add more mock clients based on your Prisma Client model
-])
+const clients = computed(() => clientsData.value?.clients || [])
+const { data: clientsData, refresh: refreshClients } = useFetch('/api/client/client')
+
 
 const filteredClients = computed(() => {
-  if (!searchQueryClient.value) return []
-  return clients.value.filter(client => 
-    `${client.first_name} ${client.last_name}`
-      .toLowerCase()
-      .includes(searchQueryClient.value.toLowerCase())
+  if (!searchQueryClient.value.trim()) return []
+  return clients.value.filter(client =>
+    `${client.first_name} ${client.last_name}`.toLowerCase().includes(searchQueryClient.value.toLowerCase())
   )
 })
 
+
+
+
+
+// Ensure fetchClients is called when a new client is added
+const addNewClient = async (clientData) => {
+  const { data, error } = await useFetch('/api/counter.post', {
+    method: 'POST',
+    body: clientData,
+  })
+
+  if (!error.value && data.value?.success) {
+    await fetchClients() // Refetch clients list to include the new client
+  }
+}
+
+
+// Select Client
 const selectClient = (client) => {
   selectedClient.value = client
-  searchQueryClient.value = `${client.first_name} ${client.last_name}`
+  selectedClientName.value = `${client.first_name} ${client.last_name}`
   isClientSearchOpen.value = false
 }
 
+// Clear Selection
 const clearClientSelection = () => {
   selectedClient.value = null
+  selectedClientName.value = null
   searchQueryClient.value = ''
 }
 
@@ -514,6 +534,16 @@ const displayedProducts = computed(() => {
   return filteredProducts.value.slice(start, end)
 })
 
+// Navigation to appointments page
+const goToAppointments = () => {
+  router.push('/appointments/appointments')
+}
+
+// Update the button click handler in the template
+const handleNewBookingClick = () => {
+  goToAppointments()
+}
+
 function handlePageChange(newPage) {
   currentPage.value = newPage
 }
@@ -527,6 +557,36 @@ watch(selectedCategory, () => {
 watch(searchQuery, () => {
   currentPage.value = 1
 })
+
+watch(clientsData, (newVal) => {
+  console.log("Fetched Clients:", newVal)
+})
+
+
+// Fetch clients on component mount
+onMounted(async () => {
+  try {
+    const response = await fetch('/api/client/client')
+    clients.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching clients:', error)
+    // Handle error appropriately
+  }
+})
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+// Fetch data when page loads
+onMounted(fetchClients)
+
 </script>
 
 <style scoped>
