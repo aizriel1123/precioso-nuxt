@@ -8,14 +8,15 @@
   }
 
   model Account {
-    id           Int         @id @default(autoincrement())
-    username     String      @db.VarChar(50)
-    password     String      @db.VarChar(256)
-    therapist_id Int
-    type_id      Int
-    Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
-    AccountType  AccountType @relation(fields: [type_id], references: [id], onUpdate: Restrict)
-  }
+  id           Int         @id @default(autoincrement())
+  username     String      @db.VarChar(50)
+  password     String      @db.Text   // Changed from VarChar(256) to Text
+  therapist_id Int
+  type_id      Int
+  Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)
+  AccountType  AccountType @relation(fields: [type_id], references: [id], onUpdate: Restrict)
+}
+
 
   model Appointment {
     transaction_id        Int
