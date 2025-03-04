@@ -26,7 +26,7 @@
           password: values.password
         },
       });
-      console.log(response)
+      console.log(response);
 
       // Assuming the response contains a token
       localStorage.setItem('token', response.token);
