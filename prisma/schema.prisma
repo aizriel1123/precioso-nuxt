@@ -10,7 +10,7 @@
   model Account {
     id           Int         @id @default(autoincrement())
     username     String      @db.VarChar(50)
-    password     String      @db.VarChar(50)
+    password     String      @db.VarChar(256)
     therapist_id Int
     type_id      Int
     Therapist    Therapist   @relation(fields: [therapist_id], references: [id], onUpdate: Restrict)

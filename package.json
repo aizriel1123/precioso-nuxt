@@ -21,6 +21,7 @@
     "@vee-validate/zod": "^4.13.2",
     "@vue/eslint-config-prettier": "^10.0.0",
     "@vueuse/core": "^11.1.0",
+    "argon2": "^0.41.1",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

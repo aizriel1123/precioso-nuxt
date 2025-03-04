@@ -1,5 +1,5 @@
 import prisma from "~/lib/prisma";
-
+import argon2 from "argon2";
 const genders = [
   { gender: "Male" },
   { gender: "Female" },
@@ -215,27 +215,40 @@ const seed = async () => {
       });
     }
   }
+  // Seed account types
+  for (const type of [{ id: 0, type: "0" }, { id: 1, type: "1" }]) {
+    await prisma.accountType.upsert({
+      where: { type: type.type }, // Type 0 == "USER" && Type 1 == "ADMIN"
+      update: {},
+      create: type,
+    });
+  }
 
   // Seed accounts
   for (const account of accounts) {
+    // Hash the password
+    const hashedPassword = await argon2.hash(account.password);
+  
+    // Check if the account already exists (WITHOUT checking the password)
     const existingAccount = await prisma.account.findFirst({
       where: {
         username: account.username,
-        password: account.password,
         therapist_id: account.therapist_id,
       },
       select: {
         id: true,
       },
     });
-
+  
     if (!existingAccount) {
       await prisma.account.create({
-        data: account,
+        data: {
+          ...account,
+          password: hashedPassword, // Use the hashed password
+        },
       });
     }
-  }
-};
+  }};
 
 seed()
   .catch((e) => {
