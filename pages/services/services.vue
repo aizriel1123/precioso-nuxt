@@ -1,8 +1,6 @@
 <template>
   <NavBar />
-
   <div class="center-components">
-
     <!-- title will depend on tab chosen -->
     <h1 class="title">{{ tabTitle }}</h1>
 
@@ -10,17 +8,17 @@
     <div class="flex-components">
       <div class="left-side">
         <Tabs 
-        v-model="selectedTab"
-        :options="['service', 'promo']"
-        class="w-[200px]"
+          v-model="selectedTab"
+          :options="['service', 'promo']"
+          class="w-[200px]"
         >
-        <TabsList class="grid w-full grid-cols-2 w-[200px]">
-          <TabsTrigger value="service">Service</TabsTrigger>
-          <TabsTrigger value="promo">Promo</TabsTrigger>
-        </TabsList>
-      </Tabs>
+          <TabsList class="grid w-full grid-cols-2 w-[200px]">
+            <TabsTrigger value="service">Service</TabsTrigger>
+            <TabsTrigger value="promo">Promo</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      <Input :placeholder="inputPlaceholder" class="input_search" v-model="searchQuery"/>
+        <Input :placeholder="inputPlaceholder" class="input_search" v-model="searchQuery"/>
       </div>
 
       <div class="right-side">
@@ -34,223 +32,206 @@
     <div class="table-product-container">
       <div class="container-table">
         <div class="table-content">
-            <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead v-if="selectedTab === 'service'">Service ID</TableHead>
-              <TableHead v-if="selectedTab === 'service'">Service Name</TableHead>
-              <TableHead v-if="selectedTab === 'service'">Price</TableHead>
-              <TableHead v-if="selectedTab === 'service'">Commission</TableHead>
-              <TableHead v-if="selectedTab === 'service'">Service Type</TableHead>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead v-if="selectedTab === 'service'">Service ID</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Service Name</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Price</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Commission</TableHead>
 
-              <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
-              <TableHead v-if="selectedTab === 'promo'">Promo Name</TableHead>
-              <TableHead v-if="selectedTab === 'promo'">Price</TableHead> 
-              <TableHead v-if="selectedTab === 'promo'">Commission</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow 
-              v-for="(item, index) in filteredItems" 
-              :key="item.id" 
-              @click="selectGoods(item)"
+                <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
+                <TableHead v-if="selectedTab === 'promo'">Promo Name</TableHead>
+                <TableHead v-if="selectedTab === 'promo'">Price</TableHead> 
+                <TableHead v-if="selectedTab === 'promo'">Commission</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow 
+                v-for="(item) in filteredItems" 
+                :key="item.id" 
+                @click="selectGoods(item)"
               >
-              <TableCell>{{ item.id }}</TableCell>
-              <TableCell>{{ item.name || item.promo }}</TableCell>
-              <TableCell>{{ item.price }}</TableCell>
-              <TableCell>{{ item.commission }}</TableCell>
-              <TableCell v-if="selectedTab === 'service'">{{ item.type }}</TableCell>
-            </TableRow>
+                <TableCell>{{ item.id }}</TableCell>
+                <TableCell>{{ item.name || item.promo }}</TableCell>
+                <TableCell>{{ item.price }}</TableCell>
+                <TableCell>{{ item.commission }}</TableCell>
+              </TableRow>
               <!-- Empty rows for pagination -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
-                <TableCell v-if="selectedTab === 'service'">&nbsp;</TableCell>
               </TableRow>
             </TableBody>
           </Table>  
           <div class="pagination-wrapper">
-          <Pagination
-              v-model:page="currentPage"
+            <Pagination
+              v-slot="{ page }"
               :total="totalPages"
               :sibling-count="1"
               show-edges
+              :default-page="currentPage"
+              @change="onPageChange"
             >
-            <PaginationList v-slot="{ items }" class="pagination-list">
-              <PaginationFirst @click="onPageChange(1)" />
-              <PaginationPrev @click="onPageChange(currentPage - 1)" />
-              <template v-for="(item, index) in items">
-                <PaginationListItem 
-                  v-if="item.type === 'page'"
-                  :key="index"
-                  :value="item.value"
-                  as-child
-                >
-                  <Button
-                    class="pagination-button"
-                    :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="onPageChange(item.value)"
+              <PaginationList v-slot="{ items }" class="pagination-list">
+                <PaginationFirst @click="onPageChange(1)" />
+                <PaginationPrev @click="onPageChange(currentPage - 1)" />
+                <template v-for="(item, index) in items">
+                  <PaginationListItem 
+                    v-if="item.type === 'page'"
+                    :key="index"
+                    :value="item.value"
+                    as-child
                   >
-                    {{ item.value }}
-                  </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else :key="item.type" :index="index" />
-              </template>
-              <PaginationNext @click="onPageChange(currentPage + 1)" />
-              <PaginationLast @click="onPageChange(totalPages)" />
-            </PaginationList>
-          </Pagination>
-        </div>
+                    <Button
+                      class="pagination-button"
+                      :variant="item.value === currentPage ? 'default' : 'outline'"
+                      @click="onPageChange(item.value)"
+                    >
+                      {{ item.value }}
+                    </Button>
+                  </PaginationListItem>
+                  <PaginationEllipsis v-else :key="item.type" :index="index" />
+                </template>
+                <PaginationNext @click="onPageChange(currentPage + 1)" />
+                <PaginationLast @click="onPageChange(totalPages)" />
+              </PaginationList>
+            </Pagination>
+          </div>
         </div>
       </div>
-    <!-- Edit Selected Service/Promo container -->
-    <div class="container-selectedproduct">
-        <h2 class="selected-product-title">Edit Selected {{tabTitle}}</h2>
 
-        <form id="update_panel"  >
-          
-        <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceid">
-        <FormItem>
-          <FormLabel>Service ID</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Service ID" 
-              v-bind="componentField" 
-              v-model="selectedServiceId" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+      <!-- Edit Selected Service/Promo container -->
+      <div class="container-selectedproduct">
+        <h2 class="selected-product-title">Edit Selected {{ tabTitle }}</h2>
+        <form id="update_panel">
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceid">
+            <FormItem>
+              <FormLabel>Service ID</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Service ID" 
+                  v-bind="componentField" 
+                  v-model="selectedServiceId" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-        <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicename">
-        <FormItem>
-          <FormLabel>Service Name</FormLabel>
-          <FormControl>
-            <Input 
-              type="text"  
-              placeholder="Service Name" 
-              v-bind="componentField" 
-              v-model="selectedServiceName" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicename">
+            <FormItem>
+              <FormLabel>Service Name</FormLabel>
+              <FormControl>
+                <Input 
+                  type="text"  
+                  placeholder="Service Name" 
+                  v-bind="componentField" 
+                  v-model="selectedServiceName" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-        <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceprice">
-        <FormItem>
-          <FormLabel>Price</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Price" 
-              v-bind="componentField" 
-              v-model="selectedServicePrice" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceprice">
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price" 
+                  v-bind="componentField" 
+                  v-model="selectedServicePrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-        <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicecommission">
-        <FormItem>
-          <FormLabel>Commission</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Commission" 
-              v-bind="componentField" 
-              v-model="selectedServiceCommission" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicecommission">
+            <FormItem>
+              <FormLabel>Commission</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Commission" 
+                  v-bind="componentField" 
+                  v-model="selectedServiceCommission" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-        <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicetype">
-        <FormItem>
-          <FormLabel>Service Type</FormLabel>
-          <FormControl>
-            <Input 
-              type="text"  
-              placeholder="Service Type" 
-              v-bind="componentField" 
-              v-model="selectedServiceType" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-else-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoid">
+            <FormItem>
+              <FormLabel>Promo ID</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Promo ID" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoId" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-      <FormField v-else-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoid">
-        <FormItem>
-          <FormLabel>Promo ID</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Promo ID" 
-              v-bind="componentField" 
-              v-model="selectedPromoId" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-      </FormField>
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoname">
+            <FormItem>
+              <FormLabel>Promo Name</FormLabel>
+              <FormControl>
+                <Input 
+                  type="text"  
+                  placeholder="Promo Name" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoName" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-      <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoname">
-        <FormItem>
-          <FormLabel>Promo Name</FormLabel>
-          <FormControl>
-            <Input 
-              type="text"  
-              placeholder="Promo Name" 
-              v-bind="componentField" 
-              v-model="selectedPromoName" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoPrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
-        <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
-        <FormItem>
-          <FormLabel>Price</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Price" 
-              v-bind="componentField" 
-              v-model="selectedPromoPrice" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
-
-        <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promocommission">
-        <FormItem>
-          <FormLabel>Commission</FormLabel>
-          <FormControl>
-            <Input 
-              type="number" 
-              min="0" 
-              placeholder="Commission" 
-              v-bind="componentField" 
-              v-model="selectedPromoCommission" 
-              disabled
-            />
-          </FormControl>
-        </FormItem>
-        </FormField>
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promocommission">
+            <FormItem>
+              <FormLabel>Commission</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Commission" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoCommission" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
 
           <div class="action-buttons">
             <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
@@ -262,106 +243,67 @@
   </div>
 
   <!-- Popup to edit service -->
-  <div v-if="isEditModalOpen" class="modal-overlay">
-    <div v-if="selectedTab === 'service'" class="modal-content">
-      <h2 class="selected-product-title">Edit Service</h2>
-      <form @submit.prevent="editGoods">
-
-        <FormField v-slot="{ componentField }" name="new_service_name">
-          <FormItem>
-            <FormLabel>Service Name</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedServiceName"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="new_service_price">
-          <FormItem>
-            <FormLabel>Price</FormLabel>
-            <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="selectedServicePrice"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="new_service_commission">
-          <FormItem>
-            <FormLabel>Commission</FormLabel>
-            <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="selectedServiceCommission"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="service_type">
-          <FormItem>
-            <FormLabel>Service Type</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Service Type" v-bind="componentField" v-model="selectedServiceType"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <div class="action-buttons">
-          <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Save Changes</Button>
-        </div>
-      </form>
-    </div>
-
-    <div v-if="selectedTab === 'promo'" class="modal-content">
-      <h2 class="selected-product-title">Edit Promo</h2>
-      <form @submit.prevent="editGoods">
-
-        <FormField v-slot="{ componentField }" name="new_promo_name">
-          <FormItem>
-            <FormLabel>Promo Name</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedPromoName"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="new_promo_price">
-          <FormItem>
-            <FormLabel>Price</FormLabel>
-            <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="selectedPromoPrice"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="new_promo_commission">
-          <FormItem>
-            <FormLabel>Commission</FormLabel>
-            <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="selectedPromoCommission"/>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <div class="action-buttons">
-          <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Save Changes</Button>
-        </div>
-      </form>
-    </div>
+<div v-if="isEditModalOpen" class="modal-overlay">
+  <div v-if="selectedTab === 'service'" class="modal-content">
+    <h2 class="selected-product-title">Edit Service</h2>
+    <form @submit.prevent="editGoods">
+      <FormField v-slot="{ componentField }" name="new_service_name">
+        <FormItem>
+          <FormLabel>Service Name</FormLabel>
+          <FormControl>
+            <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedServiceName" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+  
+      <FormField v-slot="{ componentField }" name="new_service_price">
+        <FormItem>
+          <FormLabel>Price</FormLabel>
+          <FormControl>
+            <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="selectedServicePrice" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+  
+      <!-- Commission as a select dropdown -->
+      <FormField v-slot="{ componentField }" name="new_service_commission">
+        <FormItem>
+          <FormLabel>Commission</FormLabel>
+          <FormControl>
+            <Select v-model="editServiceCommission">
+              <SelectTrigger>
+                <SelectValue placeholder="Select Commission Rate" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem v-for="rate in commissionRates" :key="rate.id" :value="rate.id">
+                    {{ rate.rate }}%
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+  
+      <div class="action-buttons">
+        <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
+        <Button variant="ghost" type="submit" class="button">Save Changes</Button>
+      </div>
+    </form>
   </div>
+</div>
+
+
 
   <!-- Popup to Add New Service -->
   <div v-if="isServiceModalOpen" class="modal-overlay">
     <div class="modal-content">
       <h2 class="selected-product-title">Add New Service</h2>
       <form @submit.prevent="addNewService">
-
         <FormField v-slot="{ componentField }" name="new_service_name">
           <FormItem>
             <FormLabel>Service Name</FormLabel>
@@ -386,21 +328,26 @@
           <FormItem>
             <FormLabel>Commission</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="newServiceCommission" />
+              <Select v-model="newServiceCommission">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Commission Rate" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem 
+                      v-for="rate in commissionRates" 
+                      :key="rate.id" 
+                      :value="rate.id">
+                      {{ rate.rate }}%
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="service_type">
-          <FormItem>
-            <FormLabel>Service Type</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Service Type" v-bind="componentField" v-model="newServiceType" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
 
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closeServiceModal">Cancel</Button>
@@ -415,7 +362,6 @@
     <div class="modal-content">
       <h2 class="selected-product-title">Add New Promo</h2>
       <form @submit.prevent="addNewPromo">
-
         <FormField v-slot="{ componentField }" name="new_promo_name">
           <FormItem>
             <FormLabel>Promo Name</FormLabel>
@@ -436,15 +382,24 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new_promo_commission">
-          <FormItem>
-            <FormLabel>Commission</FormLabel>
-            <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Commission" v-bind="componentField" v-model="newPromoCommission" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+        <!-- Commission Rate Select -->
+        <div>
+    <Select v-model="newPromoCommission">
+      <SelectTrigger>
+        <SelectValue placeholder="Select Commission Rate" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectItem 
+            v-for="rate in commissionRates" 
+            :key="rate.id" 
+            :value="rate.id">
+            {{ rate.rate }}%
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  </div>
 
         <div class="action-buttons">
           <Button variant="ghost" type="button" class="button" @click="closePromoModal">Cancel</Button>
@@ -460,6 +415,7 @@ import NavBar from '~/components/Navbar.vue';
 import { ref, computed, onMounted, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -473,7 +429,6 @@ const selectedServiceId = ref('');
 const selectedServiceName = ref('');
 const selectedServicePrice = ref(0);
 const selectedServiceCommission = ref(0);
-const selectedServiceType = ref('');
 
 const selectedPromoId = ref('');
 const selectedPromoName = ref('');
@@ -483,27 +438,25 @@ const selectedPromoCommission = ref(0);
 const newServiceName = ref('');
 const newServicePrice = ref('');
 const newServiceCommission = ref('');
-const newServiceType = ref('');
 
 const newPromoName = ref('');
 const newPromoPrice = ref('');
 const newPromoCommission = ref('');
 
-// --- API Data ---
+// API data
 const services = ref([]);
 const promos = ref([]);
+const commissionRates = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
 
 // --- Pagination & Filtering Setup ---
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
-
-// Selected tab and search query
 const selectedTab = ref('service');
 const searchQuery = ref('');
 
-// 1. Compute filteredData from services or promos (apply search filter)
+// Compute filteredData (for simplicity, using raw arrays here)
 const filteredData = computed(() => {
   let items = selectedTab.value === 'service' ? services.value : promos.value;
   if (searchQuery.value) {
@@ -512,7 +465,6 @@ const filteredData = computed(() => {
       if (selectedTab.value === 'service') {
         return (
           item.name.toLowerCase().includes(query) ||
-          item.type.toLowerCase().includes(query) ||
           item.id.toString().includes(query)
         );
       } else {
@@ -526,23 +478,19 @@ const filteredData = computed(() => {
   return items;
 });
 
-// 2. Total pages based on filtered data
 const totalPages = computed(() => {
   return Math.ceil(filteredData.value.length / itemsPerPage.value) || 1;
 });
 
-// 3. Compute filteredItems (the items to show on the current page)
 const filteredItems = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   return filteredData.value.slice(start, start + itemsPerPage.value);
 });
 
-// 4. Compute empty rows for styling purposes
 const emptyRows = computed(() => {
   return Math.max(0, itemsPerPage.value - filteredItems.value.length);
 });
 
-// 5. Ensure that onPageChange keeps currentPage within bounds
 const onPageChange = (page) => {
   if (page < 1) {
     currentPage.value = 1;
@@ -553,36 +501,28 @@ const onPageChange = (page) => {
   }
 };
 
-
-// Reset page when search query changes
 watch(searchQuery, () => {
   currentPage.value = 1;
 });
 
-// --- Data Fetching ---
+// --- Data Fetching Functions ---
 const fetchData = async () => {
   isLoading.value = true;
   error.value = null;
-  
   try {
     if (selectedTab.value === 'service') {
       const response = await fetch('/api/services/services');
-      if (!response.ok) {
-        throw new Error('Failed to fetch services');
-      }
+      if (!response.ok) throw new Error('Failed to fetch services');
       const data = await response.json();
       services.value = data.map(service => ({
         id: service.id,
         name: service.name,
         price: service.price,
-        commission: service.CommissionRate ? service.CommissionRate.rate : 0,
-        type: service.ServiceType ? service.ServiceType.type : ''
+        commission: service.CommissionRate ? service.CommissionRate.rate : 0
       }));
     } else {
       const response = await fetch('/api/promos/promos');
-      if (!response.ok) {
-        throw new Error('Failed to fetch promos');
-      }
+      if (!response.ok) throw new Error('Failed to fetch promos');
       const data = await response.json();
       promos.value = data.map(promo => ({
         id: promo.id,
@@ -599,7 +539,20 @@ const fetchData = async () => {
   }
 };
 
-// Watch for tab changes to fetch the right data and reset page
+const fetchCommissionRates = async () => {
+  try {
+    const { data, error } = await useFetch('/api/commissionrates');
+    if (error.value) {
+      console.error("Error fetching commission rates:", error.value);
+    } else {
+      commissionRates.value = data.value;
+      console.log("Commission rates:", commissionRates.value);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+};
+
 watch(selectedTab, () => {
   fetchData();
   currentPage.value = 1;
@@ -607,16 +560,17 @@ watch(selectedTab, () => {
 
 onMounted(() => {
   fetchData();
+  fetchCommissionRates();
 });
 
-// --- Selection and Edit Functions (unchanged) ---
+// --- Selection and Edit Functions ---
 const selectGoods = (item) => {
   if (selectedTab.value === 'service') {
     selectedServiceId.value = item.id;
     selectedServiceName.value = item.name;
     selectedServicePrice.value = item.price;
     selectedServiceCommission.value = item.commission;
-    selectedServiceType.value = item.type;
+    editServiceCommission.value = item.commission_rate_id;
   } else {
     selectedPromoId.value = item.id;
     selectedPromoName.value = item.promo;
@@ -639,6 +593,7 @@ const closeEditModal = () => {
 };
 
 const editGoods = async () => {
+  console.log('editGoods triggered'); // Debug log
   try {
     if (selectedTab.value === 'service') {
       const response = await fetch(`/api/services/services`, {
@@ -647,8 +602,7 @@ const editGoods = async () => {
         body: JSON.stringify({
           name: selectedServiceName.value,
           price: selectedServicePrice.value,
-          commission: selectedServiceCommission.value,
-          type: selectedServiceType.value
+          commission: editServiceCommission.value  // Use the unified ref
         }),
       });
       if (!response.ok) throw new Error('Failed to update service');
@@ -671,9 +625,11 @@ const editGoods = async () => {
   }
 };
 
+
+
+
 const deleteItem = async () => {
   if (!confirm('Are you sure you want to delete this item?')) return;
-  
   try {
     if (selectedTab.value === 'service' && selectedServiceId.value) {
       const response = await fetch('/api/services/services', {
@@ -682,13 +638,10 @@ const deleteItem = async () => {
         body: JSON.stringify({ id: selectedServiceId.value }),
       });
       if (!response.ok) throw new Error('Failed to delete service');
-      
-      // Clear selection
       selectedServiceId.value = '';
       selectedServiceName.value = '';
       selectedServicePrice.value = 0;
       selectedServiceCommission.value = 0;
-      selectedServiceType.value = '';
     } else if (selectedTab.value === 'promo' && selectedPromoId.value) {
       const response = await fetch('/api/promos/promos', {
         method: 'POST',
@@ -696,8 +649,6 @@ const deleteItem = async () => {
         body: JSON.stringify({ id: selectedPromoId.value }),
       });
       if (!response.ok) throw new Error('Failed to delete promo');
-      
-      // Clear selection
       selectedPromoId.value = '';
       selectedPromoName.value = '';
       selectedPromoPrice.value = 0;
@@ -709,12 +660,11 @@ const deleteItem = async () => {
   }
 };
 
-// --- Popup functions for Adding New Items (unchanged) ---
+// --- Popup Functions for Adding New Items ---
 const openServiceModal = () => {
   newServiceName.value = '';
   newServicePrice.value = '';
   newServiceCommission.value = '';
-  newServiceType.value = '';
   isServiceModalOpen.value = true;
 };
 
@@ -723,7 +673,7 @@ const closeServiceModal = () => {
 };
 
 const addNewService = async () => {
-  if (!newServiceName.value || !newServicePrice.value || !newServiceCommission.value || !newServiceType.value) {
+  if (!newServiceName.value || !newServicePrice.value || !newServiceCommission.value) {
     alert('Please fill in all fields');
     return;
   }
@@ -734,8 +684,7 @@ const addNewService = async () => {
       body: JSON.stringify({
         name: newServiceName.value,
         price: newServicePrice.value,
-        commission: newServiceCommission.value,
-        type: newServiceType.value
+        commission: newServiceCommission.value
       }),
     });
     if (!response.ok) throw new Error('Failed to add service');
@@ -782,174 +731,173 @@ const addNewPromo = async () => {
 </script>
 
 
+  <style scoped>
 
-<style scoped>
-
-  .title {
-    font-size: 48px;
-    font-weight: bolder;
-  }
+    .title {
+      font-size: 48px;
+      font-weight: bolder;
+    }
 
 
-.center-components {
-  margin-top: 10px;
-  margin-left: 2%;
-  margin-right: 2%;
-  margin-bottom: 50px;
-}
-
-  /* Flexbox for dropdown, input, filter, and other buttons */
-  .flex-components {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  .center-components {
     margin-top: 10px;
-    width: 100%; 
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 50px;
   }
 
-  /* Left side of table (dropdown, input and filter) */
-  .left-side {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-start;
-    width: 66.66%;
-  }
+    /* Flexbox for dropdown, input, filter, and other buttons */
+    .flex-components {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      margin-top: 10px;
+      width: 100%; 
+    }
 
-  /* Right side of table (buttons) */
-  .right-side {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-end;
-    width: 33.33%;
+    /* Left side of table (dropdown, input and filter) */
+    .left-side {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-start;
+      width: 66.66%;
+    }
 
-  }
+    /* Right side of table (buttons) */
+    .right-side {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+      width: 33.33%;
 
-  /* Table div and Edit Selected Product div */
-  .table-product-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-  }
+    }
 
-  /* Table container */
-  .container-table {
-    flex-basis: 66.66%; 
-    border: 1px solid #000000;
-    border-radius: 8px;
-    padding: 16px;
-  }
+    /* Table div and Edit Selected Product div */
+    .table-product-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
-  /* Edit Selected Product container */
-  .container-selectedproduct {
-    flex-basis: 33.33%;
-    border: 1px solid #000000;
-    border-radius: 8px;
-    padding: 16px;
+    /* Table container */
+    .container-table {
+      flex-basis: 66.66%; 
+      border: 1px solid #000000;
+      border-radius: 8px;
+      padding: 16px;
+    }
 
-  }
+    /* Edit Selected Product container */
+    .container-selectedproduct {
+      flex-basis: 33.33%;
+      border: 1px solid #000000;
+      border-radius: 8px;
+      padding: 16px;
 
-  /* Dropdown select trigger */
-  .dropdown-trigger {
-    width: 200px;
-  }
+    }
 
-  /* Search input */
-  .input_search {
-    width: 350px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
+    /* Dropdown select trigger */
+    .dropdown-trigger {
+      width: 200px;
+    }
 
-  /* All black buttons  */
-  .button {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    margin: 2px;
-    background-color: #000000;
-    color: #ffffff;
-  }
+    /* Search input */
+    .input_search {
+      width: 350px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
 
-  .icon-small {
-    width: 16px;
-    height: 16px;
-  }
+    /* All black buttons  */
+    .button {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin: 2px;
+      background-color: #000000;
+      color: #ffffff;
+    }
 
-
-  .table-content {
-    flex-grow: 1;
-  }
-
-  /* Pagination (might remove)  */
-  .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; 
-  }
-
-  /* Pagination (might remove)  */
-  .pagination-list {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Pagination (might remove)  */
-  .pagination-button {
-    width: 40px;
-    height: 40px;
-  }
-
-  /* Specifically for H2s */
-  .selected-product-title {
-    font-size: 20px;
-    margin-bottom: 16px;
-    font-weight: bolder;
-  }
-
-  /* Cancel and Save Changes button */
-  .action-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 16px;
-    margin-top: 20px;
-  }
-
-  .cancel-button {
-    color: #ffffff;
-    background-color: #dc2626;
-  }
+    .icon-small {
+      width: 16px;
+      height: 16px;
+    }
 
 
-  /* Popups */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    .table-content {
+      flex-grow: 1;
+    }
 
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-  }
+    /* Pagination (might remove)  */
+    .pagination-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px; 
+    }
 
-  .modal-action-buttons {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
+    /* Pagination (might remove)  */
+    .pagination-list {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
 
-</style>
+    /* Pagination (might remove)  */
+    .pagination-button {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Specifically for H2s */
+    .selected-product-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+      font-weight: bolder;
+    }
+
+    /* Cancel and Save Changes button */
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .cancel-button {
+      color: #ffffff;
+      background-color: #dc2626;
+    }
+
+
+    /* Popups */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+    }
+
+    .modal-action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+  </style>

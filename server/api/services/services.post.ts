@@ -4,72 +4,49 @@ import { defineEventHandler, readBody, createError } from 'h3';
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const { name, price, commission, type } = body;
+    const { name, price, commission } = body; // 'commission' represents commission_rate_id
 
     // Validate required fields
-    if (!name || price === undefined || commission === undefined || !type) {
+    if (!name || price === undefined || commission === undefined) {
       throw createError({
         statusCode: 400,
-        message: 'Missing required fields: name, price, commission, and type are required.',
+        message: 'Missing required fields: name, price, and commission are required.',
       });
     }
 
-    // Convert price and commission to float
     const priceValue = parseFloat(price);
-    const commissionRateValue = parseFloat(commission);
+    const commissionRateId = parseInt(commission);
 
-    if (isNaN(priceValue) || isNaN(commissionRateValue)) {
+    if (isNaN(priceValue) || isNaN(commissionRateId)) {
       throw createError({
         statusCode: 400,
-        message: 'Price and commission must be valid numbers.',
+        message: 'Price must be a valid number and commission must be a valid commission rate id.',
       });
     }
 
-    // Find or create the commission rate
-    let commissionRate = await prisma.commissionRate.findFirst({
-      where: { 
-        rate: { 
-          equals: commissionRateValue 
-        } 
-      },
+    // Verify that the commission rate exists
+    const commissionRate = await prisma.commissionRate.findUnique({
+      where: { id: commissionRateId }
     });
-
     if (!commissionRate) {
-      commissionRate = await prisma.commissionRate.create({
-        data: { 
-          rate: commissionRateValue 
-        },
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid commission rate id',
       });
     }
 
-    // Find or create the service type
-    let serviceType = await prisma.serviceType.findFirst({
-      where: { 
-        type: { 
-          equals: type 
-        } 
-      },
-    });
+    // Provide a default service_type_id (e.g., 1) since we're not using service type in the form
+    const defaultServiceTypeId = 1;
 
-    if (!serviceType) {
-      serviceType = await prisma.serviceType.create({
-        data: { 
-          type 
-        },
-      });
-    }
-
-    // Create the service
     const newService = await prisma.service.create({
       data: {
         name,
         price: priceValue,
         commission_rate_id: commissionRate.id,
-        service_type_id: serviceType.id,
+        service_type_id: defaultServiceTypeId,
       },
       include: {
         CommissionRate: true,
-        ServiceType: true,
       },
     });
 
@@ -78,13 +55,9 @@ export default defineEventHandler(async (event) => {
       name: newService.name,
       price: newService.price,
       commission: newService.CommissionRate.rate,
-      type: newService.ServiceType.type,
     };
   } catch (error) {
     console.error('Error creating service:', error);
-    
-    // Check if it's a Prisma-specific error
-    
     throw createError({
       statusCode: 500,
       message: 'Internal Server Error: Unable to create service.',
