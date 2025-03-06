@@ -42,9 +42,39 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar' // can add AvatarImage later
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { LogOut } from 'lucide-vue-next'
+import { onBeforeMount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { jwtDecode } from 'jwt-decode'
+import Cookies from 'js-cookie'
 
 const router = useRouter()
-
+onBeforeMount(async () => {
+  console.log(localStorage.getItem('token'))
+  const token = localStorage.getItem('token')
+  if (token) {
+    try {
+      const decoded = jwtDecode(token)
+      console.log(decoded)
+      // If the user type is 1 and we're not already on /main/pos, redirect there
+      console.log("THIS FAR IS WHERE U ARE")
+      console.log("THIS IS MY TYPE ID")
+      console.log(decoded.typeId)
+      if (decoded.typeId === 0) {
+        router.push('/main/pos')
+        return
+      }
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      router.push('/main/pos')
+      return
+    }
+  } else {
+    // If no token is found, redirect as well
+    router.push('/login-register/login')
+    console.log("AAAAAAAAA")
+    return
+  }
+});
 const goToRoute = (route) => {
   router.push(route) // Go to the specified route
 }

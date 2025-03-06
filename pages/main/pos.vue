@@ -270,6 +270,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Search, Minus, Plus, Filter } from 'lucide-vue-next'
 import NavBar from '~/components/Navbar.vue'
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev, } from '@/components/ui/pagination'
+import { jwtDecode } from "jwt-decode";
 
 const selectedCategory = ref('products')
 const searchQuery = ref('')

@@ -32,7 +32,7 @@
       localStorage.setItem('token', response.token);
 
       // Redirect based on user role or other criteria
-      router.push('/inventory/inventory');
+      router.push('/main/pos/');
     } catch (error) {
       console.error('Login failed:', error);
       // Handle login error (e.g., show a message to the user)

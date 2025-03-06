@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import argon2 from 'argon2';
 import prisma from '~/lib/prisma';
+import { setCookie } from 'h3';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -24,7 +25,21 @@ export default defineEventHandler(async (event) => {
   
   console.log("You have mogged-in");
   
-  const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '1h' });
+  const token = jwt.sign(
+    { userId: user.id, typeId: user.type_id, hashPassword: user.password },
+    'your-secret-key',
+    { expiresIn: '1h' }
+  );
   
+  // Save the JWT token into a cookie
+  setCookie(event, 'jwt', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 3600, // seconds
+    path: '/',
+    sameSite: 'lax'
+  });
+  
+  // Optionally return the token in the response as well
   return { token };
 });

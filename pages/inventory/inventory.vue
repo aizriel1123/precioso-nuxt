@@ -584,6 +584,7 @@ import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { useForm } from 'vee-validate'
+
   const form = useForm()
   let products = ref([]);
   // Fetch product details of selected item
@@ -957,9 +958,7 @@ import { useForm } from 'vee-validate'
     selectedCritical.value = "";
     selectedCommissionRate.value = "";
   }
-  
 
-  // Make sure to call this when component mounts
 onMounted(async () => {
   await fetchProductTypes();
 });
