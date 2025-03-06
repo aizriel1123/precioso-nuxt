@@ -33,6 +33,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Create the Product
+    console.log(data);
     const product = await prisma.product.create({ data });
 
     // If supplier_name is provided, find the supplier and create a Stockin entry

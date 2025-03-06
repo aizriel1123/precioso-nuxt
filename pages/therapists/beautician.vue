@@ -137,7 +137,7 @@ const deleteTherapist = async () => {
 // Update therapist
 const saveChanges = async () => {
   try {
-    const response = await fetch(`/api/therapist/therapist/${selectedTherapist.value.id}`, {
+    const response = await fetch(`/api/therapist/therapist`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -504,8 +504,6 @@ onMounted(() => {
                 <SelectItem :value="1">Available</SelectItem>
                 <SelectItem :value="2">Unavailable</SelectItem>
                 <SelectItem :value="3">Busy</SelectItem>
-                <SelectItem :value="4">Not Busy</SelectItem>
-                <SelectItem :value="5">Occupied</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    console.log(body)
     // Update therapist in database using Prisma
     const updatedTherapist = await prisma.therapist.update({
       where: {

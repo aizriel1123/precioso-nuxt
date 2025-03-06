@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
         // id: body.update_id,
         name: body.update_product_name,
         cost: body.update_product_cost,
+        sell: body.update_selling_price,
         commission: body.update_product_commission_rate,
         critical_level: body.update_product_warning_level,
         ProductType: {
