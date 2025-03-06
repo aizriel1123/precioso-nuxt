@@ -78,8 +78,20 @@ const accounts = [
     type_id: 1,
   },
   {
-    username: "carloisthebest",
-    password: "carloisthebest",
+    username: "employee",
+    password: "elitemployee",
+    therapist_id: 1,
+    type_id: 1,
+  },
+  {
+    username: "employee2",
+    password: "elitemployee",
+    therapist_id: 1,
+    type_id: 1,
+  },
+  {
+    username: "employee3",
+    password: "elitemployee",
     therapist_id: 1,
     type_id: 1,
   },
