@@ -80,7 +80,8 @@
                 <CardContent class="h-[400px]">
                   <AreaChart
                     :data="chartData"
-                    :categories="['revenue', 'net_profit', 'gross_profit', 'expenses']"
+                    :categories="['revenue', 'gross_profit', 'net_profit', 'expenses']"
+                    :colors="chartColors"
                     index="date"
                   />
                 </CardContent>
@@ -101,7 +102,7 @@
                         <p class="font-medium">{{ sale.service }}</p>
                         <p class="text-sm text-muted-foreground">{{ sale.client }}</p>
                       </div>
-                      <p class="font-medium">₱{{ sale.amount }}</p>
+                      <p class="font-medium">{{ sale.amount }}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -201,13 +202,13 @@
                             {{ transaction.type }}
                           </Badge>
                         </TableCell>
-                        <TableCell>₱{{ formatCurrency(transaction.sales) }}</TableCell>
+                        <TableCell>{{ formatCurrency(transaction.sales) }}</TableCell>
                         <TableCell>
                           <Badge variant="outline">
                             {{ transaction.mop }}
                           </Badge>
                         </TableCell>
-                        <TableCell>₱{{ formatCurrency(transaction.commission) }}</TableCell>
+                        <TableCell>{{ formatCurrency(transaction.commission) }}</TableCell>
                       </TableRow>
                     </template>
                     <template v-else>
@@ -263,8 +264,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { format, parseISO, isWithinInterval } from 'date-fns'
+import { ref, computed, watch, onMounted } from 'vue'
+import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-vue-next'
 import NavBar from '~/components/Navbar.vue'
 import { Button } from '@/components/ui/button'
@@ -286,58 +287,134 @@ const isCalendarOpen = ref(false)
 const tempDateRange = ref({ from: null, to: null })
 const dateRange = ref({ from: null, to: null })
 
-// Data placeholders based on Prisma models
+// Data placeholder – our API call returns transactions only.
 const transactions = ref([])
-const appointments = ref([])
-const productsSold = ref([])
-const defects = ref([])
-const stockins = ref([])
 
-// Computed data
+// ------------------------
+// Fetch Data from API
+// ------------------------
+const fetchData = async () => {
+  isLoading.value = true;
+  try {
+    // Fetch transactions from the API endpoint.
+    const response = await $fetch('/api/sales/sales_Report', {
+      headers: { "Content-Type": "application/json" },
+    });
+    transactions.value = response;
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// ------------------------
+// Sales Overview Computations
+// ------------------------
+
+// For demonstration, assume:
+const expenseRate = 0.2;      // 20% of sales as expenses
+const grossProfitRate = 0.6;  // 60% of sales as gross profit
+
+// Total Revenue, Average Sales, and Appointments (count of Service-type transactions)
+const totalRevenue = computed(() =>
+  transactions.value.reduce((sum, t) => sum + t.sales, 0)
+)
+const averageSales = computed(() =>
+  transactions.value.length > 0 ? totalRevenue.value / transactions.value.length : 0
+)
+const totalAppointments = computed(() =>
+  transactions.value.filter(t => t.type === 'Service').length
+)
+
+// Metrics Card Data
 const metrics = computed(() => ({
   revenue: {
     title: 'Total Revenue',
-    value: formatCurrency(transactions.value.reduce((sum, t) => sum + t.totalAmount, 0)),
-    trend: 0 // TODO: Calculate from previous period
+    value: formatCurrency(totalRevenue.value),
+    trend: 0 // TODO: Calculate trend compared to previous period
   },
   appointments: {
-    title: 'Total Appointments',
-    value: appointments.value.filter(a => a.status === 'Completed').length.toString(),
-    trend: 0 // TODO: Calculate from previous period
+    title: 'Total Transactions',
+    value: totalAppointments.value.toString(),
+    trend: 0 // TODO: Calculate trend compared to previous period
   },
   averageSales: {
     title: 'Average Sales',
-    value: formatCurrency(
-      transactions.value.length > 0 
-        ? transactions.value.reduce((sum, t) => sum + t.totalAmount, 0) / transactions.value.length
-        : 0
-    ),
-    trend: 0 // TODO: Calculate from previous period
+    value: formatCurrency(averageSales.value),
+    trend: 0 // TODO: Calculate trend compared to previous period
   }
-}))
+}));
 
+// Chart Data – Group transactions by date and calculate metrics
 const chartData = computed(() => {
   const dailyData = transactions.value.reduce((acc, transaction) => {
-    const date = format(transaction.date, 'yyyy-MM-dd')
+    const date = format(new Date(transaction.date), 'yyyy-MM-dd');
     if (!acc[date]) {
       acc[date] = {
         date,
         revenue: 0,
-        expenses: calculateDailyExpenses(date),
-        net_profit: 0,
-        gross_profit: 0
+        expenses: 0,
+        gross_profit: 0,
       }
     }
-    acc[date].revenue += transaction.totalAmount
-    acc[date].gross_profit += transaction.totalAmount - calculateCOGS(transaction)
-    return acc
-  }, {})
-
+    acc[date].revenue += transaction.sales;
+    acc[date].expenses += transaction.sales * expenseRate;
+    acc[date].gross_profit += transaction.sales * grossProfitRate;
+    return acc;
+  }, {});
+  // Net Profit = Gross Profit - Expenses
   return Object.values(dailyData).map(day => ({
     ...day,
-    net_profit: day.revenue - day.expenses
-  }))
-})
+    net_profit: day.gross_profit - day.expenses,
+  }));
+});
+
+// Define custom colors for the chart:
+// Order: revenue, gross_profit, net_profit, expenses
+const chartColors = ['#34D399', '#FBBF24', '#60A5FA', '#F87171'];
+
+// Recent Sales – last 5 transactions (sorted by date descending)
+const recentSales = computed(() =>
+  transactions.value
+    .slice()
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5)
+    .map(t => ({
+      id: t.id,
+      date: format(new Date(t.date), 'MMM dd, yyyy'),
+      type: t.type,
+      client: t.client,
+      amount: formatCurrency(t.sales),
+      mop: t.mop
+    }))
+);
+
+// Top Performing – Compute top service and top product
+const getTopService = () => {
+  const serviceMap = transactions.value
+    .filter(t => t.type === 'Service')
+    .reduce((acc, t) => {
+      acc[t.service] = acc[t.service] || { name: t.service, count: 0, revenue: 0 };
+      acc[t.service].count++;
+      acc[t.service].revenue += t.sales;
+      return acc;
+    }, {});
+  const topService = Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue)[0];
+  return topService || { name: 'N/A', revenue: 0, count: 0 };
+}
+const getTopProduct = () => {
+  const productMap = transactions.value
+    .filter(t => t.type === 'Product')
+    .reduce((acc, t) => {
+      acc[t.service] = acc[t.service] || { name: t.service, quantity: 0, revenue: 0 };
+      acc[t.service].quantity += 1; // each transaction counts as one sale
+      acc[t.service].revenue += t.sales;
+      return acc;
+    }, {});
+  const topProduct = Object.values(productMap).sort((a, b) => b.revenue - a.revenue)[0];
+  return topProduct || { name: 'N/A', revenue: 0, quantity: 0 };
+}
 
 const topItems = computed(() => [
   {
@@ -352,203 +429,113 @@ const topItems = computed(() => [
     value: formatCurrency(getTopProduct().revenue),
     metric: `${getTopProduct().quantity} sold`
   }
-])
+]);
 
-const recentSales = computed(() => 
-  transactions.value
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5)
-    .map(t => ({
-      id: t.id,
-      date: format(t.date, 'MMM dd, yyyy'),
-      type: t.services.length > 0 ? 'Service' : 'Product',
-      client: t.clientName,
-      amount: formatCurrency(t.totalAmount),
-      mop: t.modeOfPayment
-    }))
-)
+// Foot Traffic – count of service transactions
+const footTraffic = computed(() =>
+  transactions.value.filter(t => t.type === 'Service').length
+);
 
-const footTraffic = computed(() => 
-  appointments.value.filter(a => a.status === 'Completed').length
-)
-
-// Transaction filtering and sorting
+// ------------------------
+// Transaction Filtering and Pagination
+// ------------------------
 const filteredTransactions = computed(() => {
   return transactions.value
     .filter(t => {
       const searchMatch = Object.values(t).some(value =>
         String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-      const filterMatch = selectedFilter.value === 'all' ||
-        (selectedFilter.value === 'service' && t.services.length > 0) ||
-        (selectedFilter.value === 'product' && t.products.length > 0) ||
-        (selectedFilter.value === 'cash' && t.modeOfPayment === 'Cash') ||
-        (selectedFilter.value === 'card' && t.modeOfPayment === 'Card')
-      return searchMatch && filterMatch
+      );
+      const filterMatch =
+        selectedFilter.value === 'all' ||
+        (selectedFilter.value === 'service' && t.type === 'Service') ||
+        (selectedFilter.value === 'product' && t.type === 'Product') ||
+        (selectedFilter.value === 'cash' && t.mop === 'Cash') ||
+        (selectedFilter.value === 'card' && t.mop === 'Card');
+      return searchMatch && filterMatch;
     })
     .sort((a, b) => {
-      const modifier = sortConfig.value.direction === 'asc' ? 1 : -1
-      return a[sortConfig.value.column] > b[sortConfig.value.column] ? modifier : -modifier
-    })
-})
+      const modifier = sortConfig.value.direction === 'asc' ? 1 : -1;
+      return a[sortConfig.value.column] > b[sortConfig.value.column] ? modifier : -modifier;
+    });
+});
 
 const paginatedTransactions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  return filteredTransactions.value.slice(start, start + itemsPerPage)
-})
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredTransactions.value.slice(start, start + itemsPerPage);
+});
 
 const totalPages = computed(() => 
   Math.ceil(filteredTransactions.value.length / itemsPerPage)
-)
+);
 
 const paginationRange = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage + 1
-  const end = Math.min(currentPage.value * itemsPerPage, filteredTransactions.value.length)
-  return `${start}-${end}`
-})
+  const start = (currentPage.value - 1) * itemsPerPage + 1;
+  const end = Math.min(currentPage.value * itemsPerPage, filteredTransactions.value.length);
+  return `${start}-${end}`;
+});
 
-// Date handling
+// ------------------------
+// Date Handling & Formatters
+// ------------------------
 const formattedDateRange = computed(() => {
-  if (!dateRange.value.from) return 'Select date range'
-  if (!dateRange.value.to) return format(dateRange.value.from, 'MMM dd, yyyy')
-  return `${format(dateRange.value.from, 'MMM dd, yyyy')} - ${format(dateRange.value.to, 'MMM dd, yyyy')}`
-})
+  if (!dateRange.value.from) return 'Select date range';
+  if (!dateRange.value.to) return format(dateRange.value.from, 'MMM dd, yyyy');
+  return `${format(dateRange.value.from, 'MMM dd, yyyy')} - ${format(dateRange.value.to, 'MMM dd, yyyy')}`;
+});
 
 const isDateRangeValid = computed(() => 
   tempDateRange.value.from && tempDateRange.value.to
-)
+);
 
-// Data functions
-const calculateCommission = (transaction) => {
-  let commission = 0
-  // Service commissions
-  commission += transaction.services.reduce((sum, service) => 
-    sum + (service.price * service.commissionRate), 0)
-  // Product commissions
-  commission += transaction.products.reduce((sum, product) => 
-    sum + (product.quantity * product.price * product.commissionRate), 0)
-  return commission
-}
+const formatCurrency = (value) => 
+  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value);
 
-const calculateCOGS = (transaction) => {
-  return transaction.products.reduce((sum, product) => 
-    sum + (product.quantity * product.cost), 0)
-}
+const formatDate = (dateString) => 
+  format(new Date(dateString), 'MMM dd, yyyy');
 
-const calculateDailyExpenses = (date) => {
-  const stockCost = stockins.value
-    .filter(s => format(s.date, 'yyyy-MM-dd') === date)
-    .reduce((sum, s) => sum + s.totalCost, 0)
-  
-  const defectCost = defects.value
-    .filter(d => format(d.date, 'yyyy-MM-dd') === date)
-    .reduce((sum, d) => sum + (d.quantity * d.product.cost), 0)
-  
-  return stockCost + defectCost
-}
-
-const getTopService = () => {
-  const serviceMap = transactions.value
-    .flatMap(t => t.services)
-    .reduce((acc, service) => {
-      acc[service.id] = acc[service.id] || { ...service, count: 0, revenue: 0 }
-      acc[service.id].count++
-      acc[service.id].revenue += service.price
-      return acc
-    }, {})
-  return Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue)[0] || { name: 'N/A', revenue: 0, count: 0 }
-}
-
-const getTopProduct = () => {
-  const productMap = transactions.value
-    .flatMap(t => t.products)
-    .reduce((acc, product) => {
-      acc[product.id] = acc[product.id] || { ...product, quantity: 0, revenue: 0 }
-      acc[product.id].quantity += product.quantity
-      acc[product.id].revenue += product.quantity * product.price
-      return acc
-    }, {})
-  return Object.values(productMap).sort((a, b) => b.revenue - a.revenue)[0] || { name: 'N/A', revenue: 0, quantity: 0 }
-}
-
-// Data fetching
-const fetchData = async () => {
-  isLoading.value = true
-  try {
-    // TODO: Replace with actual API calls
-    // Example structure matching Prisma relationships
-    const mockTransactions = [
-      {
-        id: 1,
-        date: new Date(),
-        clientName: 'John Doe',
-        therapistName: 'Jane Smith',
-        modeOfPayment: 'Cash',
-        totalAmount: 2500,
-        services: [
-          { id: 1, name: 'Body Massage', price: 1500, commissionRate: 0.2 }
-        ],
-        products: [
-          { id: 1, name: 'Massage Oil', quantity: 2, price: 500, cost: 300, commissionRate: 0.1 }
-        ]
-      }
-    ]
-    
-    transactions.value = mockTransactions.map(t => ({
-      ...t,
-      commission: calculateCommission(t)
-    }))
-    
-    // TODO: Fetch other data (appointments, defects, stockins)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-// Event handlers
+// ------------------------
+// Event Handlers
+// ------------------------
 const handleApply = async () => {
   if (isDateRangeValid.value) {
-    dateRange.value = { ...tempDateRange.value }
-    isCalendarOpen.value = false
-    await fetchData()
+    dateRange.value = { ...tempDateRange.value };
+    isCalendarOpen.value = false;
+    await fetchData();
   }
-}
+};
 
 const handleCancel = () => {
-  tempDateRange.value = { ...dateRange.value }
-  isCalendarOpen.value = false
-}
+  tempDateRange.value = { ...dateRange.value };
+  isCalendarOpen.value = false;
+};
 
 const sortBy = (column) => {
   if (sortConfig.value.column === column) {
-    sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc'
+    sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc';
   } else {
-    sortConfig.value.column = column
-    sortConfig.value.direction = 'asc'
+    sortConfig.value.column = column;
+    sortConfig.value.direction = 'asc';
   }
-}
+};
 
-// Formatters
-const formatCurrency = (value) => 
-  new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value)
+// ------------------------
+// Lifecycle & Watchers
+// ------------------------
+onMounted(fetchData);
 
-const formatDate = (dateString) => 
-  format(new Date(dateString), 'MMM dd, yyyy')
-
-// Lifecycle hooks
-onMounted(fetchData)
-
-// Watchers
-watch([searchQuery, selectedFilter], () => currentPage.value = 1)
-watch(dateRange, fetchData, { deep: true })
+watch([searchQuery, selectedFilter], () => {
+  currentPage.value = 1;
+});
+watch(dateRange, fetchData, { deep: true });
 watch(isCalendarOpen, (newVal) => {
-  if (newVal) tempDateRange.value = { ...dateRange.value }
-})
+  if (newVal) tempDateRange.value = { ...dateRange.value };
+});
 
+// Props
 defineProps({
   direction: {
     type: String,
     default: null
   }
-})
+});
 </script>

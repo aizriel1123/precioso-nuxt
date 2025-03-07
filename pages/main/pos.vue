@@ -1,14 +1,11 @@
-<!--New POS UI-->
-
 <template>
- <div class="min-h-screen bg-background">
-  <NavBar />
+  <div class="min-h-screen bg-background">
+    <NavBar />
     <div class="container mx-auto p-4">
       <!-- Top Navigation Bar -->
       <div class="flex justify-between items-center mb-6">
         <!-- Category and Search Section -->
         <div class="flex space-x-3 items-center">
-          <!-- Category Select -->
           <Select v-model="selectedCategory" class="w-[180px]">
             <SelectTrigger>
               <SelectValue placeholder="Select an option" />
@@ -19,9 +16,7 @@
               <SelectItem value="promos">Promos</SelectItem>
             </SelectContent>
           </Select>
-
-          <!-- Search Input -->
-          <div class="relative mr=3">
+          <div class="relative">
             <Input v-model="searchQuery" placeholder="Search" class="pl-8 w-[200px]" />
             <Search class="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
@@ -34,7 +29,11 @@
               <SelectValue placeholder="Select Reservation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="res in reservations" :key="res.id" :value="res.id">
+              <SelectItem
+                v-for="res in reservations"
+                :key="res.id"
+                :value="res.id"
+              >
                 {{ res.clientName }}
               </SelectItem>
             </SelectContent>
@@ -63,7 +62,6 @@
                 <Search v-else class="h-4 w-4 text-muted-foreground" />
               </div>
             </div>
-
             <div
               v-if="isClientSearchOpen && filteredClients.length > 0"
               class="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg"
@@ -77,7 +75,9 @@
                     @mousedown.prevent="selectClient(client)"
                   >
                     <div>
-                      <span class="font-medium">{{ client.first_name }} {{ client.last_name }}</span>
+                      <span class="font-medium">
+                        {{ client.first_name }} {{ client.last_name }}
+                      </span>
                       <span class="ml-2 text-xs text-gray-500">
                         {{ client.contact_info }}
                       </span>
@@ -92,15 +92,20 @@
           </div>
 
           <!-- Therapist Select -->
-          <Select v-model="selectedTherapist" class="w-[180px]">
-            <SelectTrigger>
-              <SelectValue placeholder="Therapist" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="therapist1">Therapist 1</SelectItem>
-              <SelectItem value="therapist2">Therapist 2</SelectItem>
-            </SelectContent>
-          </Select>
+          <Select v-model="selectedTherapist">
+              <SelectTrigger>
+                <SelectValue placeholder="Therapist" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="therapist in therapists"
+                  :key="therapist.id"
+                  :value="Number(therapist.id)" 
+                >
+                  {{ therapist.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
 
           <Button variant="default" class="bg-gray-900" @click="handleNewBookingClick">
             Add New Booking
@@ -110,28 +115,40 @@
 
       <!-- Main Content Area -->
       <div class="flex gap-6">
-        <!-- Products Grid -->
+        <!-- Products/Services/Promos Grid -->
         <div class="flex-1">
           <div class="grid grid-cols-4 gap-4">
-            <div v-for="product in displayedProducts" :key="product.id" class="bg-white rounded-lg border p-4 shadow-sm">
-              <h3 class="font-medium text-gray-900">{{ product.name }}</h3>
-              <p class="text-gray-600">₱{{ product.price.toFixed(2) }}</p>
+            <div
+              v-for="item in displayedProducts"
+              :key="item.id"
+              class="bg-white rounded-lg border p-4 shadow-sm"
+            >
+              <h3 class="font-medium text-gray-900">{{ item.name }}</h3>
+              <p class="text-gray-600">₱{{ item.price.toFixed(2) }}</p>
               <div class="flex items-center justify-between mt-4">
                 <div class="flex items-center space-x-2">
-                  <Button variant="outline" size="icon" class="h-8 w-8" @click="decreaseQuantity(product)">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    class="h-8 w-8"
+                    @click="decreaseQuantity(item)"
+                  >
                     <Minus class="h-4 w-4" />
                   </Button>
-                  <span class="w-8 text-center">{{ getItemQuantity(product) }}</span>
-                  <Button variant="outline" size="icon" class="h-8 w-8" @click="increaseQuantity(product)">
+                  <span class="w-8 text-center">{{ getItemQuantity(item) }}</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    class="h-8 w-8"
+                    @click="increaseQuantity(item)"
+                  >
                     <Plus class="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Pagination (9 items per page) -->
-          <!-- Pagination from Old POS -->
+          <!-- Pagination -->
           <div class="mt-4 flex justify-center items-center">
             <Pagination v-slot="{ page }" :total="totalProducts" :sibling-count="1" show-edges :default-page="currentPage"
               :per-page="itemsPerPage" @update:page="handlePageChange">
@@ -161,13 +178,11 @@
               <h3 class="font-semibold">Order #{{ orderId }}</h3>
               <p class="text-sm text-gray-500">{{ currentDate }}</p>
             </div>
-
             <!-- Display selected Client and Therapist -->
             <div class="space-y-4 mb-6">
               <p class="text-gray-600">Client Name: {{ selectedClientName || 'N/A' }}</p>
-              <p class="text-gray-600">Therapist Name: {{ selectedTherapist || 'N/A' }}</p>
+              <p class="text-gray-600">Therapist Name: {{ selectedTherapistName || 'N/A' }}</p>
             </div>
-
             <!-- Payment Mode & Discount -->
             <div class="space-y-4 mb-6">
               <Select v-model="paymentMode">
@@ -179,7 +194,6 @@
                   <SelectItem value="gcash">Gcash</SelectItem>
                 </SelectContent>
               </Select>
-
               <div class="relative">
                 <Select v-model="selectedDiscount">
                   <SelectTrigger>
@@ -192,16 +206,13 @@
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                <!-- Discount Remove Button
-                  <Button variant="outline" size="sm" class="absolute right-0 top-0" @click="removeDiscount">
-                  Remove Discount
-                </Button> 
-                
-                -->
-              
+                <Input 
+                  v-model="notesInput" 
+                  placeholder="Add notes..." 
+                  class="mt-2"
+                />
               </div>
             </div>
-
             <!-- Order Summary and Confirm Order -->
             <div class="border-t pt-4 space-y-2 mb-6">
               <div class="flex justify-between">
@@ -221,7 +232,6 @@
                 <span>₱{{ total.toFixed(2) }}</span>
               </div>
             </div>
-
             <!-- Confirm Order Button and Popup Trigger -->
             <div class="flex space-x-2">
               <Button variant="destructive" class="flex-1" @click="cancelOrder">
@@ -236,7 +246,7 @@
       </div>
     </div>
 
-    <!-- Dialogs (Confirm, Success, Discount) -->
+    <!-- Confirm Order Dialog -->
     <Dialog :open="showConfirmDialog" @update:open="showConfirmDialog = $event">
       <DialogContent>
         <DialogHeader>
@@ -244,17 +254,22 @@
           <DialogDescription>
             <h3 class="font-bold mb-2">Order Details:</h3>
             <ul class="mb-4">
-              <li v-for="item in cart" :key="item.id">{{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}</li>
+              <li v-for="item in cart" :key="item.id">
+                {{ item.name }} - {{ item.quantity }}x - ₱{{ (item.price * item.quantity).toFixed(2) }}
+              </li>
             </ul>
             <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
             <p>Tax: ₱{{ tax.toFixed(2) }}</p>
             <p>Discount: ₱{{ discount.toFixed(2) }}</p>
+            <p v-if="notesInput" class="mt-2">Notes: {{ notesInput }}</p>
             <p class="font-bold">Total: ₱{{ total.toFixed(2) }}</p>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button @click="showConfirmDialog = false">Cancel</Button>
-          <Button @click="handleConfirmOrder" class="bg-green-500 text-white">Confirm</Button>
+          <Button @click="handleConfirmOrder" class="bg-green-500 text-white">
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -263,15 +278,46 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useRouter } from 'vue-router'
+import { useFetch } from '#app'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Search, Minus, Plus, Filter } from 'lucide-vue-next'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
+import { Search, Minus, Plus, X } from 'lucide-vue-next'
 import NavBar from '~/components/Navbar.vue'
+<<<<<<< HEAD
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev, } from '@/components/ui/pagination'
 import { jwtDecode } from "jwt-decode";
+=======
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev
+} from '@/components/ui/pagination'
+>>>>>>> b8c8736 (added sales and pos transaction functionality)
 
+const router = useRouter()
+
+// Reactive state
 const selectedCategory = ref('products')
 const searchQuery = ref('')
 const currentPage = ref(1)
@@ -279,7 +325,6 @@ const itemsPerPage = 16
 const cart = ref([])
 const showConfirmDialog = ref(false)
 const showSuccessDialog = ref(false)
-const showDiscountDialog = ref(false)
 const selectedReservationId = ref(null)
 const paymentMode = ref(null)
 const orderId = ref('123456')
@@ -288,116 +333,43 @@ const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', mo
 const selectedDiscount = ref(null)
 const selectedPromoDiscount = ref(null)
 const customDiscountValue = ref(null)
-const selectedFilter = ref(null)
 const selectedClientName = ref(null)
-const router = useRouter()
-const selectedTherapist = ref(null);
+const selectedTherapist = ref(null)
 
+// Data containers
+const currentItems = ref([])
+const reservations = ref([])
+const therapists = ref([])
+const promoDiscounts = ref([])
+const clients = ref([])
 
-const promoDiscounts = [
-  { id: 1, name: 'Summer Sale', value: 10 },
-  { id: 2, name: 'Loyalty Discount', value: 15 },
-  { id: 3, name: 'First-Time Customer', value: 20 },
-]
-
-const allProducts = {
-  services: [
-    { id: 's1', name: 'Facial Treatment', price: 500 },
-    { id: 's2', name: 'Massage Therapy', price: 700 },
-    { id: 's3', name: 'Hair Styling', price: 300 },
-    { id: 's4', name: 'Manicure', price: 200 },
-    { id: 's5', name: 'Pedicure', price: 250 },
-    { id: 's6', name: 'Waxing', price: 350 },
-    { id: 's7', name: 'Skin Consultation', price: 150 },
-    { id: 's8', name: 'Makeup Application', price: 400 },
-    { id: 's9', name: 'Body Scrub', price: 450 },
-    { id: 's10', name: 'Aromatherapy', price: 550 },
-    { id: 's11', name: 'Hot Stone Massage', price: 800 },
-    { id: 's12', name: 'Reflexology', price: 300 },
-  ],
-  products: [
-    { id: 'p1', name: 'Vitamin C Serum', price: 250 },
-    { id: 'p2', name: '3-in-1 Cream', price: 250 },
-    { id: 'p3', name: 'Green Toner', price: 250 },
-    { id: 'p4', name: 'ABC Serum', price: 250 },
-    { id: 'p5', name: 'Moisturizing Lotion', price: 200 },
-    { id: 'p6', name: 'Sunscreen SPF 50', price: 300 },
-    { id: 'p7', name: 'Cleansing Gel', price: 180 },
-    { id: 'p8', name: 'Night Cream', price: 280 },
-    { id: 'p9', name: 'Eye Cream', price: 220 },
-    { id: 'p10', name: 'Face Mask', price: 150 },
-    { id: 'p11', name: 'Body Lotion', price: 270 },
-    { id: 'p12', name: 'Lip Balm', price: 100 },
-  ],
-  promos: [
-    { id: 'pr1', name: 'Summer Package', price: 800 },
-    { id: 'pr2', name: 'Couple Spa Day', price: 1200 },
-    { id: 'pr3', name: 'Beauty Box Set', price: 500 },
-    { id: 'pr4', name: 'Skincare Starter Kit', price: 600 },
-    { id: 'pr5', name: 'Hair Care Bundle', price: 450 },
-    { id: 'pr6', name: 'Nail Polish Set', price: 300 },
-    { id: 'pr7', name: 'Mask Collection', price: 350 },
-    { id: 'pr8', name: 'Anti-Aging Package', price: 900 },
-    { id: 'pr9', name: 'Wellness Package', price: 1000 },
-    { id: 'pr10', name: 'Bridal Beauty Set', price: 1500 },
-    { id: 'pr11', name: 'Men\'s Grooming Kit', price: 550 },
-    { id: 'pr12', name: 'Teen Skincare Bundle', price: 400 },
-  ],
-}
-
-const reservations = [
-  { id: 'r1', clientName: 'John Doe', therapistName: 'Jane Smith' },
-  { id: 'r2', clientName: 'Alice Johnson', therapistName: 'Bob Williams' },
-  { id: 'r3', clientName: 'Emma Davis', therapistName: 'Michael Brown' },
-]
-
-const filterOptions = [
-  { value: 'price_low_high', label: 'Price: Low to High' },
-  { value: 'price_high_low', label: 'Price: High to Low' },
-  { value: 'name_a_z', label: 'Name: A to Z' },
-  { value: 'name_z_a', label: 'Name: Z to A' },
-]
-
-const filteredProducts = computed(() => {
-  let filtered = allProducts[selectedCategory.value].filter(product =>
-    product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-
-  if (selectedFilter.value) {
-    switch (selectedFilter.value) {
-      case 'price_low_high':
-        filtered.sort((a, b) => a.price - b.price)
-        break
-      case 'price_high_low':
-        filtered.sort((a, b) => b.price - a.price)
-        break
-      case 'name_a_z':
-        filtered.sort((a, b) => a.name.localeCompare(b.name))
-        break
-      case 'name_z_a':
-        filtered.sort((a, b) => b.name.localeCompare(a.name))
-        break
-    }
-  }
-
-  return filtered
-})
-
-const fetchClients = async () => {
-  const { data, error, refresh } = await useFetch('/api/client/client', { key: 'clients' })
-  if (!error.value && data.value?.success) {
-    clients.value = data.value.clients
-  }
-}
-
-// Client Search Functionality
+// Client search state
 const searchQueryClient = ref('')
 const selectedClient = ref(null)
 const isClientSearchOpen = ref(false)
-const clients = computed(() => clientsData.value?.clients || [])
-const { data: clientsData, refresh: refreshClients } = useFetch('/api/client/client')
+
+// Add the missing reactive variable for notes
+const notesInput = ref('')
 
 
+
+const selectedTherapistName = computed(() => {
+  const id = Number(selectedTherapist.value)
+  const therapist = therapists.value.find(t => t.id === id)
+  return therapist ? therapist.name : 'N/A'
+})
+
+
+const filteredProducts = computed(() =>
+  currentItems.value.filter(product =>
+    product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+)
+const totalProducts = computed(() => filteredProducts.value.length)
+const displayedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return filteredProducts.value.slice(start, start + itemsPerPage)
+})
 const filteredClients = computed(() => {
   if (!searchQueryClient.value.trim()) return []
   return clients.value.filter(client =>
@@ -405,58 +377,21 @@ const filteredClients = computed(() => {
   )
 })
 
-
-
-
-
-// Ensure fetchClients is called when a new client is added
-const addNewClient = async (clientData) => {
-  const { data, error } = await useFetch('/api/counter.post', {
-    method: 'POST',
-    body: clientData,
-  })
-
-  if (!error.value && data.value?.success) {
-    await fetchClients() // Refetch clients list to include the new client
-  }
-}
-
-
-// Select Client
-const selectClient = (client) => {
-  selectedClient.value = client
-  selectedClientName.value = `${client.first_name} ${client.last_name}`
-  isClientSearchOpen.value = false
-}
-
-// Clear Selection
-const clearClientSelection = () => {
-  selectedClient.value = null
-  selectedClientName.value = null
-  searchQueryClient.value = ''
-}
-
-
-const subtotal = computed(() => {
-  return cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
-})
-
+// Order calculations
+const subtotal = computed(() =>
+  cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+)
 const tax = computed(() => subtotal.value * 0.1)
-
 const discount = computed(() => {
   if (selectedPromoDiscount.value) {
-    const promo = promoDiscounts.find(p => p.id === selectedPromoDiscount.value)
+    const promo = promoDiscounts.value.find(p => p.id === selectedPromoDiscount.value)
     return promo ? (subtotal.value * promo.value / 100) : 0
   }
   return customDiscountValue.value ? (subtotal.value * Number(customDiscountValue.value) / 100) : 0
 })
-
 const total = computed(() => subtotal.value + tax.value - discount.value)
 
-const selectedReservation = computed(() => 
-  reservations.find(r => r.id === selectedReservationId.value)
-)
-
+// Cart operations
 function addToCart(product) {
   const existingItem = cart.value.find(item => item.id === product.id)
   if (existingItem) {
@@ -465,7 +400,6 @@ function addToCart(product) {
     cart.value.push({ ...product, quantity: 1 })
   }
 }
-
 function removeFromCart(productId) {
   const index = cart.value.findIndex(item => item.id === productId)
   if (index !== -1) {
@@ -476,20 +410,16 @@ function removeFromCart(productId) {
     }
   }
 }
-
 function getItemQuantity(product) {
   const item = cart.value.find(item => item.id === product.id)
   return item ? item.quantity : 0
 }
-
 function increaseQuantity(product) {
   addToCart(product)
 }
-
 function decreaseQuantity(product) {
   removeFromCart(product.id)
 }
-
 function confirmOrder() {
   if (cart.value.length > 0) {
     showConfirmDialog.value = true
@@ -498,15 +428,78 @@ function confirmOrder() {
   }
 }
 
-function handleConfirmOrder() {
-  showConfirmDialog.value = false
-  showSuccessDialog.value = true
-  // Here you would typically send the order to a backend
-  cart.value = [] // Clear the cart
-  selectedReservationId.value = null
-  paymentMode.value = null
-  selectedPromoDiscount.value = null
-  customDiscountValue.value = null
+async function handleConfirmOrder() {
+  showConfirmDialog.value = false;
+  
+  // Validate before submitting
+  if (!selectedClient.value?.id) {
+    alert("Please select a client before confirming the order");
+    return;
+  }
+  
+  if (!selectedTherapist.value) {
+    alert("Please select a therapist before confirming the order");
+    return;
+  }
+  
+  if (!paymentMode.value) {
+    alert("Please select a payment mode before confirming the order");
+    return;
+  }
+  
+  try {
+    // Build payload from your selections
+    const payload = {
+      clientId: selectedClient.value.id,
+      therapistId: Number(selectedTherapist.value),
+      paymentMode: paymentMode.value,
+      notes: notesInput.value || "Transaction created from POS",
+      
+      // Add products from cart with validation
+      products: cart.value.map(item => ({
+        id: Number(item.id),
+        quantity: Number(item.quantity) || 1
+      })),
+      
+      // Add promos if selected with validation
+      promos: selectedDiscount.value && selectedDiscount.value !== 'none' ? 
+        [{ id: Number(selectedDiscount.value), statusId: 1 }] : []
+    };
+
+    console.log("Submitting payload:", payload);
+
+    const { data, error } = await useFetch('/api/pos/counter', {
+      method: 'POST',
+      body: payload
+    });
+
+    console.log("Response:", data.value, error.value);
+
+    if (error.value) {
+      console.error("Error creating transaction:", error.value);
+      alert(`Failed to create transaction: ${error.value.message || 'Unknown error'}`);
+      return;
+    }
+
+    if (!data.value?.success) {
+      alert(`Transaction failed: ${data.value?.error || 'Unknown error'}`);
+      return;
+    }
+
+    // Reset cart and selections on success
+    cart.value = [];
+    selectedReservationId.value = null;
+    paymentMode.value = null;
+    selectedDiscount.value = null;
+    notesInput.value = '';
+    selectedClient.value = null;
+    selectedClientName.value = null;
+    
+    alert("Transaction completed successfully!");
+  } catch (err) {
+    console.error("Transaction error:", err);
+    alert(`An error occurred: ${err.message || 'Unknown error'}`);
+  }
 }
 
 function cancelOrder() {
@@ -516,65 +509,22 @@ function cancelOrder() {
   selectedPromoDiscount.value = null
   customDiscountValue.value = null
 }
-
-function goToBookingPage() {
-  // Implement navigation to booking page
-  console.log('Navigating to booking page...')
-}
-
-function handleReservationSelect(reservationId) {
-  selectedReservationId.value = reservationId
-}
-
-
-const totalProducts = computed(() => filteredProducts.value.length)
-
-const displayedProducts = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredProducts.value.slice(start, end)
-})
-
-// Navigation to appointments page
-const goToAppointments = () => {
-  router.push('/appointments/appointments')
-}
-
-// Update the button click handler in the template
-const handleNewBookingClick = () => {
-  goToAppointments()
-}
-
 function handlePageChange(newPage) {
   currentPage.value = newPage
 }
-
-
-watch(selectedCategory, () => {
-  currentPage.value = 1
-  searchQuery.value = ''
-})
-
-watch(searchQuery, () => {
-  currentPage.value = 1
-})
-
-watch(clientsData, (newVal) => {
-  console.log("Fetched Clients:", newVal)
-})
-
-
-// Fetch clients on component mount
-onMounted(async () => {
-  try {
-    const response = await fetch('/api/client/client')
-    clients.value = await response.json()
-  } catch (error) {
-    console.error('Error fetching clients:', error)
-    // Handle error appropriately
-  }
-})
-
+function handleNewBookingClick() {
+  router.push('/counter/pos')
+}
+function selectClient(client) {
+  selectedClient.value = client
+  selectedClientName.value = `${client.first_name} ${client.last_name}`
+  isClientSearchOpen.value = false
+}
+function clearClientSelection() {
+  selectedClient.value = null
+  selectedClientName.value = null
+  searchQueryClient.value = ''
+}
 const formatDate = (dateString) => {
   if (!dateString) return ''
   const date = new Date(dateString)
@@ -585,8 +535,92 @@ const formatDate = (dateString) => {
   })
 }
 
-// Fetch data when page loads
-onMounted(fetchClients)
+// Data fetching functions
+const fetchClients = async () => {
+  try {
+    const response = await fetch('/api/client/client')
+    clients.value = await response.json()
+  } catch (error) {
+    console.error('Error fetching clients:', error)
+  }
+}
+const fetchReservations = async () => {
+  try {
+    // Use /api/transactions as defined in your GET endpoint
+    const { data } = await useFetch('/api/reservations/reservations')
+    reservations.value = data.value?.map(res => ({
+      id: res.id,
+      clientName: `${res.Client.first_name} ${res.Client.last_name}`,
+      therapistName: res.Therapist?.first_name
+    })) || []
+  } catch (error) {
+    console.error('Error fetching reservations:', error)
+  }
+}
+
+
+
+
+const fetchTherapists = async () => {
+  try {
+    const { data } = await useFetch('/api/pos/therapists/therapists')
+    therapists.value = data.value || []
+  } catch (error) {
+    console.error('Error fetching therapists:', error)
+  }
+}
+
+const fetchPromos = async () => {
+  try {
+    // Use /api/promos as defined in your GET endpoint
+    const { data } = await useFetch('/api/promos/promos')
+    promoDiscounts.value = data.value?.map(promo => ({
+      id: promo.id,
+      name: promo.name,
+      value: promo.price
+    })) || []
+  } catch (error) {
+    console.error('Error fetching promos:', error)
+  }
+}
+const fetchItems = async () => {
+  try {
+    const endpointMap = {
+      services: '/api/pos/services/services',
+      products: '/api/pos/products/products',
+      promos: '/api/pos/promos/promos',
+    };
+    const { data } = await useFetch(endpointMap[selectedCategory.value]);
+    // The endpoints return objects with { id, name, price } already
+    currentItems.value = data.value || [];
+  } catch (error) {
+    console.error('Error fetching items:', error);
+  }
+};
+
+
+// Optional: Fetch all data at once
+const fetchAllData = async () => {
+  await Promise.all([
+    fetchClients(),
+    fetchReservations(),
+    fetchTherapists(),
+    fetchPromos(),
+    fetchItems()
+  ])
+}
+// Watch for changes in category to re-fetch items
+watch(selectedCategory, async () => {
+  currentPage.value = 1
+  searchQuery.value = ''
+  await fetchItems()
+})
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
+// At the end of your <script setup>:
+fetchAllData()
 
 </script>
 

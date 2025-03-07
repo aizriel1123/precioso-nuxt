@@ -25,7 +25,6 @@ const selectDate = (date) => {
 
 
 
-
 // State management
 const clients = ref([])
 const selectedClient = ref(null)
