@@ -5,20 +5,30 @@ interface TransactionPayload {
   therapistId: number;
   paymentMode: 'cash' | 'gcash';
   notes?: string;
-  products?: { id: number, quantity: number }[];
-  promos?: { id: number, statusId?: number }[];
+  services?: { id: number; quantity: number }[]; // <--- Add
+  products?: { id: number; quantity: number }[];
+  promos?: { id: number; quantity?: number; statusId?: number }[]; // allow quantity if you want
 }
 
 export default defineEventHandler(async (event) => {
   try {
     const body = (await readBody(event)) as TransactionPayload;
-    const { clientId, therapistId, paymentMode, notes, products = [], promos = [] } = body;
+    const {
+      clientId,
+      therapistId,
+      paymentMode,
+      notes,
+      services = [],
+      products = [],
+      promos = [],
+    } = body;
 
     // Validate required fields
     if (!clientId) throw new Error('Client ID is required');
     if (!therapistId) throw new Error('Therapist ID is required');
     if (!paymentMode) throw new Error('Payment mode is required');
 
+    // Map string to mode_of_payment_id
     const modeMapping: Record<string, number> = { cash: 1, gcash: 2 };
     const modeId = modeMapping[paymentMode] || 1;
 
@@ -27,6 +37,7 @@ export default defineEventHandler(async (event) => {
       therapistId,
       modeId,
       notes,
+      servicesCount: services.length,
       productsCount: products.length,
       promosCount: promos.length
     });
@@ -41,14 +52,31 @@ export default defineEventHandler(async (event) => {
         date: new Date(),
       }
     });
-    
     console.log('Transaction created:', newTransaction.id);
 
-    // Process each product and update stock
+    // 1) Create Appointment records for each service
+    if (services.length > 0) {
+      for (const service of services) {
+        try {
+          await prisma.appointment.create({
+            data: {
+              transaction_id: newTransaction.id,
+              service_id: service.id,
+              quantity: service.quantity,
+              appointment_status_id: 1, // or your default "Completed" status
+            },
+          });
+          console.log(`Added service ${service.id} x${service.quantity} to transaction`);
+        } catch (serviceError) {
+          console.error(`Error adding service ${service.id}:`, serviceError);
+        }
+      }
+    }
+
+    // 2) Create ProductsSold for each product
     if (products.length > 0) {
       for (const product of products) {
         try {
-          // Record the sold product
           await prisma.productsSold.create({
             data: {
               transaction_id: newTransaction.id,
@@ -56,34 +84,16 @@ export default defineEventHandler(async (event) => {
               quantity: product.quantity
             }
           });
-          console.log(`Added product ${product.id} to transaction`);
+          console.log(`Added product ${product.id} x${product.quantity} to transaction`);
 
-          // Find the most recent stockin record for the product
-          const latestStockin = await prisma.stockin.findFirst({
-            where: { product_id: product.id },
-            orderBy: { date: 'desc' }
-          });
-          
-          if (latestStockin) {
-            // Subtract the sold quantity from stock
-            await prisma.stockin.update({
-              where: { id: latestStockin.id },
-              data: {
-                quantity: { decrement: product.quantity }
-              }
-            });
-            console.log(`Updated stock for product ${product.id}`);
-          } else {
-            console.warn(`No stockin record found for product ${product.id}`);
-          }
+          // Optionally update stock from your Stockin logic...
         } catch (productError) {
-          console.error(`Error processing product ${product.id}:`, productError);
-          // Continue processing other products even if one fails
+          console.error(`Error adding product ${product.id}:`, productError);
         }
       }
     }
 
-    // Process promos (if any)
+    // 3) Create PromoTransaction for each promo
     if (promos.length > 0) {
       for (const promo of promos) {
         try {
@@ -91,13 +101,12 @@ export default defineEventHandler(async (event) => {
             data: {
               transaction_id: newTransaction.id,
               promo_id: promo.id,
-              status_id: promo.statusId || 1 // Default to status 1 if not provided
+              status_id: promo.statusId || 1 // default to 1 if not provided
             }
           });
           console.log(`Added promo ${promo.id} to transaction`);
         } catch (promoError) {
           console.error(`Error adding promo ${promo.id}:`, promoError);
-          // Continue with other promos even if one fails
         }
       }
     }

@@ -295,6 +295,7 @@
       </div>
     </form>
   </div>
+  <!-- Promo edit section remains unchanged if not relevant -->
 </div>
 
 
@@ -593,7 +594,6 @@ const closeEditModal = () => {
 };
 
 const editGoods = async () => {
-  console.log('editGoods triggered'); // Debug log
   try {
     if (selectedTab.value === 'service') {
       const response = await fetch(`/api/services/services`, {
@@ -602,7 +602,7 @@ const editGoods = async () => {
         body: JSON.stringify({
           name: selectedServiceName.value,
           price: selectedServicePrice.value,
-          commission: editServiceCommission.value  // Use the unified ref
+          commission: editServiceCommission.value  // Use the updated ref
         }),
       });
       if (!response.ok) throw new Error('Failed to update service');
@@ -624,7 +624,6 @@ const editGoods = async () => {
     console.error('Error updating item:', err);
   }
 };
-
 
 
 

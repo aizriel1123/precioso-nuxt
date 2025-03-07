@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
       select: { 
         id: true,        // Product ID
         name: true,      // Product Name
-        price: true,     // Example additional field
       }, 
     });
 
