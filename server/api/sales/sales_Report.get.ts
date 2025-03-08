@@ -2,50 +2,25 @@ import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   try {
-    // Fetch transactions with all related data, including PromoTransaction
+    // Fetch transactions with all related data, including the new ServiceTransaction
     const transactionsData = await prisma.transaction.findMany({
       include: {
         Client: true,
         Therapist: true,
         ModeOfPayment: true,
-        Appointment: {
-          include: {
-            Service: {
-              include: {
-                CommissionRate: true,
-              },
-            },
-          },
-        },
         ProductsSold: {
           include: {
             Product: true,
           },
         },
-        PromoTransaction: {
-          include: {
-            Promo: {
-              include: {
-                CommissionRate: true,
-              },
-            },
-            PromoStatus: true, // Optional, if needed
-          },
-        },
+        PromoTransaction: true, // if needed
+        ServiceTransaction: true,
       },
     });
 
-    // Process each transaction to calculate totals and combine related items
+    // Process each transaction to calculate totals and combine related items.
     const output = transactionsData.map((transaction) => {
-      // Sales from appointments: service price * quantity
-      const salesFromAppointments = transaction.Appointment.reduce((acc, appointment) => {
-        const price = appointment.Service.price
-          ? parseFloat(appointment.Service.price.toString())
-          : 0;
-        return acc + price * appointment.quantity;
-      }, 0);
-
-      // Sales from products sold: product sell price * quantity
+      // Sales from products: product sell price * quantity
       const salesFromProducts = transaction.ProductsSold.reduce((acc, ps) => {
         const sellPrice = ps.Product.sell
           ? parseFloat(ps.Product.sell.toString())
@@ -54,28 +29,27 @@ export default defineEventHandler(async (event) => {
         return acc + sellPrice * quantity;
       }, 0);
 
-      // Sales from promo transactions: promo price (assume one unit per promo transaction)
+      // Sales from promo transactions: use promo_price (assume 1 unit per record)
       const salesFromPromos = transaction.PromoTransaction.reduce((acc, pt) => {
-        const price = pt.Promo.price
-          ? parseFloat(pt.Promo.price.toString())
+        const price = pt.promo_price
+          ? parseFloat(pt.promo_price.toString())
           : 0;
         return acc + price;
       }, 0);
 
-      const totalSales = salesFromAppointments + salesFromProducts + salesFromPromos;
-
-      // Commission from appointments: service price * quantity * commission rate
-      const commissionFromAppointments = transaction.Appointment.reduce((acc, appointment) => {
-        const rate = appointment.Service.CommissionRate && appointment.Service.CommissionRate.rate
-          ? parseFloat(appointment.Service.CommissionRate.rate.toString())
+      // Sales from direct service transactions: service_price * quantity
+      const salesFromService = transaction.ServiceTransaction.reduce((acc, st) => {
+        const price = st.service_price
+          ? parseFloat(st.service_price.toString())
           : 0;
-        const price = appointment.Service.price
-          ? parseFloat(appointment.Service.price.toString())
-          : 0;
-        return acc + price * appointment.quantity * rate;
+        const quantity = st.quantity || 0;
+        return acc + price * quantity;
       }, 0);
 
-      // Commission from products sold: product commission * quantity
+      const totalSales = salesFromProducts + salesFromPromos + salesFromService;
+
+      // Commission calculations
+      // For products, commission is computed from Product.commission * quantity.
       const commissionFromProducts = transaction.ProductsSold.reduce((acc, ps) => {
         const commissionValue = ps.Product.commission
           ? parseFloat(ps.Product.commission.toString())
@@ -83,52 +57,52 @@ export default defineEventHandler(async (event) => {
         const quantity = ps.quantity || 0;
         return acc + commissionValue * quantity;
       }, 0);
+      // If you need to compute commissions on promos or direct services, add them here.
+      // For this example, we assume commission is only applied to products.
+      const totalCommission = commissionFromProducts;
 
-      // Commission from promo transactions: promo price * commission rate
-      const commissionFromPromos = transaction.PromoTransaction.reduce((acc, pt) => {
-        const rate = pt.Promo.CommissionRate && pt.Promo.CommissionRate.rate
-          ? parseFloat(pt.Promo.CommissionRate.rate.toString())
-          : 0;
-        const price = pt.Promo.price
-          ? parseFloat(pt.Promo.price.toString())
-          : 0;
-        return acc + price * rate;
-      }, 0);
-
-      const totalCommission = commissionFromAppointments + commissionFromProducts + commissionFromPromos;
-
-      // Combine the related items into type and service name strings.
+      // Build combined type and name strings for display.
       const types = [];
       const names = [];
-      if (transaction.Appointment.length > 0) {
+      if (transaction.ServiceTransaction.length > 0) {
         types.push("Service");
-        names.push(transaction.Appointment.map(a => a.Service.name).join(", "));
+        // Display the service names from ServiceTransaction.
+        names.push(
+          transaction.ServiceTransaction.map((st) => st.service_name).join(", ")
+        );
       }
       if (transaction.ProductsSold.length > 0) {
         types.push("Product");
-        names.push(transaction.ProductsSold.map(ps => ps.Product.name).join(", "));
+        names.push(
+          transaction.ProductsSold.map((ps) => ps.Product.name).join(", ")
+        );
       }
       if (transaction.PromoTransaction.length > 0) {
         types.push("Promo");
-        names.push(transaction.PromoTransaction.map(pt => pt.Promo.promo).join(", "));
+        // Use the promo_name stored in PromoTransaction; if missing, fall back to Promo.promo.
+        names.push(
+          transaction.PromoTransaction
+            .map((pt) => pt.promo_name || pt.Promo?.promo)
+            .join(", ")
+        );
       }
       const type = types.join(" / ") || "N/A";
       const serviceName = names.join(" / ") || "";
 
       return {
         id: transaction.id,
-        date: transaction.date, // DateTime value
+        date: transaction.date,
         client: transaction.Client
           ? `${transaction.Client.first_name} ${transaction.Client.last_name}`
           : "",
         therapist: transaction.Therapist
           ? `${transaction.Therapist.first_name} ${transaction.Therapist.last_name}`
           : "",
-        type,         // Combined type string (e.g., "Service / Promo")
-        service: serviceName,  // Combined service/promo names
-        sales: totalSales,     // Total sales amount
+        type, // Combined type string (e.g., "Service / Promo")
+        service: serviceName, // Combined names of items sold
+        sales: totalSales, // Total sales amount
         mop: transaction.ModeOfPayment ? transaction.ModeOfPayment.mode : "",
-        commission: totalCommission, // Total commission
+        commission: totalCommission, // Total commission (only for products in this example)
       };
     });
 

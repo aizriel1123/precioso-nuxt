@@ -1,126 +1,118 @@
 import prisma from '~/lib/prisma';
+import { defineEventHandler, readBody, createError } from 'h3';
 
 interface TransactionPayload {
   clientId: number;
   therapistId: number;
   paymentMode: 'cash' | 'gcash';
   notes?: string;
-  services?: { id: number; quantity: number }[]; // <--- Add
+  // Products sold
   products?: { id: number; quantity: number }[];
-  promos?: { id: number; quantity?: number; statusId?: number }[]; // allow quantity if you want
+  // Promos applied (only promo details)
+  promos?: { id: number; statusId?: number }[];
+  // Direct service sales (standalone services)
+  services?: { id: number; quantity: number }[];
 }
 
 export default defineEventHandler(async (event) => {
   try {
-    const body = (await readBody(event)) as TransactionPayload;
-    const {
-      clientId,
-      therapistId,
-      paymentMode,
-      notes,
-      services = [],
-      products = [],
-      promos = [],
-    } = body;
+    const body = await readBody<TransactionPayload>(event);
+    console.log("Received payload:", body);
 
-    // Validate required fields
-    if (!clientId) throw new Error('Client ID is required');
-    if (!therapistId) throw new Error('Therapist ID is required');
-    if (!paymentMode) throw new Error('Payment mode is required');
+    // Validate required fields.
+    if (!body.clientId) throw new Error('Client ID is required');
+    if (!body.therapistId) throw new Error('Therapist ID is required');
+    if (!body.paymentMode) throw new Error('Payment mode is required');
 
-    // Map string to mode_of_payment_id
-    const modeMapping: Record<string, number> = { cash: 1, gcash: 2 };
-    const modeId = modeMapping[paymentMode] || 1;
+    // Map payment mode (assume cash = 1, gcash = 2)
+    const modeId = body.paymentMode === 'cash' ? 1 : 2;
 
-    console.log('Creating transaction with data:', {
-      clientId,
-      therapistId,
-      modeId,
-      notes,
-      servicesCount: services.length,
-      productsCount: products.length,
-      promosCount: promos.length
-    });
+    const result = await prisma.$transaction(async (prisma) => {
+      // Create the main Transaction record.
+      const transaction = await prisma.transaction.create({
+        data: {
+          client_id: body.clientId,
+          therapist_id: body.therapistId,
+          mode_of_payment_id: modeId,
+          notes: body.notes,
+          date: new Date(),
+        },
+      });
 
-    // Create the transaction
-    const newTransaction = await prisma.transaction.create({
-      data: {
-        client_id: clientId,
-        therapist_id: therapistId,
-        mode_of_payment_id: modeId,
-        notes: notes || "",
-        date: new Date(),
+      // Process products: create ProductsSold records.
+      if (body.products && body.products.length > 0) {
+        await prisma.productsSold.createMany({
+          data: body.products.map((prod) => ({
+            transaction_id: transaction.id,
+            product_id: prod.id,
+            quantity: prod.quantity,
+          })),
+        });
       }
-    });
-    console.log('Transaction created:', newTransaction.id);
 
-    // 1) Create Appointment records for each service
-    if (services.length > 0) {
-      for (const service of services) {
-        try {
-          await prisma.appointment.create({
-            data: {
-              transaction_id: newTransaction.id,
-              service_id: service.id,
-              quantity: service.quantity,
-              appointment_status_id: 1, // or your default "Completed" status
-            },
-          });
-          console.log(`Added service ${service.id} x${service.quantity} to transaction`);
-        } catch (serviceError) {
-          console.error(`Error adding service ${service.id}:`, serviceError);
+      // Process promos: create PromoTransaction records.
+      if (body.promos && body.promos.length > 0) {
+        console.log("Processing promos:", body.promos);
+        // Retrieve promos for the provided promo IDs.
+        const promoIds = body.promos.map(p => p.id);
+        const promosFromDB = await prisma.promo.findMany({
+          where: { id: { in: promoIds } },
+        });
+        console.log("Found promos:", promosFromDB);
+        // Look up a default promo status (for example, the first record in PromoStatus).
+        const defaultPromoStatus = await prisma.promoStatus.findFirst();
+        if (!defaultPromoStatus) {
+          throw new Error("No default promo status found. Please seed your PromoStatus table.");
         }
-      }
-    }
-
-    // 2) Create ProductsSold for each product
-    if (products.length > 0) {
-      for (const product of products) {
-        try {
-          await prisma.productsSold.create({
-            data: {
-              transaction_id: newTransaction.id,
-              product_id: product.id,
-              quantity: product.quantity
-            }
-          });
-          console.log(`Added product ${product.id} x${product.quantity} to transaction`);
-
-          // Optionally update stock from your Stockin logic...
-        } catch (productError) {
-          console.error(`Error adding product ${product.id}:`, productError);
-        }
-      }
-    }
-
-    // 3) Create PromoTransaction for each promo
-    if (promos.length > 0) {
-      for (const promo of promos) {
-        try {
+        for (const promo of promosFromDB) {
+          const payloadPromo = body.promos.find(p => p.id === promo.id);
+          // Use the provided statusId or the default promo status.
+          const promoStatusId = payloadPromo?.statusId || defaultPromoStatus.id;
+          console.log(`Creating PromoTransaction for promo ${promo.id} with status ${promoStatusId}`);
           await prisma.promoTransaction.create({
             data: {
-              transaction_id: newTransaction.id,
+              transaction_id: transaction.id,
               promo_id: promo.id,
-              status_id: promo.statusId || 1 // default to 1 if not provided
-            }
+              status_id: promoStatusId,
+              promo_name: promo.promo,   // Use the promo name from the Promo table.
+              promo_price: promo.price,
+            },
           });
-          console.log(`Added promo ${promo.id} to transaction`);
-        } catch (promoError) {
-          console.error(`Error adding promo ${promo.id}:`, promoError);
+        }
+      } else {
+        console.log("No promos provided; skipping PromoTransaction creation.");
+      }
+
+      // Process direct service sales: create ServiceTransaction records.
+      if (body.services && body.services.length > 0) {
+        for (const svc of body.services) {
+          // Look up the service to get its name and price.
+          const serviceRecord = await prisma.service.findUnique({
+            where: { id: svc.id },
+          });
+          if (!serviceRecord) {
+            console.warn(`Service ${svc.id} not found; skipping.`);
+            continue;
+          }
+          await prisma.serviceTransaction.create({
+            data: {
+              transaction_id: transaction.id,
+              service_id: svc.id,
+              quantity: svc.quantity,
+              service_name: serviceRecord.name,
+              service_price: serviceRecord.price,
+            },
+          });
         }
       }
-    }
 
-    return {
-      success: true,
-      transactionId: newTransaction.id
-    };
+      return { success: true, transactionId: transaction.id };
+    });
 
-  } catch (error) {
-    console.error('Error creating transaction:', error);
-    return {
-      success: false,
-      error: 'Unknown error occurred'
-    };
+    console.log("Transaction created:", result.transactionId);
+    return result;
+  } catch (error: any) {
+    console.error("Transaction error:", error);
+    return { success: false, error: error.message || "Unknown error occurred" };
   }
 });

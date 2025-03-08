@@ -231,15 +231,15 @@
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious 
-                        href="#" 
-                        @click.prevent="currentPage--"
+                        as="button"
+                        @click="currentPage = Math.max(1, currentPage - 1)"
                         :disabled="currentPage === 1"
                       />
                     </PaginationItem>
                     <PaginationItem v-for="page in totalPages" :key="page">
                       <PaginationLink 
-                        href="#" 
-                        @click.prevent="currentPage = page"
+                        as="button"
+                        @click="currentPage = page"
                         :is-active="currentPage === page"
                       >
                         {{ page }}
@@ -247,8 +247,8 @@
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationNext 
-                        href="#" 
-                        @click.prevent="currentPage++"
+                        as="button"
+                        @click="currentPage = Math.min(totalPages, currentPage + 1)"
                         :disabled="currentPage === totalPages"
                       />
                     </PaginationItem>
@@ -295,6 +295,7 @@ const transactions = ref([])
 // ------------------------
 const fetchData = async () => {
   isLoading.value = true;
+  currentPage.value = 1;
   try {
     // Fetch transactions from the API endpoint.
     const response = await $fetch('/api/sales/sales_Report', {
@@ -538,4 +539,15 @@ defineProps({
     default: null
   }
 });
+
+// Add this watcher
+watch(totalPages, (newVal) => {
+  if (currentPage.value > newVal) {
+    currentPage.value = newVal > 0 ? newVal : 1
+  }
+})
+
+
+
+
 </script>

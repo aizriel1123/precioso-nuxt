@@ -299,21 +299,8 @@ import {
 } from '@/components/ui/dialog'
 import { Search, Minus, Plus, X } from 'lucide-vue-next'
 import NavBar from '~/components/Navbar.vue'
-<<<<<<< HEAD
 import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev, } from '@/components/ui/pagination'
 import { jwtDecode } from "jwt-decode";
-=======
-import {
-  Pagination,
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev
-} from '@/components/ui/pagination'
->>>>>>> b8c8736 (added sales and pos transaction functionality)
 
 const router = useRouter()
 
@@ -448,22 +435,32 @@ async function handleConfirmOrder() {
   }
   
   try {
-    // Build payload from your selections
+    // Build payload from your selections.
+    // Depending on the selectedCategory, put the cart items into the correct array.
     const payload = {
       clientId: selectedClient.value.id,
       therapistId: Number(selectedTherapist.value),
       paymentMode: paymentMode.value,
       notes: notesInput.value || "Transaction created from POS",
-      
-      // Add products from cart with validation
-      products: cart.value.map(item => ({
-        id: Number(item.id),
-        quantity: Number(item.quantity) || 1
-      })),
-      
-      // Add promos if selected with validation
-      promos: selectedDiscount.value && selectedDiscount.value !== 'none' ? 
-        [{ id: Number(selectedDiscount.value), statusId: 1 }] : []
+      products: selectedCategory.value === 'products'
+        ? cart.value.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity) || 1
+          }))
+        : [],
+      services: selectedCategory.value === 'services'
+        ? cart.value.map(item => ({
+            id: Number(item.id),
+            quantity: Number(item.quantity) || 1
+          }))
+        : [],
+      promos: selectedCategory.value === 'promos'
+        ? cart.value.map(item => ({
+            id: Number(item.id),
+            statusId: 1
+            // Optionally, you can pass service_id here if your UI allows it.
+          }))
+        : []
     };
 
     console.log("Submitting payload:", payload);
@@ -501,6 +498,7 @@ async function handleConfirmOrder() {
     alert(`An error occurred: ${err.message || 'Unknown error'}`);
   }
 }
+
 
 function cancelOrder() {
   cart.value = []

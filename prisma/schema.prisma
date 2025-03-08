@@ -135,16 +135,24 @@
     PromoTransaction PromoTransaction[]
   }
 
-  model PromoTransaction {
-    transaction_id Int
-    promo_id       Int
-    status_id      Int
-    Promo          Promo       @relation(fields: [promo_id], references: [id], onUpdate: Restrict)
-    PromoStatus    PromoStatus @relation(fields: [status_id], references: [id], onUpdate: Restrict)
-    Transaction    Transaction @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+model PromoTransaction {
+  transaction_id Int
+  promo_id       Int    
+  status_id      Int
+  promo_name     String?    @db.VarChar(255)
+  promo_price    Decimal?   @db.Decimal(6,2)
+  service_name   String?    @db.VarChar(100)
+  service_price  Decimal?   @db.Decimal(10,2)
 
-    @@id([transaction_id, promo_id])
-  }
+  Promo          Promo       @relation(fields: [promo_id], references: [id], onUpdate: Restrict)
+  PromoStatus    PromoStatus @relation(fields: [status_id], references: [id], onUpdate: Restrict)
+  Transaction    Transaction @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+
+  @@id([transaction_id, promo_id])
+}
+
+
+
 
   model Service {
     id                 Int             @id @default(autoincrement())
@@ -155,8 +163,22 @@
     Appointment        Appointment[]
     PromoServices      PromoServices[]
     CommissionRate     CommissionRate  @relation(fields: [commission_rate_id], references: [id], onUpdate: Restrict)
+    ServiceTransaction ServiceTransaction[]
     ServiceType        ServiceType     @relation(fields: [service_type_id], references: [id], onUpdate: Restrict)
   }
+
+  model ServiceTransaction {
+  transaction_id Int
+  service_id     Int
+  quantity       Int?               // quantity sold, if needed
+  service_name   String?  @db.VarChar(100)   // store snapshot of service name for reporting
+  service_price  Decimal? @db.Decimal(10,2)    // store snapshot of service price for reporting
+  
+  Transaction    Transaction @relation(fields: [transaction_id], references: [id], onUpdate: Restrict)
+  Service        Service     @relation(fields: [service_id], references: [id], onUpdate: Restrict)
+  
+  @@id([transaction_id, service_id])
+}
 
   model ServiceType {
     id      Int       @id @default(autoincrement())
@@ -225,20 +247,22 @@
     Therapist Therapist[]
   }
 
-  model Transaction {
-    id                 Int                @id @default(autoincrement())
-    date               DateTime?          @db.Timestamptz(6)
-    client_id          Int
-    therapist_id       Int
-    mode_of_payment_id Int
-    notes              String?
-    Appointment        Appointment[]
-    ProductsSold       ProductsSold[]
-    PromoTransaction   PromoTransaction[]
-    Client             Client             @relation(fields: [client_id], references: [id])
-    ModeOfPayment      ModeOfPayment      @relation(fields: [mode_of_payment_id], references: [id])
-    Therapist          Therapist          @relation(fields: [therapist_id], references: [id])
-  }
+ model Transaction {
+  id                 Int                  @id @default(autoincrement())
+  date               DateTime?            @db.Timestamptz(6)
+  client_id          Int
+  therapist_id       Int
+  mode_of_payment_id Int
+  notes              String?
+  Appointment        Appointment[]
+  ProductsSold       ProductsSold[]
+  PromoTransaction   PromoTransaction[]
+  ServiceTransaction ServiceTransaction[] // NEW: records direct service sales
+  Client             Client               @relation(fields: [client_id], references: [id])
+  ModeOfPayment      ModeOfPayment        @relation(fields: [mode_of_payment_id], references: [id])
+  Therapist          Therapist            @relation(fields: [therapist_id], references: [id])
+}
+
 
   model AccountType {
     id      Int       @id @default(autoincrement())

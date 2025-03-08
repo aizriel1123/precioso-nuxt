@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     // Verify that the commission rate exists
     const commissionRate = await prisma.commissionRate.findUnique({
-      where: { id: commissionRateId }
+      where: { id: commissionRateId },
     });
     if (!commissionRate) {
       throw createError({
@@ -35,15 +35,27 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Provide a default service_type_id (e.g., 1) since we're not using service type in the form
-    const defaultServiceTypeId = 1;
+    // Define a default service type name
+    const defaultServiceTypeName = "Default Service";
+
+    // Look for an existing default service type
+    let serviceType = await prisma.serviceType.findFirst({
+      where: { type: defaultServiceTypeName },
+    });
+
+    // If not found, create one
+    if (!serviceType) {
+      serviceType = await prisma.serviceType.create({
+        data: { type: defaultServiceTypeName },
+      });
+    }
 
     const newService = await prisma.service.create({
       data: {
         name,
         price: priceValue,
         commission_rate_id: commissionRate.id,
-        service_type_id: defaultServiceTypeId,
+        service_type_id: serviceType.id,
       },
       include: {
         CommissionRate: true,
