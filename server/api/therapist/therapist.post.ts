@@ -27,6 +27,22 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Status not found' });
   }
 
+  // Check if a therapist with the same first and last name already exists
+const existingTherapist = await prisma.therapist.findFirst({
+  where: {
+    first_name,
+    last_name,
+  },
+});
+
+if (existingTherapist) {
+  throw createError({
+    statusCode: 400,
+    message: 'A therapist with that first and last name already exists.',
+  });
+}
+
+
   try {
     // Provide a default type_id (e.g., 1) since it's required in the model.
     const newTherapist = await prisma.therapist.create({
@@ -38,7 +54,7 @@ export default defineEventHandler(async (event) => {
         schedule,
         contactinfo,
         status_id: parseInt(status_id),
-        type_id: 1 // Default or provided value for TherapistType relation
+        type_id: 1, // Default or provided value for TherapistType relation
       },
     });
     return {

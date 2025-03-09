@@ -540,6 +540,7 @@ import { DateFormatter, getLocalTimeZone, maxDate, minDate } from '@internationa
   //Placeholder for calendar value
   const value = ref(null)
 
+  
   //Sample data
   const appointments = ref([
   {

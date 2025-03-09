@@ -51,6 +51,7 @@
         <TabsList>
           <TabsTrigger value="overview">Sales Overview</TabsTrigger>
           <TabsTrigger value="history"> Sales History</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
         </TabsList>
 
         <!-- Sales Overview Tab -->
@@ -258,6 +259,175 @@
             </CardContent>
           </Card>
         </TabsContent>
+         <!-- Expenses Tab (Migrated from your original expenses page) -->
+         <TabsContent value="expenses">
+          <Card>
+            <CardHeader class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle>Expenses</CardTitle>
+              <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <!-- Period Selector -->
+                <Select v-model="selectedPeriodExpense">
+                  <SelectTrigger class="w-[180px]">
+                    <SelectValue placeholder="Past 24 hours" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="past-24-hours">Past 24 hours</SelectItem>
+                      <SelectItem value="past-7-days">Past 7 days</SelectItem>
+                      <SelectItem value="past-30-days">Past 30 days</SelectItem>
+                      <SelectItem value="all-transactions">All Transactions</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <!-- Search Input -->
+                <Input
+                  placeholder="Search by description..."
+                  v-model="expenseSearchQuery"
+                  class="input_search"
+                />
+
+                <!-- Button to open expense modal -->
+                <Button variant="ghost" @click="expenseModalOpen = true">Add New Expense</Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div class="table-product-container">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Expense ID</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Cost</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow
+                      v-for="(expense, index) in paginatedExpenses"
+                      :key="`${expense.id}-${index}`"
+                    >
+                      <TableCell>{{ expense.id }}</TableCell>
+                      <TableCell>{{ expense.date }}</TableCell>
+                      <TableCell>{{ expense.cost }}</TableCell>
+                      <TableCell>{{ expense.description }}</TableCell>
+                    </TableRow>
+                    <!-- If there are fewer than 10 rows, pad with empty rows -->
+                    <TableRow
+                      v-for="index in emptyRowsExpenses"
+                      :key="'empty-' + index"
+                      class="empty-row"
+                    >
+                      <TableCell>&nbsp;</TableCell>
+                      <TableCell>&nbsp;</TableCell>
+                      <TableCell>&nbsp;</TableCell>
+                      <TableCell>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+                <!-- Pagination controls -->
+                <div class="pagination-wrapper mt-4 flex justify-center items-center">
+                  <Pagination
+                    v-slot="{ page }"
+                    :total="totalPagesExpenses"
+                    :sibling-count="1"
+                    show-edges
+                    :default-page="currentPageExpenses"
+                    :per-page="itemsPerPageExpenses"
+                    @update:page="handlePageChangeExpenses"
+                  >
+                    <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                      <PaginationFirst />
+                      <PaginationPrev />
+                      <template v-for="(item, index) in items">
+                        <PaginationListItem
+                          v-if="item.type === 'page'"
+                          :key="index"
+                          :value="item.value"
+                          as-child
+                        >
+                          <Button
+                            class="w-9 h-9 p-0"
+                            :variant="item.value === page ? 'default' : 'outline'"
+                          >
+                            {{ item.value }}
+                          </Button>
+                        </PaginationListItem>
+                        <PaginationEllipsis v-else :key="item.type" :index="index" />
+                      </template>
+                      <PaginationNext />
+                      <PaginationLast />
+                    </PaginationList>
+                  </Pagination>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <!-- Modal for adding a new expense -->
+          <div
+            v-if="expenseModalOpen"
+            class="modal-overlay fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+          >
+            <div class="modal-content bg-white p-4 rounded-md shadow-md w-full max-w-md">
+              <h2 class="selected-product-title text-xl font-bold mb-4">Add New Expense</h2>
+              <form @submit.prevent="submitExpenseForm">
+                <!-- Date Picker Field -->
+                <FormField v-slot="{ componentField }" name="date">
+                  <FormLabel class="label">Select Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger as-child>
+                      <Button
+                        variant="outline"
+                        class="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon class="mr-2 h-4 w-4" />
+                        {{ expenseDate ? dateFormatter.format(expenseDate) : "Pick a date" }}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent class="calendar-popover">
+                      <div class="calendar-wrapper">
+                        <Calendar v-model="expenseDate" initial-focus />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </FormField>
+
+                <!-- Cost Field -->
+                <FormField v-slot="{ componentField }" name="cost">
+                  <FormItem>
+                    <FormLabel>Cost</FormLabel>
+                    <FormControl>
+                      <Input
+                        v-model="expenseCost"
+                        type="number"
+                        min="0"
+                        placeholder="Enter cost"
+                      />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
+
+                <!-- Description Field -->
+                <FormField v-slot="{ componentField }" name="description">
+                  <FormLabel class="label">Description</FormLabel>
+                  <textarea
+                    v-model="expenseDescription"
+                    placeholder="Enter description"
+                    class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  ></textarea>
+                </FormField>
+
+                <div class="action-buttons mt-4 flex justify-end gap-2">
+                  <Button variant="ghost" type="button" @click="expenseModalOpen = false">
+                    Cancel
+                  </Button>
+                  <Button type="submit">Submit</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   </div>
@@ -327,6 +497,20 @@ const averageSales = computed(() =>
 const totalAppointments = computed(() =>
   transactions.value.filter(t => t.type === 'Service').length
 )
+
+const expensesReport = ref([
+  { id: 1, date: '2025-01-09', cost: 200, description: 'Massage Therapy' },
+  { id: 2, date: '2025-01-09', cost: 200, description: 'Other expense' },
+])
+
+// For filtering and searching expenses
+const expenseSearchQuery = ref('')
+const selectedPeriodExpense = ref('past-24-hours')
+// For the Add Expense modal
+const expenseCost = ref('')
+const expenseDescription = ref('')
+const expenseModalOpen = ref(false)
+const expenseDate = ref(null)
 
 // Metrics Card Data
 const metrics = computed(() => ({
@@ -474,6 +658,78 @@ const paginationRange = computed(() => {
   const end = Math.min(currentPage.value * itemsPerPage, filteredTransactions.value.length);
   return `${start}-${end}`;
 });
+
+
+
+// Filter expenses by time period and search query
+const filteredExpenses = computed(() => {
+  const now = new Date()
+  let startDate
+  if (selectedPeriodExpense.value === 'past-24-hours') {
+    startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+  } else if (selectedPeriodExpense.value === 'past-7-days') {
+    startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  } else if (selectedPeriodExpense.value === 'past-30-days') {
+    startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  }
+  let expenses = expensesReport.value
+  if (startDate && selectedPeriodExpense.value !== 'all-transactions') {
+    expenses = expenses.filter(expense => new Date(expense.date) >= startDate)
+  }
+  if (expenseSearchQuery.value) {
+    expenses = expenses.filter(expense =>
+      expense.description.toLowerCase().includes(expenseSearchQuery.value.toLowerCase())
+    )
+  }
+  return expenses
+})
+
+// Pagination for expenses
+const currentPageExpenses = ref(1)
+const itemsPerPageExpenses = ref(10)
+const paginatedExpenses = computed(() => {
+  const startIndex = (currentPageExpenses.value - 1) * itemsPerPageExpenses.value
+  return filteredExpenses.value.slice(startIndex, startIndex + itemsPerPageExpenses.value)
+})
+const emptyRowsExpenses = computed(() =>
+  Math.max(0, itemsPerPageExpenses.value - paginatedExpenses.value.length)
+)
+const totalPagesExpenses = computed(() =>
+  Math.ceil(filteredExpenses.value.length / itemsPerPageExpenses.value)
+)
+function handlePageChangeExpenses(newPage) {
+  currentPageExpenses.value = newPage
+}
+
+// Expense form validation and submission
+const validateExpenseForm = () => {
+  return (
+    expenseDate.value !== null &&
+    (expenseCost.value !== '' && !isNaN(expenseCost.value)) &&
+    expenseDescription.value.trim() !== ''
+  )
+}
+
+const submitExpenseForm = () => {
+  if (validateExpenseForm()) {
+    // (Replace this with your DB logic as needed)
+    expensesReport.value.push({
+      id: expensesReport.value.length + 1,
+      date: expenseDate.value.toISOString().split('T')[0],
+      cost: expenseCost.value,
+      description: expenseDescription.value,
+    })
+    // Reset form fields
+    expenseDate.value = null
+    expenseCost.value = ''
+    expenseDescription.value = ''
+    alert('Successfully added an expense!')
+    expenseModalOpen.value = false
+  } else {
+    alert('Fill all necessary information first.')
+  }
+}
+
 
 // ------------------------
 // Date Handling & Formatters
