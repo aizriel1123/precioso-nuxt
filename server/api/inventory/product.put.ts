@@ -3,61 +3,68 @@ import prisma from "~/lib/prisma";
 export default defineEventHandler(async (event) => {
   // Parse the request body
   const body = await readBody(event);
-  console.log("Waow")
-  console.log(body)
+  console.log("Waow");
+  console.log(body);
+
   try {
-    // Check if all necessary fields are provided
+    // Validate required fields
     if (!body.update_id || !body.update_product_name || !body.update_product_type) {
-      throw new Error('Missing required fields');
+      throw new Error("Missing required fields");
+    }
+
+    const productId = Number(body.update_id);
+
+    // Check if any StockinProduct record exists for this product
+    const existingStockinProduct = await prisma.stockinProduct.findFirst({
+      where: { product_id: productId },
+    });
+
+    // Build nested update only if a StockinProduct record exists
+    let stockinProductUpdate = {};
+    if (existingStockinProduct) {
+      stockinProductUpdate = {
+        StockinProduct: {
+          updateMany: {
+            where: { product_id: productId },
+            data: { quantity: Number(body.update_product_stock) },
+          },
+        },
+      };
     }
 
     // Update the product using Prisma ORM
     const updatedProduct = await prisma.product.update({
       where: {
-        id: body.update_id,
+        id: productId,
       },
       data: {
-        // id: body.update_id,
         name: body.update_product_name,
-        cost: body.update_product_cost,
-        sell: body.update_selling_price,
-        commission: body.update_product_commission_rate,
-        critical_level: body.update_product_warning_level,
+        cost: Number(body.update_product_cost),
+        sell: Number(body.update_selling_price),
+        commission: Number(body.update_product_commission_rate),
+        critical_level: Number(body.update_product_warning_level),
         ProductType: {
           connect: {
-            type: body.update_product_type, // Assuming type is unique
+            type: body.update_product_type, // Assuming product type is unique
           },
         },
-        StockinProduct: {
-          update: {
-            where: {
-              id_product_id: {
-                product_id: body.update_id, // This part is correct
-                id: body.update_id,          // Here, 'id' is missing or not correctly passed
-              },
-            },
-            data: {
-              quantity: body.update_product_stock,
-            },
-          },
-        },
+        ...stockinProductUpdate,
       },
     });
 
-    console.log(updatedProduct)
-    console.log("WORKING")
+    console.log(updatedProduct);
+    console.log("WORKING");
 
-    // Return the updated product details
     return {
       statusCode: 200,
-      message: 'Product updated successfully',
+      message: "Product updated successfully",
       data: updatedProduct,
     };
   } catch (error) {
-    // Handle errors and return error response
-    console.log(error)
+    console.error("Error updating product:", error);
     return {
       statusCode: 400,
+      message: "Failed to update product",
     };
   }
 });

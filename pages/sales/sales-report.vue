@@ -134,132 +134,125 @@
         </TabsContent>
 
         <!-- History Tab -->
-        <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <CardTitle>Sales History</CardTitle>
-                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                  <div class="relative w-full">
-                    <input
-                      v-model="searchQuery"
-                      placeholder="Search transactions..."
-                      class="pl-10 pr-4 py-2 w-full rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    />
-                    <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <Select v-model="selectedFilter">
-                    <SelectTrigger class="w-[180px]">
-                      <SelectValue placeholder="Filter by..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Filters</SelectLabel>
-                        <SelectItem value="all">All Transactions</SelectItem>
-                        <SelectItem value="service">Service</SelectItem>
-                        <SelectItem value="product">Product</SelectItem>
-                        <SelectItem value="cash">Cash Payments</SelectItem>
-                        <SelectItem value="card">Card Payments</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div class="rounded-md border">
-                <Table>
-                  <TableHeader class="bg-muted/50">
-                    <TableRow>
-                      <TableHead class="w-[100px] cursor-pointer" @click="sortBy('date')">
-                        Date
-                        <SortIndicator :direction="sortConfig.column === 'date' ? sortConfig.direction : null" />
-                      </TableHead>
-                      <TableHead class="min-w-[150px]">Service/Product</TableHead>
-                      <TableHead class="min-w-[120px]">Client</TableHead>
-                      <TableHead class="min-w-[120px]">Therapist</TableHead>
-                      <TableHead class="w-[100px]">Type</TableHead>
-                      <TableHead class="w-[100px] cursor-pointer" @click="sortBy('sales')">
-                        Sales
-                        <SortIndicator :direction="sortConfig.column === 'sales' ? sortConfig.direction : null" />
-                      </TableHead>
-                      <TableHead class="w-[100px]">MOP</TableHead>
-                      <TableHead class="w-[130px]">Commission</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <template v-if="filteredTransactions.length">
-                      <TableRow
-                        v-for="transaction in paginatedTransactions"
-                        :key="transaction.id"
-                        class="hover:bg-muted/50"
-                      >
-                        <TableCell class="font-medium">{{ formatDate(transaction.date) }}</TableCell>
-                        <TableCell>{{ transaction.service }}</TableCell>
-                        <TableCell>{{ transaction.client }}</TableCell>
-                        <TableCell>{{ transaction.therapist }}</TableCell>
-                        <TableCell>
-                          <Badge :variant="transaction.type === 'Service' ? 'default' : 'secondary'">
-                            {{ transaction.type }}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{{ formatCurrency(transaction.sales) }}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {{ transaction.mop }}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{{ formatCurrency(transaction.commission) }}</TableCell>
-                      </TableRow>
-                    </template>
-                    <template v-else>
-                      <TableRow>
-                        <TableCell colspan="8" class="h-24 text-center text-muted-foreground">
-                          No transactions found
-                        </TableCell>
-                      </TableRow>
-                    </template>
-                  </TableBody>
-                </Table>
-              </div>
-              
-              <!-- Pagination -->
-              <div class="flex items-center justify-between px-2 py-4">
-                <div class="text-sm text-muted-foreground">
-                  Showing {{ paginationRange }} of {{ filteredTransactions.length }} transactions
-                </div>
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        as="button"
-                        @click="currentPage = Math.max(1, currentPage - 1)"
-                        :disabled="currentPage === 1"
-                      />
-                    </PaginationItem>
-                    <PaginationItem v-for="page in totalPages" :key="page">
-                      <PaginationLink 
-                        as="button"
-                        @click="currentPage = page"
-                        :is-active="currentPage === page"
-                      >
-                        {{ page }}
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext 
-                        as="button"
-                        @click="currentPage = Math.min(totalPages, currentPage + 1)"
-                        :disabled="currentPage === totalPages"
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-         <!-- Expenses Tab (Migrated from your original expenses page) -->
+<TabsContent value="history">
+  <Card>
+    <CardHeader>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <CardTitle>Sales History</CardTitle>
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <div class="relative w-full">
+            <Input
+              v-model="searchQuery"
+              placeholder="Search transactions..."
+              class="pl-10 pr-4 py-2 w-full rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            />
+            <MagnifyingGlassIcon class="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+          </div>
+          <Select v-model="selectedFilter">
+            <SelectTrigger class="w-[180px]">
+              <SelectValue placeholder="Filter by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Filters</SelectLabel>
+                <SelectItem value="all">All Transactions</SelectItem>
+                <SelectItem value="promo">Promos</SelectItem>
+                <SelectItem value="service">Service</SelectItem>
+                <SelectItem value="product">Product</SelectItem>
+                <SelectItem value="cash">Cash Payments</SelectItem>
+                <SelectItem value="card">Card Payments</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div class="rounded-md border">
+        <Table>
+          <TableHeader class="bg-muted/50">
+            <TableRow>
+              <TableHead class="w-[100px] cursor-pointer" @click="sortBy('date')">
+                Date
+                <SortIndicator :direction="sortConfig.column === 'date' ? sortConfig.direction : null" />
+              </TableHead>
+              <TableHead class="min-w-[150px]">Service/Product</TableHead>
+              <TableHead class="min-w-[120px]">Client</TableHead>
+              <TableHead class="min-w-[120px]">Therapist</TableHead>
+              <TableHead class="w-[100px]">Type</TableHead>
+              <TableHead class="w-[100px] cursor-pointer" @click="sortBy('sales')">
+                Sales
+                <SortIndicator :direction="sortConfig.column === 'sales' ? sortConfig.direction : null" />
+              </TableHead>
+              <TableHead class="w-[100px]">MOP</TableHead>
+              <TableHead class="w-[130px]">Commission</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template v-if="filteredTransactions.length">
+              <TableRow
+                v-for="transaction in paginatedTransactions"
+                :key="transaction.id"
+                class="hover:bg-muted/50"
+              >
+                <TableCell class="font-medium">{{ formatDate(transaction.date) }}</TableCell>
+                <TableCell>{{ transaction.service }}</TableCell>
+                <TableCell>{{ transaction.client }}</TableCell>
+                <TableCell>{{ transaction.therapist }}</TableCell>
+                <TableCell>
+                  <Badge :variant="transaction.type === 'Service' ? 'default' : 'secondary'">
+                    {{ transaction.type }}
+                  </Badge>
+                </TableCell>
+                <TableCell>{{ formatCurrency(transaction.sales) }}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">{{ transaction.mop }}</Badge>
+                </TableCell>
+                <TableCell>{{ formatCurrency(transaction.commission) }}</TableCell>
+              </TableRow>
+            </template>
+            <template v-else>
+              <TableRow>
+                <TableCell colspan="8" class="h-24 text-center text-muted-foreground">
+                  No transactions found
+                </TableCell>
+              </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
+
+      <!-- Sales History Pagination-->
+      <div class="pagination-wrapper mt-4 flex justify-center items-center">
+        <Pagination
+    :page="currentPage"
+    :total="totalPages"
+    :sibling-count="1"
+    show-edges
+    :per-page="itemsPerPage"
+    @update:page="handlePageChange"
+  >
+    <PaginationList v-slot="{ items, page }" class="flex items-center gap-1">
+      <PaginationFirst />
+      <PaginationPrev />
+      <template v-for="(item, index) in items" :key="index">
+        <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+          <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
+            {{ item.value }}
+          </Button>
+        </PaginationListItem>
+        <PaginationEllipsis v-else :key="item.type" :index="index" />
+      </template>
+      <PaginationNext />
+      <PaginationLast />
+    </PaginationList>
+  </Pagination>
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
+
+         <!-- Expenses Tab -->
          <TabsContent value="expenses">
           <Card>
             <CardHeader class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -465,7 +458,6 @@ const transactions = ref([])
 // ------------------------
 const fetchData = async () => {
   isLoading.value = true;
-  currentPage.value = 1;
   try {
     // Fetch transactions from the API endpoint.
     const response = await $fetch('/api/sales/sales_Report', {
@@ -495,7 +487,7 @@ const averageSales = computed(() =>
   transactions.value.length > 0 ? totalRevenue.value / transactions.value.length : 0
 )
 const totalAppointments = computed(() =>
-  transactions.value.filter(t => t.type === 'Service').length
+  transactions.value.length
 )
 
 const expensesReport = ref([
@@ -548,18 +540,22 @@ const chartData = computed(() => {
     acc[date].gross_profit += transaction.sales * grossProfitRate;
     return acc;
   }, {});
-  // Net Profit = Gross Profit - Expenses
-  return Object.values(dailyData).map(day => ({
-    ...day,
-    net_profit: day.gross_profit - day.expenses,
-  }));
+  
+  // Convert the dailyData object to an array, calculate net profit, and sort by date
+  return Object.values(dailyData)
+    .map(day => ({
+      ...day,
+      net_profit: day.gross_profit - day.expenses,
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort in ascending order
 });
+
 
 // Define custom colors for the chart:
 // Order: revenue, gross_profit, net_profit, expenses
 const chartColors = ['#34D399', '#FBBF24', '#60A5FA', '#F87171'];
 
-// Recent Sales – last 5 transactions (sorted by date descending)
+// Recent Sales c– last 5 transactions (sorted by date descending)
 const recentSales = computed(() =>
   transactions.value
     .slice()
@@ -624,24 +620,25 @@ const footTraffic = computed(() =>
 // ------------------------
 // Transaction Filtering and Pagination
 // ------------------------
+// Computed property: Filter and sort transactions
 const filteredTransactions = computed(() => {
-  return transactions.value
-    .filter(t => {
-      const searchMatch = Object.values(t).some(value =>
+  let filtered = transactions.value;
+  if (searchQuery.value) {
+    filtered = filtered.filter((t) => {
+      return Object.values(t).some(value =>
         String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
       );
-      const filterMatch =
-        selectedFilter.value === 'all' ||
-        (selectedFilter.value === 'service' && t.type === 'Service') ||
-        (selectedFilter.value === 'product' && t.type === 'Product') ||
-        (selectedFilter.value === 'cash' && t.mop === 'Cash') ||
-        (selectedFilter.value === 'card' && t.mop === 'Card');
-      return searchMatch && filterMatch;
-    })
-    .sort((a, b) => {
-      const modifier = sortConfig.value.direction === 'asc' ? 1 : -1;
-      return a[sortConfig.value.column] > b[sortConfig.value.column] ? modifier : -modifier;
     });
+  }
+  if (selectedFilter.value !== 'all') {
+    filtered = filtered.filter((t) => t.type.toLowerCase() === selectedFilter.value);
+  }
+  // Sort transactions based on sortConfig
+  filtered.sort((a, b) => {
+    const modifier = sortConfig.value.direction === 'asc' ? 1 : -1;
+    return a[sortConfig.value.column] > b[sortConfig.value.column] ? modifier : -modifier;
+  });
+  return filtered;
 });
 
 const paginatedTransactions = computed(() => {
@@ -653,11 +650,9 @@ const totalPages = computed(() =>
   Math.ceil(filteredTransactions.value.length / itemsPerPage)
 );
 
-const paginationRange = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage + 1;
-  const end = Math.min(currentPage.value * itemsPerPage, filteredTransactions.value.length);
-  return `${start}-${end}`;
-});
+function handlePageChange(newPage) {
+  currentPage.value = newPage;
+}
 
 
 
@@ -697,6 +692,10 @@ const emptyRowsExpenses = computed(() =>
 const totalPagesExpenses = computed(() =>
   Math.ceil(filteredExpenses.value.length / itemsPerPageExpenses.value)
 )
+
+
+
+
 function handlePageChangeExpenses(newPage) {
   currentPageExpenses.value = newPage
 }
@@ -795,14 +794,6 @@ defineProps({
     default: null
   }
 });
-
-// Add this watcher
-watch(totalPages, (newVal) => {
-  if (currentPage.value > newVal) {
-    currentPage.value = newVal > 0 ? newVal : 1
-  }
-})
-
 
 
 
