@@ -224,7 +224,7 @@ model PromoTransaction {
 
 model Therapist {
   id              Int             @id @default(autoincrement())
-  first_name      String?         @db.VarChar(255) 
+  first_name      String?         @db.VarChar(255) // Remove @unique here
   last_name       String?         @db.VarChar(255) 
   dob             DateTime?       @db.Date
   contactinfo     String?         @db.VarChar(50)

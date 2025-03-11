@@ -201,6 +201,24 @@
             </FormItem>
           </FormField>
 
+          
+
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+            <FormItem>
+              <FormLabel>Base Price</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price (Single Session)" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoPrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
           <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
             <FormItem>
               <FormLabel>Price</FormLabel>
@@ -208,7 +226,23 @@
                 <Input 
                   type="number" 
                   min="0" 
-                  placeholder="Price" 
+                  placeholder="Price (Buy 1 Take 1; if applicable)" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoPrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+            <FormItem>
+              <FormLabel>Price</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price ()" 
                   v-bind="componentField" 
                   v-model="selectedPromoPrice" 
                   disabled

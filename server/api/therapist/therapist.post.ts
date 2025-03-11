@@ -28,19 +28,6 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if a therapist with the same first and last name already exists
-const existingTherapist = await prisma.therapist.findFirst({
-  where: {
-    first_name,
-    last_name,
-  },
-});
-
-if (existingTherapist) {
-  throw createError({
-    statusCode: 400,
-    message: 'A therapist with that first and last name already exists.',
-  });
-}
 
 
   try {
