@@ -37,12 +37,15 @@
               <TableRow>
                 <TableHead v-if="selectedTab === 'service'">Service ID</TableHead>
                 <TableHead v-if="selectedTab === 'service'">Service Name</TableHead>
-                <TableHead v-if="selectedTab === 'service'">Price</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Base Price</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Buy 1 Take 1 Price</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Package Price</TableHead>
                 <TableHead v-if="selectedTab === 'service'">Commission</TableHead>
-
                 <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Promo Name</TableHead>
-                <TableHead v-if="selectedTab === 'promo'">Price</TableHead> 
+                <TableHead v-if="selectedTab === 'promo'">Base Price</TableHead>
+                <TableHead v-if="selectedTab === 'promo'">Buy 1 Take 1 Price</TableHead>
+                <TableHead v-if="selectedTab === 'promo'">Package Price</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Commission</TableHead>
               </TableRow>
             </TableHeader>
@@ -140,15 +143,60 @@
 
           <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceprice">
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>Base Price</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
                   min="0" 
-                  placeholder="Price" 
+                  placeholder="Price (Single Session)" 
                   v-bind="componentField" 
                   v-model="selectedServicePrice" 
                   disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceOneTakeOnePrice">
+            <FormItem>
+              <FormLabel>Price  (Buy 1 Take 1; if applicable)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price (Buy 1 Take 1; if applicable)" 
+                  v-bind="componentField" 
+                  v-model="selectedOneTakeOnePrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_packagePrice">
+            <FormItem>
+              <FormLabel>Price (Package)</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  min="0" 
+                  placeholder="Price (Package)" 
+                  v-bind="componentField" 
+                  v-model="selectedServicePackagePrice" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceDescription">
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Describe the service or promo" 
+                  v-bind="componentField" 
+                  v-model="selectedServiceDescription"
                 />
               </FormControl>
             </FormItem>
@@ -219,37 +267,51 @@
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoOneTakeOnePrice">
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>Price  (Buy 1 Take 1; if applicable)</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
                   min="0" 
                   placeholder="Price (Buy 1 Take 1; if applicable)" 
                   v-bind="componentField" 
-                  v-model="selectedPromoPrice" 
+                  v-model="selectedPromoOneTakeOnePrice" 
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoPackagePrice">
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>Price (Package)</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
                   min="0" 
-                  placeholder="Price ()" 
+                  placeholder="Price (Package)" 
                   v-bind="componentField" 
-                  v-model="selectedPromoPrice" 
+                  v-model="selectedPromoPackagePrice" 
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
+
+          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoDescription">
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Describe the service or promo" 
+                  v-bind="componentField" 
+                  v-model="selectedPromoDescription"
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
 
           <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promocommission">
             <FormItem>
@@ -353,11 +415,47 @@
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newServicePrice" />
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Base Price" v-bind="componentField" v-model="newServicePrice" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_service_one_take_one_price">
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price (for Buy 1 Take 1)" v-bind="componentField" v-model="newServiceOneTakeOnePrice" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_service_package_price">
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price (for Package)" v-bind="componentField" v-model="newServicePackagePrice" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_service_description">
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Describe the service or promo" 
+                v-bind="componentField" 
+                v-model="newServiceDescription"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+
 
         <FormField v-slot="{ componentField }" name="new_service_commission">
           <FormItem>
@@ -412,6 +510,40 @@
             <FormLabel>Price</FormLabel>
             <FormControl>
               <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newPromoPrice" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_promo_one_take_one_price">
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price (for Buy 1 Take 1)" v-bind="componentField" v-model="newPromoOneTakeOnePrice" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_promo_package_price">
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price (for Package)" v-bind="componentField" v-model="newPromoPackagePrice" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_promo_description">
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Describe the service or promo" 
+                v-bind="componentField" 
+                v-model="newPromoDescription"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
