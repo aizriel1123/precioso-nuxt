@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
       if (body.products && body.products.length > 0) {
         for (const prod of body.products) {
           // Fetch all Stockin records for this product
-          const stockRecords = await prisma.stockin.findMany({
+          const stockRecords = await prisma.stockinProduct.findMany({
             where: { product_id: prod.id },
           });
           // Sum up the total available stock manually

@@ -156,34 +156,210 @@ const productData = [
   },
 ];
 
+//Therapists
 
-
-const therapists = [
+const therapistsFlood = [
   {
-    first_name: "Therapist0",
-    gender_id: 1,
-    status_id: 1,
-    type_id: 1,
-  },
-  {
-    first_name: "Therapist1",
+    first_name: "Christine",
+    last_name: "Marcelino",
+    dob: new Date("1990-05-12"),
+    contactinfo: "09171234567",
+    schedule: "9AM-5PM",
     gender_id: 2,
     status_id: 1,
     type_id: 1,
   },
   {
-    first_name: "Therapist",
-    gender_id: 1,
+    first_name: "Judyvie",
+    last_name: "Mendez",
+    dob: new Date("1988-08-23"),
+    contactinfo: "09281234567",
+    schedule: "10AM-6PM",
+    gender_id: 2,
+    status_id: 2,
+    type_id: 2,
+  },
+  {
+    first_name: "Iris",
+    last_name: "Andrade",
+    dob: new Date("1992-03-15"),
+    contactinfo: "09391234567",
+    schedule: "11AM-7PM",
+    gender_id: 2,
+    status_id: 3,
+    type_id: 3,
+  },
+  {
+    first_name: "Janice",
+    last_name: "Viray",
+    dob: new Date("1995-07-10"),
+    contactinfo: "09451234567",
+    schedule: "9AM-5PM",
+    gender_id: 2,
     status_id: 1,
+    type_id: 2,
+  },
+  {
+    first_name: "Amelie",
+    last_name: "Uy",
+    dob: new Date("1989-12-01"),
+    contactinfo: "09561234567",
+    schedule: "10AM-6PM",
+    gender_id: 2,
+    status_id: 2,
     type_id: 1,
   },
   {
-    first_name: "therapist2",
-    gender_id: 1,
-    status_id: 1,
-    type_id: 1,
+    first_name: "Kimberly",
+    last_name: "del Mundo",
+    dob: new Date("1993-04-18"),
+    contactinfo: "09671234567",
+    schedule: "11AM-7PM",
+    gender_id: 2,
+    status_id: 3,
+    type_id: 3,
   },
 ];
+
+//Clients
+
+const clientsFlood = [
+  {
+    first_name: "LeBron",
+    last_name: "James",
+    dob: new Date("1984-12-30"),
+    contact_info: "09181234567",
+    gender_id: 1,
+  },
+  {
+    first_name: "Jung-kook",
+    last_name: "Jeon",
+    dob: new Date("1997-09-01"),
+    contact_info: "09281234567",
+    gender_id: 1,
+  },
+  {
+    first_name: "Bretman",
+    last_name: "Rock",
+    dob: new Date("1998-07-31"),
+    contact_info: "09391234567",
+    gender_id: 3,
+  },
+  {
+    first_name: "Ryan",
+    last_name: "Gosling",
+    dob: new Date("1980-11-12"),
+    contact_info: "09451234567",
+    gender_id: 1,
+  },
+  {
+    first_name: "Lisa",
+    last_name: "Manoban",
+    dob: new Date("1997-03-27"),
+    contact_info: "09561234567",
+    gender_id: 2,
+  },
+  {
+    first_name: "Sakura",
+    last_name: "Miyawaki",
+    dob: new Date("1998-03-19"),
+    contact_info: "09671234567",
+    gender_id: 2,
+  },
+  {
+    first_name: "Ice",
+    last_name: "Spice",
+    dob: new Date("2000-01-01"),
+    contact_info: "09781234567",
+    gender_id: 2,
+  },
+  {
+    first_name: "Yuri",
+    last_name: "Lowenthal",
+    dob: new Date("1971-03-05"),
+    contact_info: "09891234567",
+    gender_id: 1,
+  },
+  {
+    first_name: "Sam",
+    last_name: "Smith",
+    dob: new Date("1992-05-19"),
+    contact_info: "09991234567",
+    gender_id: 3,
+  },
+  {
+    first_name: "Yujin",
+    last_name: "Ahn",
+    dob: new Date("2003-09-01"),
+    contact_info: "09102345678",
+    gender_id: 2,
+  },
+  {
+    first_name: "Haewon",
+    last_name: "Oh",
+    dob: new Date("2003-02-25"),
+    contact_info: "09203456789",
+    gender_id: 2,
+  },
+  {
+    first_name: "Tsuda",
+    last_name: "Kenjiro",
+    dob: new Date("1971-06-11"),
+    contact_info: "09304567891",
+    gender_id: 1,
+  },
+  {
+    first_name: "Rie",
+    last_name: "Takahashi",
+    dob: new Date("1994-02-27"),
+    contact_info: "09405678912",
+    gender_id: 2,
+  },
+  {
+    first_name: "Wonyoung",
+    last_name: "Jang",
+    dob: new Date("2004-08-31"),
+    contact_info: "09506789123",
+    gender_id: 2,
+  },
+  {
+    first_name: "Ji-woo",
+    last_name: "Kim",
+    dob: new Date("1999-10-20"),
+    contact_info: "09607891234",
+    gender_id: 3,
+  },
+  {
+    first_name: "Nicolette",
+    last_name: "Vergara",
+    dob: new Date("2001-09-14"),
+    contact_info: "09708912345",
+    gender_id: 2,
+  },
+  {
+    first_name: "Jin-Woo",
+    last_name: "Sung",
+    dob: new Date("2003-03-08"),
+    contact_info: "09809123456",
+    gender_id: 1,
+  },
+  {
+    first_name: "Shai",
+    last_name: "Gilgeous-Alexander",
+    dob: new Date("1998-07-12"),
+    contact_info: "09910234567",
+    gender_id: 1,
+  },
+  {
+    first_name: "Jimmy",
+    last_name: "Butler III",
+    dob: new Date("1989-09-14"),
+    contact_info: "09111234567",
+    gender_id: 1,
+  },
+];
+
+//Accounts
 
 const accounts = [
   {
@@ -218,52 +394,105 @@ const accounts = [
   },
 ];
 
-const clientData = [
+//Suppliers
+
+const suppliersFlood = [
   {
-    first_name: "Max",
-    last_name: "Lorem",
-    dob: "1984-12-30T00:00:00.000Z",
-    gender: "Male",
-    contact_info: "08042981",
+    supplier_name: "Dermatech Pro Supplies",
+    supplier_contactnum: "+1 (213) 555-7812",
+    supplier_email: "sales@dermatechpro.com",
+    supplier_address: "145 Radiance Blvd, Los Angeles, CA 90015, USA",
   },
   {
-    first_name: "Jane",
-    last_name: "Doe",
-    dob: "1990-05-15T00:00:00.000Z",
-    gender: "Female",
-    contact_info: "08012345",
+    supplier_name: "Elite Aesthetic Distributors",
+    supplier_contactnum: "+1 (305) 555-9910",
+    supplier_email: "info@eliteaestheticdistributors.com",
+    supplier_address: "908 Serenity Lane, Miami, FL 33140, USA",
   },
   {
-    first_name: "Alex",
-    last_name: "Smith",
-    dob: "1987-11-12T00:00:00.000Z",
-    gender: "Other",
-    contact_info: "08067890",
-  },
-];
-const supplierData = [
-  {
-    supplier_name: "Supplier1",
-    supplier_contactnum: "09123456789",
-    supplier_address: "123 Supplier Street, City, Country",
+    supplier_name: "Seoul DermaTech",
+    supplier_contactnum: "+82 2-555-6741",
+    supplier_email: "support@seouldermatech.kr",
+    supplier_address: "47 Gangnam-daero, Gangnam-gu, Seoul 06035, South Korea",
   },
   {
-    supplier_name: "Supplier2",
-    supplier_contactnum: "09234567890",
-    supplier_address: "456 Warehouse Avenue, City, Country",
+    supplier_name: "Manila Beauty Systems",
+    supplier_contactnum: "+63 (2) 555-9988",
+    supplier_email: "inquiry@manilabeautysystems.ph",
+    supplier_address: "88 Makati Avenue, Makati City, Metro Manila 1229, Philippines",
   },
   {
-    supplier_name: "Supplier3",
-    supplier_contactnum: "09345678901",
-    supplier_address: "789 Distribution Road, City, Country",
+    supplier_name: "SkinGlow Equipment & Supplies",
+    supplier_contactnum: "+1 (646) 555-8745",
+    supplier_email: "sales@skinglowequip.com",
+    supplier_address: "322 Aesthetic Street, New York, NY 10012, USA",
+  },
+  {
+    supplier_name: "MedSpa Innovations",
+    supplier_contactnum: "+65 6555 4455",
+    supplier_email: "contact@medspainnovations.sg",
+    supplier_address: "99 Orchard Road, Singapore 238888",
+  },
+  {
+    supplier_name: "Prestige Beauty Equipment",
+    supplier_contactnum: "+1 (206) 555-2109",
+    supplier_email: "hello@prestigebeautyequip.com",
+    supplier_address: "450 Elegance Road, Seattle, WA 98101, USA",
+  },
+  {
+    supplier_name: "HydroGlow Technologies Korea",
+    supplier_contactnum: "+82 2-888-7777",
+    supplier_email: "sales@hydroglow.kr",
+    supplier_address: "15 Itaewon-ro, Yongsan-gu, Seoul 04391, South Korea",
+  },
+  {
+    supplier_name: "LuxeSpa Distributors Philippines",
+    supplier_contactnum: "+63 (917) 555-1122",
+    supplier_email: "orders@luxespaph.com",
+    supplier_address: "78 Bonifacio High Street, Taguig, Metro Manila 1634, Philippines",
+  },
+  {
+    supplier_name: "Dermaluxe Global",
+    supplier_contactnum: "+61 2 5556 7890",
+    supplier_email: "info@dermaluxeglobal.com",
+    supplier_address: "555 Skintastic Ave, Sydney, NSW 2000, Australia",
+  },
+  {
+    supplier_name: "Radiant Beauty Supply Japan",
+    supplier_contactnum: "+81 3-5555-9988",
+    supplier_email: "support@radiantbeautysupply.jp",
+    supplier_address: "1-9-1 Ginza, Chuo City, Tokyo 104-0061, Japan",
   },
 ];
 
+const promoStatusData = [
+  {
+    status: "Available",
+  },
+  {
+    status: "Not Available",
+  },
+];
+
+const commissionRate = [
+  {
+    rate: 0,
+  },
+  {
+    rate: 5,
+  },
+  {
+    rate: 10,
+  },
+  {
+    rate: 15,
+  },
+];
 
 async function createSuppliers() {
   try {
     await Promise.all(
-      supplierData.map(async (supplier) => {
+      suppliersFlood.map(async (supplier) => {
         const existingSupplier = await prisma.supplier.findFirst({
           where: {
             supplier_name: supplier.supplier_name,
@@ -278,6 +507,7 @@ async function createSuppliers() {
               supplier_name: supplier.supplier_name,
               supplier_contactnum: supplier.supplier_contactnum,
               supplier_address: supplier.supplier_address,
+              supplier_email: supplier.supplier_email,
             },
           });
 
@@ -338,6 +568,24 @@ const seed = async () => {
       where: { type: type.type },
       update: {},
       create: type,
+    });
+  }
+
+  // Seed promo status
+  for (const status of promoStatusData) {
+    await prisma.promoStatus.upsert({
+      where: { status: status.status },
+      update: {},
+      create: status,
+    });
+  }
+
+  // Seed commision rate
+  for (const rate of commissionRate) {
+    await prisma.commissionRate.upsert({
+      where: { rate: rate.rate },
+      update: {},
+      create: rate,
     });
   }
 
@@ -414,40 +662,40 @@ const seed = async () => {
 
 
   // Seed clients with gender lookup
-  for (const client of clientData) {
-    const genderRecord = await prisma.gender.findUnique({
-      where: {
-        gender: client.gender,
-      },
-    });
+  // for (const client of clientsFlood) {
+  //   const genderRecord = await prisma.gender.findUnique({
+  //     where: {
+  //       gender: client.gender,
+  //     },
+  //   });
 
-    if (!genderRecord) {
-      console.error(`Gender "${client.gender}" not found for client ${client.first_name} ${client.last_name}.`);
-      continue;
-    }
+  //   if (!genderRecord) {
+  //     console.error(`Gender "${client.gender}" not found for client ${client.first_name} ${client.last_name}.`);
+  //     continue;
+  //   }
 
-    await prisma.client.upsert({
-      where: {
-        contact_info: client.contact_info,
-      },
-      update: {
-        first_name: client.first_name,
-        last_name: client.last_name,
-        dob: client.dob,
-        gender_id: genderRecord.id,
-      },
-      create: {
-        first_name: client.first_name,
-        last_name: client.last_name,
-        dob: client.dob,
-        gender_id: genderRecord.id,
-        contact_info: client.contact_info,
-      },
-    });
-  }
+  //   await prisma.client.upsert({
+  //     where: {
+  //       contact_info: client.contact_info,
+  //     },
+  //     update: {
+  //       first_name: client.first_name,
+  //       last_name: client.last_name,
+  //       dob: client.dob,
+  //       gender_id: genderRecord.id,
+  //     },
+  //     create: {
+  //       first_name: client.first_name,
+  //       last_name: client.last_name,
+  //       dob: client.dob,
+  //       gender_id: genderRecord.id,
+  //       contact_info: client.contact_info,
+  //     },
+  //   });
+  // }
 
   // Seed therapists
-  for (const therapist of therapists) {
+  for (const therapist of therapistsFlood) {
     const existingTherapist = await prisma.therapist.findFirst({
       where: {
         first_name: therapist.first_name,

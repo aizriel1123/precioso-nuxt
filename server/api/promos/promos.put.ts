@@ -3,9 +3,9 @@ import prisma from '~/lib/prisma';
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
   const body = await readBody(event);
-  const { name, price, commission } = body;
+  const { name, price, commission, status, description } = body;
 
-  if (!id || !name || price == null || commission == null) {
+  if (!id || !name || price == null || commission == null || !status || !description) {
     throw createError({
       statusCode: 400,
       message: 'Missing required fields'
@@ -16,9 +16,11 @@ export default defineEventHandler(async (event) => {
     const updatedPromo = await prisma.promo.update({
       where: { id: parseInt(id, 10) },
       data: {
-        name,
+        promo: name,
         price: parseFloat(price),
-        commission: parseFloat(commission)
+        commission_rate_id: parseInt(commission),
+        status_id: parseInt(status),
+        description: description,
       }
     });
     return updatedPromo;

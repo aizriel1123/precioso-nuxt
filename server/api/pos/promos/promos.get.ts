@@ -1,7 +1,21 @@
 import prisma from '~/lib/prisma';
 
 export default defineEventHandler(async (event) => {
+  // Only if present
+  const status = await prisma.promoStatus.findFirst({
+    where: {
+      status: "Available",
+    },
+    select: {
+      id: true,
+    }
+  })
+  if (!status) throw new Error("Invalid Status")
+
   const promos = await prisma.promo.findMany({
+    where: {
+      status_id: status.id,
+    },
     select: {
       id: true,
       promo: true,

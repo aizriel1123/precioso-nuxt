@@ -4,7 +4,8 @@ import { defineEventHandler, readBody, createError } from 'h3';
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const { name, price, commission } = body; // 'commission' represents commission_rate_id
+    console.log(body)
+    const { name, price, commission, description } = body; // 'commission' represents commission_rate_id
 
     // Validate required fields
     if (!name || price === undefined || commission === undefined) {
@@ -56,6 +57,7 @@ export default defineEventHandler(async (event) => {
         price: priceValue,
         commission_rate_id: commissionRate.id,
         service_type_id: serviceType.id,
+        description: description || "",
       },
       include: {
         CommissionRate: true,

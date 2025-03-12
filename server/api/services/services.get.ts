@@ -5,12 +5,14 @@ export default defineEventHandler(async (event) => {
   try {
     const services = await prisma.service.findMany({
       include: {
-        CommissionRate: true, // include the related commission rate data
+        CommissionRate: true, // Include the CommissionRate relation
       },
-    });
-    return services;
+    })
+    return services
   } catch (error) {
-    console.error('Error fetching services:', error);
-    throw createError({ statusCode: 500, message: 'Failed to fetch services' });
+    console.error('Error fetching services:', error)
+    throw createError({ statusCode: 500, message: 'Failed to fetch services' })
   }
-});
+})
+
+

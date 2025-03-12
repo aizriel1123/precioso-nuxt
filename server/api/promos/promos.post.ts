@@ -4,13 +4,14 @@ import { defineEventHandler, readBody, createError } from 'h3';
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const { name, price, commission } = body; // 'commission' here represents the commission_rate_id
+    const { name, price, commission, description, status } = body; // 'commission' here represents the commission_rate_id
 
-    if (!name || price == null || commission == null) {
+    if (!name || price == null || commission == null || !status) {
       throw createError({ statusCode: 400, message: 'Missing required fields' });
     }
 
     const commissionRateId = parseInt(commission);
+    const statusId = parseInt(status)
 
     // Verify that the commission rate exists
     const commissionRateExists = await prisma.commissionRate.findUnique({
@@ -20,11 +21,21 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, message: 'Invalid commission rate id' });
     }
 
+    // Verify that the commission rate exists
+    const statusCheck = await prisma.promoStatus.findUnique({
+      where: { id: statusId }
+    });
+    if (!statusCheck) {
+      throw createError({ statusCode: 400, message: 'Invalid promo status' });
+    }
+
     const newPromo = await prisma.promo.create({
       data: {
         promo: name,
         price: parseFloat(price),
-        commission_rate_id: commissionRateId
+        commission_rate_id: commissionRateId,
+        status_id: statusId,
+        description: description || "",
       }
     });
 

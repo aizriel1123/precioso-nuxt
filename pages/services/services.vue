@@ -7,7 +7,7 @@
     <!-- Flex container for dropdown, input, filter and buttons -->
     <div class="flex-components">
       <div class="left-side">
-        <Tabs 
+        <Tabs
           v-model="selectedTab"
           :options="['service', 'promo']"
           class="w-[200px]"
@@ -18,13 +18,21 @@
           </TabsList>
         </Tabs>
 
-        <Input :placeholder="inputPlaceholder" class="input_search" v-model="searchQuery"/>
+        <Input
+          :placeholder="inputPlaceholder"
+          class="input_search"
+          v-model="searchQuery"
+        />
       </div>
 
       <div class="right-side">
         <!-- Buttons for adding new service and promo -->
-        <Button variant="ghost" class="button" @click="openServiceModal">Add New Service</Button>
-        <Button variant="ghost" class="button" @click="openPromoModal">Add New Promo</Button>
+        <Button variant="ghost" class="button" @click="openServiceModal"
+          >Add New Service</Button
+        >
+        <Button variant="ghost" class="button" @click="openPromoModal"
+          >Add New Promo</Button
+        >
       </div>
     </div>
 
@@ -35,24 +43,37 @@
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead v-if="selectedTab === 'service'">Service ID</TableHead>
-                <TableHead v-if="selectedTab === 'service'">Service Name</TableHead>
+                <TableHead v-if="selectedTab === 'service'"
+                  >Service ID</TableHead
+                >
+                <TableHead v-if="selectedTab === 'service'"
+                  >Service Name</TableHead
+                >
                 <TableHead v-if="selectedTab === 'service'">Price</TableHead>
-                <TableHead v-if="selectedTab === 'service'">Commission</TableHead>
-                <TableHead v-if="selectedTab === 'service'">Description</TableHead>
+                <TableHead v-if="selectedTab === 'service'"
+                  >Commission</TableHead
+                >
+                <TableHead v-if="selectedTab === 'service'"
+                  >Description</TableHead
+                >
+                  
 
                 <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Promo Name</TableHead>
-                <TableHead v-if="selectedTab === 'promo'">Price</TableHead> 
+                <TableHead v-if="selectedTab === 'promo'">Price</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Commission</TableHead>
-                <TableHead v-if="selectedTab === 'service'">Description</TableHead>
-
+                <TableHead v-if="selectedTab === 'promo'"
+                  >Description</TableHead
+                >
+                <TableHead v-if="selectedTab === 'promo'"
+                  >Promo Status</TableHead
+                >
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow 
-                v-for="(item) in filteredItems" 
-                :key="item.id" 
+              <TableRow
+                v-for="item in filteredItems"
+                :key="item.id"
                 @click="selectGoods(item)"
               >
                 <TableCell>{{ item.id }}</TableCell>
@@ -60,16 +81,21 @@
                 <TableCell>{{ item.price }}</TableCell>
                 <TableCell>{{ item.commission }}</TableCell>
                 <TableCell>{{ item.description }}</TableCell>
+                <TableCell>{{ item.status }}</TableCell>
               </TableRow>
               <!-- Empty rows for pagination -->
-              <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
+              <TableRow
+                v-for="index in emptyRows"
+                :key="'empty-' + index"
+                class="empty-row"
+              >
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
               </TableRow>
             </TableBody>
-          </Table>  
+          </Table>
           <div class="pagination-wrapper">
             <Pagination
               v-slot="{ page }"
@@ -83,7 +109,7 @@
                 <PaginationFirst @click="onPageChange(1)" />
                 <PaginationPrev @click="onPageChange(currentPage - 1)" />
                 <template v-for="(item, index) in items">
-                  <PaginationListItem 
+                  <PaginationListItem
                     v-if="item.type === 'page'"
                     :key="index"
                     :value="item.value"
@@ -91,7 +117,9 @@
                   >
                     <Button
                       class="pagination-button"
-                      :variant="item.value === currentPage ? 'default' : 'outline'"
+                      :variant="
+                        item.value === currentPage ? 'default' : 'outline'
+                      "
                       @click="onPageChange(item.value)"
                     >
                       {{ item.value }}
@@ -111,141 +139,216 @@
       <div class="container-selectedproduct">
         <h2 class="selected-product-title">Edit Selected {{ tabTitle }}</h2>
         <form id="update_panel">
-          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceid">
+          <FormField
+            v-if="selectedTab === 'service'"
+            v-slot="{ componentField }"
+            name="update_serviceid"
+          >
             <FormItem>
               <FormLabel>Service ID</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Service ID" 
-                  v-bind="componentField" 
-                  v-model="selectedServiceId" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Service ID"
+                  v-bind="componentField"
+                  v-model="selectedServiceId"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicename">
+          <FormField
+            v-if="selectedTab === 'service'"
+            v-slot="{ componentField }"
+            name="update_servicename"
+          >
             <FormItem>
               <FormLabel>Service Name</FormLabel>
               <FormControl>
-                <Input 
-                  type="text"  
-                  placeholder="Service Name" 
-                  v-bind="componentField" 
-                  v-model="selectedServiceName" 
+                <Input
+                  type="text"
+                  placeholder="Service Name"
+                  v-bind="componentField"
+                  v-model="selectedServiceName"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_serviceprice">
+          <FormField
+            v-if="selectedTab === 'service'"
+            v-slot="{ componentField }"
+            name="update_serviceprice"
+          >
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Price" 
-                  v-bind="componentField" 
-                  v-model="selectedServicePrice" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Price"
+                  v-bind="componentField"
+                  v-model="selectedServicePrice"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicecommission">
+          <FormField
+            v-if="selectedTab === 'service'"
+            v-slot="{ componentField }"
+            name="update_servicecommission"
+          >
             <FormItem>
               <FormLabel>Commission</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Commission" 
-                  v-bind="componentField" 
-                  v-model="selectedServiceCommission" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Commission"
+                  v-bind="componentField"
+                  v-model="selectedServiceCommission"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicedescription">
+          <FormField
+            v-if="selectedTab === 'service'"
+            v-slot="{ componentField }"
+            name="update_servicedescription"
+          >
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input 
-                  type="text"  
-                  placeholder="Description" 
-                  v-bind="componentField" 
-                  v-model="selectedServiceDescription" 
+                <Input
+                  type="text"
+                  placeholder="Description"
+                  v-bind="componentField"
+                  v-model="selectedServiceDescription"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-else-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoid">
+
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promoid"
+          >
             <FormItem>
               <FormLabel>Promo ID</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Promo ID" 
-                  v-bind="componentField" 
-                  v-model="selectedPromoId" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Promo ID"
+                  v-bind="componentField"
+                  v-model="selectedPromoId"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoname">
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promoname"
+          >
             <FormItem>
               <FormLabel>Promo Name</FormLabel>
               <FormControl>
-                <Input 
-                  type="text"  
-                  placeholder="Promo Name" 
-                  v-bind="componentField" 
-                  v-model="selectedPromoName" 
+                <Input
+                  type="text"
+                  placeholder="Promo Name"
+                  v-bind="componentField"
+                  v-model="selectedPromoName"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promoprice">
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promoprice"
+          >
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Price" 
-                  v-bind="componentField" 
-                  v-model="selectedPromoPrice" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Price"
+                  v-bind="componentField"
+                  v-model="selectedPromoPrice"
                   disabled
                 />
               </FormControl>
             </FormItem>
           </FormField>
 
-          <FormField v-if="selectedTab === 'promo'" v-slot="{ componentField }" name="update_promocommission">
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promocommission"
+          >
             <FormItem>
               <FormLabel>Commission</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  placeholder="Commission" 
-                  v-bind="componentField" 
-                  v-model="selectedPromoCommission" 
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Commission"
+                  v-bind="componentField"
+                  v-model="selectedPromoCommission"
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promodescription"
+          >
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter description"
+                  v-bind="componentField"
+                  v-model="selectedPromoDescription"
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-if="selectedTab === 'promo'"
+            v-slot="{ componentField }"
+            name="update_promostatus"
+          >
+            <FormItem>
+              <FormLabel>Promo Status</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Promo Status"
+                  v-bind="componentField"
+                  v-model="selectedPromoStatus"
                   disabled
                 />
               </FormControl>
@@ -253,8 +356,20 @@
           </FormField>
 
           <div class="action-buttons">
-            <Button variant="ghost" class="button" type="button" @click="openEditModal">Edit Data</Button>
-            <Button variant="ghost" class="button" type="button" @click="deleteItem">Delete</Button>
+            <Button
+              variant="ghost"
+              class="button"
+              type="button"
+              @click="openEditModal"
+              >Edit Data</Button
+            >
+            <Button
+              variant="ghost"
+              class="button"
+              type="button"
+              @click="deleteItem"
+              >Delete</Button
+            >
           </div>
         </form>
       </div>
@@ -262,62 +377,84 @@
   </div>
 
   <!-- Popup to edit service -->
-<div v-if="isEditModalOpen" class="modal-overlay">
-  <div v-if="selectedTab === 'service'" class="modal-content">
-    <h2 class="selected-product-title">Edit Service</h2>
-    <form @submit.prevent="editGoods">
-      <FormField v-slot="{ componentField }" name="new_service_name">
-        <FormItem>
-          <FormLabel>Service Name</FormLabel>
-          <FormControl>
-            <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="selectedServiceName" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-  
-      <FormField v-slot="{ componentField }" name="new_service_price">
-        <FormItem>
-          <FormLabel>Price</FormLabel>
-          <FormControl>
-            <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="selectedServicePrice" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-  
-      <!-- Commission as a select dropdown -->
-      <FormField v-slot="{ componentField }" name="new_service_commission">
-        <FormItem>
-          <FormLabel>Commission</FormLabel>
-          <FormControl>
-            <Select v-model="editServiceCommission">
-              <SelectTrigger>
-                <SelectValue placeholder="Select Commission Rate" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem v-for="rate in commissionRates" :key="rate.id" :value="rate.id">
-                    {{ rate.rate }}%
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-  
-      <div class="action-buttons">
-        <Button variant="ghost" type="button" class="button" @click="closeEditModal">Cancel</Button>
-        <Button variant="ghost" type="submit" class="button">Save Changes</Button>
-      </div>
-    </form>
+  <div v-if="isEditModalOpen" class="modal-overlay">
+    <div v-if="selectedTab === 'service'" class="modal-content">
+      <h2 class="selected-product-title">Edit Service</h2>
+      <form @submit.prevent="editGoods">
+        <FormField v-slot="{ componentField }" name="new_service_name">
+          <FormItem>
+            <FormLabel>Service Name</FormLabel>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Enter Name"
+                v-bind="componentField"
+                v-model="selectedServiceName"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_service_price">
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min="0.00"
+                step="0.01"
+                placeholder="Enter Price"
+                v-bind="componentField"
+                v-model="selectedServicePrice"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <!-- Commission as a select dropdown -->
+        <FormField v-slot="{ componentField }" name="new_service_commission">
+          <FormItem>
+            <FormLabel>Commission</FormLabel>
+            <FormControl>
+              <Select v-model="selectedServiceCommission">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Commission Rate" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="rate in commissionRates"
+                      :key="rate.id"
+                      :value="rate.id"
+                    >
+                      {{ rate.rate }}%
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <div class="action-buttons">
+          <Button
+            variant="ghost"
+            type="button"
+            class="button"
+            @click="closeEditModal"
+            >Cancel</Button
+          >
+          <Button variant="ghost" type="submit" class="button"
+            >Save Changes</Button
+          >
+        </div>
+      </form>
+    </div>
+    <!-- Promo edit section remains unchanged if not relevant -->
   </div>
-  <!-- Promo edit section remains unchanged if not relevant -->
-</div>
-
-
 
   <!-- Popup to Add New Service -->
   <div v-if="isServiceModalOpen" class="modal-overlay">
@@ -328,7 +465,12 @@
           <FormItem>
             <FormLabel>Service Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="newServiceName" />
+              <Input
+                type="text"
+                placeholder="Enter Name"
+                v-bind="componentField"
+                v-model="newServiceName"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -338,7 +480,14 @@
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newServicePrice" />
+              <Input
+                type="number"
+                min="0.00"
+                step="0.01"
+                placeholder="Enter Price"
+                v-bind="componentField"
+                v-model="newServicePrice"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -354,10 +503,11 @@
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem 
-                      v-for="rate in commissionRates" 
-                      :key="rate.id" 
-                      :value="rate.id">
+                    <SelectItem
+                      v-for="rate in commissionRates"
+                      :key="rate.id"
+                      :value="rate.id"
+                    >
                       {{ rate.rate }}%
                     </SelectItem>
                   </SelectGroup>
@@ -368,10 +518,31 @@
           </FormItem>
         </FormField>
 
+        <FormField v-slot="{ componentField }" name="new_service_description">
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Enter description"
+                v-bind="componentField"
+                v-model="newServiceDescription"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
         <div class="action-buttons">
-          <Button variant="ghost" type="button" class="button" @click="closeServiceModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Add Service</Button>
+          <Button
+            variant="ghost"
+            type="button"
+            class="button"
+            @click="closeServiceModal"
+            >Cancel</Button
+          >
+          <Button variant="ghost" type="submit" class="button"
+            >Add Service</Button
+          >
         </div>
       </form>
     </div>
@@ -386,7 +557,12 @@
           <FormItem>
             <FormLabel>Promo Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Enter Name" v-bind="componentField" v-model="newPromoName" />
+              <Input
+                type="text"
+                placeholder="Enter Name"
+                v-bind="componentField"
+                v-model="newPromoName"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -396,7 +572,14 @@
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" min="0.00" step="0.01" placeholder="Enter Price" v-bind="componentField" v-model="newPromoPrice" />
+              <Input
+                type="number"
+                min="0.00"
+                step="0.01"
+                placeholder="Enter Price"
+                v-bind="componentField"
+                v-model="newPromoPrice"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -404,97 +587,170 @@
 
         <!-- Commission Rate Select -->
         <div>
-    <Select v-model="newPromoCommission">
-      <SelectTrigger>
-        <SelectValue placeholder="Select Commission Rate" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectItem 
-            v-for="rate in commissionRates" 
-            :key="rate.id" 
-            :value="rate.id">
-            {{ rate.rate }}%
-          </SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  </div>
+          <Select v-model="newPromoCommission">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Commission Rate" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem
+                  v-for="rate in commissionRates"
+                  :key="rate.id"
+                  :value="rate.id"
+                >
+                  {{ rate.rate }}%
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <FormField v-slot="{ componentField }" name="new_promo_description">
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Enter description"
+                v-bind="componentField"
+                v-model="newPromoDescription"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <div>
+          <Select v-model="newPromoStatus">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Promo Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem
+                  v-for="status in promoStatus"
+                  :key="status.id"
+                  :value="status.id"
+                >
+                  {{ status.status }}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
         <div class="action-buttons">
-          <Button variant="ghost" type="button" class="button" @click="closePromoModal">Cancel</Button>
-          <Button variant="ghost" type="submit" class="button">Add Promo</Button>
+          <Button
+            variant="ghost"
+            type="button"
+            class="button"
+            @click="closePromoModal"
+            >Cancel</Button
+          >
+          <Button variant="ghost" type="submit" class="button"
+            >Add Promo</Button
+          >
         </div>
       </form>
     </div>
   </div>
+  
 </template>
 
 <script setup>
-import NavBar from '~/components/Navbar.vue';
-import { ref, computed, onMounted, watch } from 'vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
-import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import NavBar from "~/components/Navbar.vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from "@/components/ui/pagination";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 // --- Popup states, selection, and form data ---
 const isEditModalOpen = ref(false);
 const isServiceModalOpen = ref(false);
 const isPromoModalOpen = ref(false);
 
-const selectedServiceId = ref('');
-const selectedServiceName = ref('');
+const selectedServiceId = ref("");
+const selectedServiceName = ref("");
 const selectedServicePrice = ref(0);
 const selectedServiceCommission = ref(0);
-const selectedServiceDescription = ref('');
+const selectedServiceDescription = ref("");
 
-const selectedPromoId = ref('');
-const selectedPromoName = ref('');
+const selectedPromoId = ref("");
+const selectedPromoName = ref("");
 const selectedPromoPrice = ref(0);
 const selectedPromoCommission = ref(0);
-const selectedPromoDescription = ref('');
+const selectedPromoDescription = ref("");
 
+const newServiceName = ref("");
+const newServicePrice = ref("");
+const newServiceCommission = ref("");
+const newServiceDescription = ref("");
 
-const newServiceName = ref('');
-const newServicePrice = ref('');
-const newServiceCommission = ref('');
-const newServiceCommission = ref('');
-
-
-const newPromoName = ref('');
-const newPromoPrice = ref('');
-const newPromoCommission = ref('');
+const newPromoName = ref("");
+const newPromoPrice = ref("");
+const newPromoCommission = ref("");
+const newPromoStatus = ref("");
+const newPromoDescription = ref("");
 
 // API data
 const services = ref([]);
 const promos = ref([]);
 const commissionRates = ref([]);
+const promoStatus = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
 
 // --- Pagination & Filtering Setup ---
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
-const selectedTab = ref('service');
-const searchQuery = ref('');
+const selectedTab = ref("service");
+const searchQuery = ref("");
 
 // Compute filteredData (for simplicity, using raw arrays here)
 const filteredData = computed(() => {
-  let items = selectedTab.value === 'service' ? services.value : promos.value;
+  let items = selectedTab.value === "service" ? services.value : promos.value;
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    items = items.filter(item => {
-      if (selectedTab.value === 'service') {
+    items = items.filter((item) => {
+      if (selectedTab.value === "service") {
         return (
           item.name.toLowerCase().includes(query) ||
           item.id.toString().includes(query)
         );
       } else {
         return (
-          (item.promo || '').toLowerCase().includes(query) ||
+          (item.promo || "").toLowerCase().includes(query) ||
           item.id.toString().includes(query)
         );
       }
@@ -532,41 +788,46 @@ watch(searchQuery, () => {
 
 // --- Data Fetching Functions ---
 const fetchData = async () => {
+  console.log("Testing1")
   isLoading.value = true;
   error.value = null;
   try {
-    if (selectedTab.value === 'service') {
-      const response = await fetch('/api/services/services');
-      if (!response.ok) throw new Error('Failed to fetch services');
+    if (selectedTab.value === "service") {
+      const response = await fetch("/api/services/services");
+      if (!response.ok) throw new Error("Failed to fetch services");
       const data = await response.json();
-      services.value = data.map(service => ({
+      services.value = data.map((service) => ({
         id: service.id,
         name: service.name,
         price: service.price,
-        commission: service.CommissionRate ? service.CommissionRate.rate : 0
+        commission: service.CommissionRate ? service.CommissionRate.rate : 0,
+        description: service.description,
       }));
     } else {
-      const response = await fetch('/api/promos/promos');
-      if (!response.ok) throw new Error('Failed to fetch promos');
+      const response = await fetch("/api/promos/promos");
+      if (!response.ok) throw new Error("Failed to fetch promos");
       const data = await response.json();
-      promos.value = data.map(promo => ({
+      promos.value = data.map((promo) => ({
         id: promo.id,
         promo: promo.promo,
         price: promo.price,
-        commission: promo.CommissionRate ? promo.CommissionRate.rate : 0
+        commission: promo.CommissionRate ? promo.CommissionRate.rate : 0,
+        description: promo.description,
       }));
     }
   } catch (err) {
     error.value = err.message;
-    console.error('Error fetching data:', err);
+    console.error("Error fetching data:", err);
   } finally {
     isLoading.value = false;
   }
 };
+fetchData()
 
 const fetchCommissionRates = async () => {
+  console.log("Testing2")
   try {
-    const { data, error } = await useFetch('/api/commissionrates');
+    const { data, error } = await useFetch("/api/commissionrates");
     if (error.value) {
       console.error("Error fetching commission rates:", error.value);
     } else {
@@ -577,6 +838,23 @@ const fetchCommissionRates = async () => {
     console.error("Unexpected error:", err);
   }
 };
+fetchCommissionRates()
+
+const fetchPromoStatus = async () => {
+  console.log("Testing3")
+  try {
+    const { data, error } = await useFetch("/api/promostatus");
+    if (error.value) {
+      console.error("Error fetching promo status:", error.value);
+    } else {
+      promoStatus.value = data.value;
+      console.log("Promo status:", promoStatus.value);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+};
+fetchPromoStatus()
 
 watch(selectedTab, () => {
   fetchData();
@@ -590,7 +868,7 @@ onMounted(() => {
 
 // --- Selection and Edit Functions ---
 const selectGoods = (item) => {
-  if (selectedTab.value === 'service') {
+  if (selectedTab.value === "service") {
     selectedServiceId.value = item.id;
     selectedServiceName.value = item.name;
     selectedServicePrice.value = item.price;
@@ -606,8 +884,8 @@ const selectGoods = (item) => {
 
 const openEditModal = () => {
   if (
-    (selectedTab.value === 'service' && selectedServiceId.value) || 
-    (selectedTab.value === 'promo' && selectedPromoId.value)
+    (selectedTab.value === "service" && selectedServiceId.value) ||
+    (selectedTab.value === "promo" && selectedPromoId.value)
   ) {
     isEditModalOpen.value = true;
   }
@@ -619,75 +897,74 @@ const closeEditModal = () => {
 
 const editGoods = async () => {
   try {
-    if (selectedTab.value === 'service') {
+    if (selectedTab.value === "service") {
       const response = await fetch(`/api/services/services`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: selectedServiceName.value,
           price: selectedServicePrice.value,
-          commission: editServiceCommission.value  // Use the updated ref
+          commission: editServiceCommission.value, // Use the updated ref
         }),
       });
-      if (!response.ok) throw new Error('Failed to update service');
+      if (!response.ok) throw new Error("Failed to update service");
     } else {
       const response = await fetch(`/api/promos/promos`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: selectedPromoName.value,
           price: selectedPromoPrice.value,
-          commission: selectedPromoCommission.value
+          commission: selectedPromoCommission.value,
         }),
       });
-      if (!response.ok) throw new Error('Failed to update promo');
+      if (!response.ok) throw new Error("Failed to update promo");
     }
     await fetchData();
     closeEditModal();
   } catch (err) {
-    console.error('Error updating item:', err);
+    console.error("Error updating item:", err);
   }
 };
 
-
-
 const deleteItem = async () => {
-  if (!confirm('Are you sure you want to delete this item?')) return;
+  if (!confirm("Are you sure you want to delete this item?")) return;
   try {
-    if (selectedTab.value === 'service' && selectedServiceId.value) {
-      const response = await fetch('/api/services/services', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    if (selectedTab.value === "service" && selectedServiceId.value) {
+      const response = await fetch("/api/services/services", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: selectedServiceId.value }),
       });
-      if (!response.ok) throw new Error('Failed to delete service');
-      selectedServiceId.value = '';
-      selectedServiceName.value = '';
+      if (!response.ok) throw new Error("Failed to delete service");
+      selectedServiceId.value = "";
+      selectedServiceName.value = "";
       selectedServicePrice.value = 0;
       selectedServiceCommission.value = 0;
-    } else if (selectedTab.value === 'promo' && selectedPromoId.value) {
-      const response = await fetch('/api/promos/promos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    } else if (selectedTab.value === "promo" && selectedPromoId.value) {
+      const response = await fetch("/api/promos/promos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: selectedPromoId.value }),
       });
-      if (!response.ok) throw new Error('Failed to delete promo');
-      selectedPromoId.value = '';
-      selectedPromoName.value = '';
+      if (!response.ok) throw new Error("Failed to delete promo");
+      selectedPromoId.value = "";
+      selectedPromoName.value = "";
       selectedPromoPrice.value = 0;
       selectedPromoCommission.value = 0;
     }
     await fetchData();
   } catch (err) {
-    console.error('Error deleting item:', err);
+    console.error("Error deleting item:", err);
   }
 };
 
 // --- Popup Functions for Adding New Items ---
 const openServiceModal = () => {
-  newServiceName.value = '';
-  newServicePrice.value = '';
-  newServiceCommission.value = '';
+  newServiceName.value = "";
+  newServicePrice.value = "";
+  newServiceCommission.value = "";
+  newServiceDescription.value = ""
   isServiceModalOpen.value = true;
 };
 
@@ -696,32 +973,39 @@ const closeServiceModal = () => {
 };
 
 const addNewService = async () => {
-  if (!newServiceName.value || !newServicePrice.value || !newServiceCommission.value) {
-    alert('Please fill in all fields');
+  if (
+    !newServiceName.value ||
+    !newServicePrice.value ||
+    !newServiceCommission.value
+  ) {
+    alert("Please fill in all fields");
     return;
   }
   try {
-    const response = await fetch('/api/services/services', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/services/services", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: newServiceName.value,
         price: newServicePrice.value,
-        commission: newServiceCommission.value
+        commission: newServiceCommission.value,
+        description: newServiceDescription.value
       }),
     });
-    if (!response.ok) throw new Error('Failed to add service');
+    if (!response.ok) throw new Error("Failed to add service");
     await fetchData();
     closeServiceModal();
   } catch (err) {
-    console.error('Error adding service:', err);
+    console.error("Error adding service:", err);
   }
 };
 
 const openPromoModal = () => {
-  newPromoName.value = '';
-  newPromoPrice.value = '';
-  newPromoCommission.value = '';
+  newPromoName.value = "";
+  newPromoPrice.value = "";
+  newPromoCommission.value = "";
+  newPromoStatus.value = "";
+  newPromoDescription.value = "";
   isPromoModalOpen.value = true;
 };
 
@@ -730,197 +1014,197 @@ const closePromoModal = () => {
 };
 
 const addNewPromo = async () => {
-  if (!newPromoName.value || !newPromoPrice.value || !newPromoCommission.value) {
-    alert('Please fill in all fields');
+  if (
+    !newPromoName.value ||
+    !newPromoPrice.value ||
+    !newPromoCommission.value ||
+    !newPromoStatus.value
+  ) {
+    alert("Please fill in all fields");
     return;
   }
   try {
-    const response = await fetch('/api/promos/promos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/promos/promos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: newPromoName.value,
         price: newPromoPrice.value,
-        commission: newPromoCommission.value
+        commission: newPromoCommission.value,
+        description: newPromoDescription.value,
+        status: newPromoStatus.value,
       }),
     });
-    if (!response.ok) throw new Error('Failed to add promo');
+    if (!response.ok) throw new Error("Failed to add promo");
     await fetchData();
     closePromoModal();
   } catch (err) {
-    console.error('Error adding promo:', err);
+    console.error("Error adding promo:", err);
   }
 };
 </script>
 
 
   <style scoped>
+.title {
+  font-size: 48px;
+  font-weight: bolder;
+}
 
-    .title {
-      font-size: 48px;
-      font-weight: bolder;
-    }
+.center-components {
+  margin-top: 10px;
+  margin-left: 2%;
+  margin-right: 2%;
+  margin-bottom: 50px;
+}
 
+/* Flexbox for dropdown, input, filter, and other buttons */
+.flex-components {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  width: 100%;
+}
 
-  .center-components {
-    margin-top: 10px;
-    margin-left: 2%;
-    margin-right: 2%;
-    margin-bottom: 50px;
-  }
+/* Left side of table (dropdown, input and filter) */
+.left-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  width: 66.66%;
+}
 
-    /* Flexbox for dropdown, input, filter, and other buttons */
-    .flex-components {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      margin-top: 10px;
-      width: 100%; 
-    }
+/* Right side of table (buttons) */
+.right-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+  width: 33.33%;
+}
 
-    /* Left side of table (dropdown, input and filter) */
-    .left-side {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-start;
-      width: 66.66%;
-    }
+/* Table div and Edit Selected Product div */
+.table-product-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
 
-    /* Right side of table (buttons) */
-    .right-side {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
-      width: 33.33%;
+/* Table container */
+.container-table {
+  flex-basis: 66.66%;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  padding: 16px;
+}
 
-    }
+/* Edit Selected Product container */
+.container-selectedproduct {
+  flex-basis: 33.33%;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  padding: 16px;
+}
 
-    /* Table div and Edit Selected Product div */
-    .table-product-container {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-    }
+/* Dropdown select trigger */
+.dropdown-trigger {
+  width: 200px;
+}
 
-    /* Table container */
-    .container-table {
-      flex-basis: 66.66%; 
-      border: 1px solid #000000;
-      border-radius: 8px;
-      padding: 16px;
-    }
+/* Search input */
+.input_search {
+  width: 350px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
 
-    /* Edit Selected Product container */
-    .container-selectedproduct {
-      flex-basis: 33.33%;
-      border: 1px solid #000000;
-      border-radius: 8px;
-      padding: 16px;
+/* All black buttons  */
+.button {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin: 2px;
+  background-color: #000000;
+  color: #ffffff;
+}
 
-    }
+.icon-small {
+  width: 16px;
+  height: 16px;
+}
 
-    /* Dropdown select trigger */
-    .dropdown-trigger {
-      width: 200px;
-    }
+.table-content {
+  flex-grow: 1;
+}
 
-    /* Search input */
-    .input_search {
-      width: 350px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
+/* Pagination (might remove)  */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
 
-    /* All black buttons  */
-    .button {
-      display: flex;
-      align-items: center;
-      padding: 8px;
-      margin: 2px;
-      background-color: #000000;
-      color: #ffffff;
-    }
+/* Pagination (might remove)  */
+.pagination-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
 
-    .icon-small {
-      width: 16px;
-      height: 16px;
-    }
+/* Pagination (might remove)  */
+.pagination-button {
+  width: 40px;
+  height: 40px;
+}
 
+/* Specifically for H2s */
+.selected-product-title {
+  font-size: 20px;
+  margin-bottom: 16px;
+  font-weight: bolder;
+}
 
-    .table-content {
-      flex-grow: 1;
-    }
+/* Cancel and Save Changes button */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}
 
-    /* Pagination (might remove)  */
-    .pagination-wrapper {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px; 
-    }
+.cancel-button {
+  color: #ffffff;
+  background-color: #dc2626;
+}
 
-    /* Pagination (might remove)  */
-    .pagination-list {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
+/* Popups */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    /* Pagination (might remove)  */
-    .pagination-button {
-      width: 40px;
-      height: 40px;
-    }
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
 
-    /* Specifically for H2s */
-    .selected-product-title {
-      font-size: 20px;
-      margin-bottom: 16px;
-      font-weight: bolder;
-    }
-
-    /* Cancel and Save Changes button */
-    .action-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 16px;
-      margin-top: 20px;
-    }
-
-    .cancel-button {
-      color: #ffffff;
-      background-color: #dc2626;
-    }
-
-
-    /* Popups */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 400px;
-      max-width: 90%;
-    }
-
-    .modal-action-buttons {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 20px;
-    }
-
-  </style>
+.modal-action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+</style>

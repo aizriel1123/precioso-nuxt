@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
     const promos = await prisma.promo.findMany({
       include: {
         CommissionRate: true,
+        PromoStatus: true,
       },
     });
     return promos;

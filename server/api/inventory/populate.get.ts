@@ -24,6 +24,11 @@ export default defineEventHandler(async (event) => {
             }
           }
         },
+        ProductsSold: {
+          select: {
+            quantity: true,
+          },
+        },
         // Get stock quantity from StockinProduct
         StockinProduct: {
           select: {
@@ -34,26 +39,31 @@ export default defineEventHandler(async (event) => {
     });
 
     // Flatten the data into a shape your front end expects
-    const output = products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      // Convert Decimals to string (or parseFloat if you prefer numeric)
-      cost: product.cost.toString(),
-      commission: product.commission.toString(),
-      // We'll call it `sellingPrice` on the front end
-      sellingPrice: product.sell.toString(),
-      critical_level: product.critical_level ?? 0,
-      // Flatten ProductType to just a string
-      ProductType: product.ProductType?.type ?? "",
-      // If you want to show just the first supplier
-      supplierName: product.Stockin.length > 0
-        ? product.Stockin[0].Supplier?.supplier_name ?? ""
-        : "",
-      // Show the first StockinProduct quantity (or sum them if you want total)
-      StockinProduct: product.StockinProduct.length > 0
-        ? product.StockinProduct[0].quantity
-        : 0,
-    }));
+    const output = products.map((product) => {
+      const stock = product.StockinProduct.reduce((acc, rec) => acc + (rec.quantity || 0), 0);
+      const sold = product.ProductsSold.reduce((acc, rec) => acc + (rec.quantity || 0), 0);
+
+      return {
+        id: product.id,
+        name: product.name,
+        // Convert Decimals to string (or parseFloat if you prefer numeric)
+        cost: product.cost.toString(),
+        commission: product.commission.toString(),
+        // We'll call it `sellingPrice` on the front end
+        sellingPrice: product.sell.toString(),
+        critical_level: product.critical_level ?? 0,
+        // Flatten ProductType to just a string
+        ProductType: product.ProductType?.type ?? "",
+        // If you want to show just the first supplier
+        supplierName: product.Stockin.length > 0
+          ? product.Stockin[0].Supplier?.supplier_name ?? ""
+          : "",
+        // Show the first StockinProduct quantity (or sum them if you want total)
+        StockinProduct: product.StockinProduct.length > 0
+          ? stock - sold
+          : 0,
+      }
+    });
 
     return output;
   } catch (error) {
