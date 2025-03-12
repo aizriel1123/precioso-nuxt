@@ -380,11 +380,24 @@ const total = computed(() => subtotal.value + tax.value - discount.value)
 
 // Cart operations
 function addToCart(product) {
-  const existingItem = cart.value.find(item => item.id === product.id)
+  // Create a unique identifier combining the category and the product id
+  const uniqueId = `${selectedCategory.value}-${product.id}`;
+  
+  // Look for an existing cart item using the composite key
+  const existingItem = cart.value.find(item => item.uniqueId === uniqueId);
+  
   if (existingItem) {
-    existingItem.quantity++
+    existingItem.quantity++;
   } else {
-    cart.value.push({ ...product, quantity: 1 })
+    // Add the current category and price snapshot to the item
+    cart.value.push({ 
+      ...product, 
+      quantity: 1, 
+      uniqueId, 
+      category: selectedCategory.value, 
+      // Ensure the price is captured from the API response:
+      price: product.price 
+    });
   }
 }
 function removeFromCart(productId) {
@@ -397,10 +410,7 @@ function removeFromCart(productId) {
     }
   }
 }
-function getItemQuantity(product) {
-  const item = cart.value.find(item => item.id === product.id)
-  return item ? item.quantity : 0
-}
+
 function increaseQuantity(product) {
   addToCart(product)
 }
@@ -439,29 +449,31 @@ async function handleConfirmOrder() {
     // Depending on the selectedCategory, put the cart items into the correct array.
     const payload = {
       clientId: selectedClient.value.id,
-      therapistId: Number(selectedTherapist.value),
-      paymentMode: paymentMode.value,
-      notes: notesInput.value || "Transaction created from POS",
-      products: selectedCategory.value === 'products'
-        ? cart.value.map(item => ({
-            id: Number(item.id),
-            quantity: Number(item.quantity) || 1
-          }))
-        : [],
-      services: selectedCategory.value === 'services'
-        ? cart.value.map(item => ({
-            id: Number(item.id),
-            quantity: Number(item.quantity) || 1
-          }))
-        : [],
-      promos: selectedCategory.value === 'promos'
-        ? cart.value.map(item => ({
-            id: Number(item.id),
-            statusId: 1
-            // Optionally, you can pass service_id here if your UI allows it.
-          }))
-        : []
-    };
+  therapistId: Number(selectedTherapist.value),
+  paymentMode: paymentMode.value,
+  notes: notesInput.value || "Transaction created from POS",
+  products: cart.value
+    .filter(item => item.category === 'products')
+    .map(item => ({
+      id: Number(item.id),
+      quantity: Number(item.quantity) || 1,
+      price: Number(item.price) // Product price from the Product model
+    })),
+  services: cart.value
+    .filter(item => item.category === 'services')
+    .map(item => ({
+      id: Number(item.id),
+      quantity: Number(item.quantity) || 1,
+      price: Number(item.price) // Service price from the Service model
+    })),
+  promos: cart.value
+    .filter(item => item.category === 'promos')
+    .map(item => ({
+      id: Number(item.id),
+      statusId: 1,
+      price: Number(item.price) // Promo price from the Promo model
+    }))
+};
 
     console.log("Submitting payload:", payload);
 
@@ -499,6 +511,11 @@ async function handleConfirmOrder() {
   }
 }
 
+function getItemQuantity(product) {
+  const uniqueId = `${selectedCategory.value}-${product.id}`;
+  const item = cart.value.find(item => item.uniqueId === uniqueId);
+  return item ? item.quantity : 0;
+}
 
 function cancelOrder() {
   cart.value = []

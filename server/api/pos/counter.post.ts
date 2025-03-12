@@ -1,17 +1,17 @@
 import prisma from '~/lib/prisma';
-import { defineEventHandler, readBody, createError } from 'h3';
+import { defineEventHandler, readBody } from 'h3';
 
 interface TransactionPayload {
   clientId: number;
   therapistId: number;
   paymentMode: 'cash' | 'gcash';
   notes?: string;
-  // Products sold
-  products?: { id: number; quantity: number }[];
+  // Products sold – note that we also allow a price snapshot if needed
+  products?: { id: number; quantity: number; price?: number }[];
   // Promos applied (only promo details)
   promos?: { id: number; statusId?: number }[];
   // Direct service sales (standalone services)
-  services?: { id: number; quantity: number }[];
+  services?: { id: number; quantity: number; price?: number }[];
 }
 
 export default defineEventHandler(async (event) => {
@@ -39,8 +39,48 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Process products: create ProductsSold records.
+      // === Process products: Check stock and update it before recording the sale ===
       if (body.products && body.products.length > 0) {
+        // Loop through each product to ensure sufficient stock
+        for (const prod of body.products) {
+          // Aggregate total stock for this product from all Stockin entries
+          const totalStock = await prisma.stockin.aggregate({
+            _sum: { quantity: true },
+            where: { product_id: prod.id },
+          });
+          // Use nullish coalescing to default to 0 if no stock found
+          const availableStock = totalStock._sum.quantity ?? 0;
+          console.log(
+            `Checking stock for product id ${prod.id}: availableStock = ${availableStock}, requested = ${prod.quantity}`
+          );
+
+          // If available stock is less than the quantity requested, throw an error
+          if (availableStock < prod.quantity) {
+            throw new Error(`Product with id ${prod.id} is out of stock.`);
+          }
+
+          // Deduct the quantity sold using a FIFO approach:
+          let remainingQty = prod.quantity;
+          // Get Stockin records for this product that still have stock (ordered oldest first)
+          const stockinRecords = await prisma.stockin.findMany({
+            where: { product_id: prod.id, quantity: { gt: 0 } },
+            orderBy: { date: 'asc' },
+          });
+          for (const stockin of stockinRecords) {
+            if (remainingQty <= 0) break;
+            if (stockin.quantity > 0) {
+              // Determine how many units to deduct from this record
+              const deduct = Math.min(stockin.quantity, remainingQty);
+              remainingQty -= deduct;
+              await prisma.stockin.update({
+                where: { id: stockin.id },
+                data: { quantity: stockin.quantity - deduct },
+              });
+            }
+          }
+        }
+
+        // After updating the stock, create ProductsSold records for all sold products.
         await prisma.productsSold.createMany({
           data: body.products.map((prod) => ({
             transaction_id: transaction.id,
@@ -50,7 +90,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      // Process promos: create PromoTransaction records.
+      // === Process promos: Create PromoTransaction records ===
       if (body.promos && body.promos.length > 0) {
         console.log("Processing promos:", body.promos);
         // Retrieve promos for the provided promo IDs.
@@ -74,7 +114,7 @@ export default defineEventHandler(async (event) => {
               transaction_id: transaction.id,
               promo_id: promo.id,
               status_id: promoStatusId,
-              promo_name: promo.promo,   // Use the promo name from the Promo table.
+              promo_name: promo.promo,   // Using the promo name from the Promo table.
               promo_price: promo.price,
             },
           });
@@ -83,7 +123,7 @@ export default defineEventHandler(async (event) => {
         console.log("No promos provided; skipping PromoTransaction creation.");
       }
 
-      // Process direct service sales: create ServiceTransaction records.
+      // === Process services: Create ServiceTransaction records ===
       if (body.services && body.services.length > 0) {
         for (const svc of body.services) {
           // Look up the service to get its name and price.

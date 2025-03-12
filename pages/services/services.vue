@@ -39,11 +39,14 @@
                 <TableHead v-if="selectedTab === 'service'">Service Name</TableHead>
                 <TableHead v-if="selectedTab === 'service'">Price</TableHead>
                 <TableHead v-if="selectedTab === 'service'">Commission</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Description</TableHead>
 
                 <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Promo Name</TableHead>
                 <TableHead v-if="selectedTab === 'promo'">Price</TableHead> 
                 <TableHead v-if="selectedTab === 'promo'">Commission</TableHead>
+                <TableHead v-if="selectedTab === 'service'">Description</TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -56,6 +59,7 @@
                 <TableCell>{{ item.name || item.promo }}</TableCell>
                 <TableCell>{{ item.price }}</TableCell>
                 <TableCell>{{ item.commission }}</TableCell>
+                <TableCell>{{ item.description }}</TableCell>
               </TableRow>
               <!-- Empty rows for pagination -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
@@ -164,6 +168,21 @@
                   placeholder="Commission" 
                   v-bind="componentField" 
                   v-model="selectedServiceCommission" 
+                  disabled
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
+
+          <FormField v-if="selectedTab === 'service'" v-slot="{ componentField }" name="update_servicedescription">
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input 
+                  type="text"  
+                  placeholder="Description" 
+                  v-bind="componentField" 
+                  v-model="selectedServiceDescription" 
                   disabled
                 />
               </FormControl>

@@ -286,7 +286,7 @@
           <FormItem>
             <FormLabel>Stock</FormLabel>
             <FormControl>
-              <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="selectedStock" />
+              <Input type="number" min="0" placeholder="Enter Stock" v-bind="componentField" v-model="selectedStock"/>
             </FormControl>
           </FormItem>
         </FormField>
@@ -500,7 +500,7 @@
       </form>
     </div>
   </div>
-
+  
 
 </template>
 
@@ -678,7 +678,10 @@ const validateForm = () => {
 
 // Add New Product
 const addNewProduct = form.handleSubmit(async () => {
-  try {
+  if (parseInt(NP_Stock.value) < parseInt(NP_WarningLevel.value) || parseFloat(NP_SellingPrice.value) < parseFloat(NP_ProductCost.value)) {
+    alert('Product warning level higher than stock value!');
+  } else {
+    try {
     const payload = {
       new_product_name: NP_ProductName.value, // Keep consistent naming
       product_type: NP_ProductType.value, // Should be the ID from dropdown
@@ -714,6 +717,9 @@ const addNewProduct = form.handleSubmit(async () => {
     console.error('Add Product failed:', error);
     alert('Failed to add product. Please check the data and try again.');
   }
+  }
+  
+  
 });
 
 // Add New Product Type addNewProductType ?
@@ -746,7 +752,13 @@ const addNewType = form.handleSubmit(async (values) => {
 // Define the function to handle the form submission
 const editExistingProduct = form.handleSubmit(async (values) => {
   // Add the selectedProductId to the body
-  const updatedValues = {
+  if (values.edited_product_cost || selectedCost.value > values.edited_selling_price || selectedSellingPrice.value) {
+    alert('Updated values invalid.')
+  }
+  if (values.edited_product_warning_level || selectedCritical.value > values.edited_product_stock || selectedStock.value) {
+    alert('Updated values invalid.')
+  } else {
+    const updatedValues = {
     // ...values,                      // Spread the existing values
     update_id: selectedProductId.value,    // Add selectedProductId to the body
     update_product_name: values.edited_product_name || selectedProductName.value,
@@ -788,6 +800,8 @@ const editExistingProduct = form.handleSubmit(async (values) => {
   } catch (error) {
     console.error('Update Product failed:', error);
   }
+  }
+  
   //closeEditModal();
   fetchProductDetails();
   isEditModalOpen.value = false;
