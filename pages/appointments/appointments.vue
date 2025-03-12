@@ -23,7 +23,7 @@
 
       <div class="right-side">
         <!-- Button for adding new appointment -->
-        <Button variant="ghost" class="button" @click="isNewAppointmentModalOpen=true">Add New Booking</Button>
+        <Button variant="ghost" class="button" @click="isNewAppointmentModalOpen = true">Add New Booking</Button>
       </div>
     </div>
 
@@ -54,7 +54,7 @@
                 <TableCell>{{ appointment.time }}</TableCell>
                 <TableCell>{{ appointment.servicespromos }}</TableCell>
               </TableRow>
-              <!-- Populate empty rows if current row count is les than 10 -->
+              <!-- Populate empty rows if current row count is less than 10 -->
               <TableRow v-for="index in emptyRows" :key="'empty-' + index" class="empty-row">
                 <TableCell>&nbsp;</TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -70,719 +70,595 @@
         <!-- Pagination controls -->
         <div class="pagination-wrapper">
           <Pagination
-            v-slot="{ page }"
+            :page="currentPage"
             :total="totalPages"
             :sibling-count="1"
             show-edges
-            :default-page="currentPage"
-            @change="onPageChange"
+            :per-page="itemsPerPage"
           >
-            <PaginationList v-slot="{ items }" class="pagination-list">
-              <PaginationFirst @click="onPageChange(1)" />
-              <PaginationPrev @click="onPageChange(currentPage - 1)" />
-              <template v-for="(item, index) in items">
-                <PaginationListItem
-                  v-if="item.type === 'page'"
-                  :key="index"
-                  :value="item.value"
-                  as-child
-                >
-                  <Button
-                    class="pagination-button"
-                    :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="onPageChange(item.value)"
+          <PaginationList v-slot="{ items }" class="pagination-list">
+                <PaginationFirst :disabled="isFirstPage" @click="handlePageChange(1)"/>
+                <PaginationPrev :disabled="isFirstPage" @click="handlePageChange(currentPage-1)"/>
+                <template v-for="(item, index) in items">
+                  <PaginationListItem 
+                    v-if="item.type === 'page'"
+                    :key="index"
+                    :value="item.value"
+                    as-child
                   >
+                  <Button class="w-9 h-9 p-0" :variant="item.value === page ? 'default' : 'outline'">
                     {{ item.value }}
                   </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else :key="item.type" :index="index" />
-              </template>
-              <PaginationNext @click="onPageChange(currentPage + 1)" />
-              <PaginationLast @click="onPageChange(totalPages)" />
-            </PaginationList>
+                  </PaginationListItem>
+                  <PaginationEllipsis v-else :key="item.type" :index="index" />
+                </template>
+                <PaginationNext :disabled="isLastPage" @click="handlePageChange(currentPage+1)"/>
+                <PaginationLast :disabled="isLastPage" @click="handlePageChange(totalPages)"/>
+              </PaginationList>
           </Pagination>
         </div>
       </div>
 
       <!-- Edit Selected Appointment container -->
       <div class="container-selectedappointment">
-      <h2 class="selected-appointment-title">Appointment Information</h2>
-      
-      <form id="update_appointment_panel">
-        <div class="row">
-          <FormField v-slot="{ componentField }" name="update_client_name">
+        <h2 class="selected-appointment-title">Appointment Information</h2>
+        <form id="update_appointment_panel">
+          <div class="row">
+            <FormField v-slot="{ componentField }" name="update_client_name">
+              <FormItem>
+                <FormLabel>Client Name</FormLabel>
+                <FormControl>
+                  <Input type="text" v-bind="componentField" v-model="selectedClientName" disabled/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="update_therapist_name">
+              <FormItem>
+                <FormLabel>Therapist Name</FormLabel>
+                <FormControl>
+                  <Input type="text" v-bind="componentField" v-model="selectedTherapistName" disabled/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+          </div>  
+          <div class="row">
+            <FormField v-slot="{ componentField }" name="update_time">
+              <FormItem>
+                <FormLabel>Appointment Date</FormLabel>
+                <FormControl>
+                  <Input type="text" v-bind="componentField" v-model="selectedDate" disabled/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="update_time">
+              <FormItem>
+                <FormLabel>Appointment Time</FormLabel>
+                <FormControl>
+                  <Input type="text" v-bind="componentField" v-model="selectedTime" disabled/>
+                </FormControl>
+              </FormItem>
+            </FormField>
+          </div>
+          <FormField v-slot="{ componentField }" name="update_services_promos">
             <FormItem>
-              <FormLabel>Client Name</FormLabel>
+              <FormLabel>Services/Promos</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Enter Client Name" v-bind="componentField" v-model="selectedClientName" disabled/>
+                <Input type="text" v-bind="componentField" v-model="servicespromos" disabled/>
               </FormControl>
             </FormItem>
           </FormField>
-
-          <FormField v-slot="{ componentField }" name="update_therapist_name">
-            <FormItem>
-              <FormLabel>Therapist Name</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="Enter Therapist Name" v-bind="componentField" v-model="selectedTherapistName" disabled/>
-              </FormControl>
-            </FormItem>
-          </FormField>
-        </div>  
-
-        <div class="row">
-        <FormField v-slot="{ componentField }" name="update_time">
-          <FormItem>
-            <FormLabel>Appointment Date</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Select Date" v-bind="componentField" v-model="selectedDate" disabled/>
-            </FormControl>
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="update_time">
-          <FormItem>
-            <FormLabel>Appointment Time</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Select Time" v-bind="componentField" v-model="selectedTime" disabled/>
-            </FormControl>
-          </FormItem>
-        </FormField>
+          <div class="action-buttons">
+            <Button variant="ghost" class="button" type="button" @click="isEditModalOpen = true">Edit Appointment</Button>
+          </div>
+        </form>
       </div>
-
-        <FormField v-slot="{ componentField }" name="note">
-          <FormLabel class="label">Note</FormLabel>
-          <textarea class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" disabled></textarea>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="update_services_promos">
-          <FormItem>
-            <FormLabel>Services/Promos</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Enter Services/Promos" v-bind="componentField" v-model="servicespromos" disabled/>
-            </FormControl>
-          </FormItem>
-        </FormField>
-
-        <div class="action-buttons">
-          <Button variant="ghost" class="button" type="button" @click="isEditModalOpen=true">Edit Appointment</Button>
-        </div>
-      </form>
     </div>
   </div>
-</div>
 
   <!-- Popup to Add New Appointment -->
   <div v-if="isNewAppointmentModalOpen" class="modal-overlay">
     <div class="modal-content">
       <h2 class="selected-appointment-title">Add New Booking</h2>
-
       <form @submit.prevent="submitAppointmentForm">
         <div class="row">
           <FormField v-slot="{ componentField }" name="client_name">
             <FormLabel class="label">Select Client</FormLabel>
-            <input list="clients" v-model=newAppointment_Client class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search Client..." />
-            <datalist id="clients">
-              <option value="Alice Johnson"></option>
-              <option value="Bob Brown"></option>
-              <option value="Charlie Davis"></option>
-              <option value="Dana Evans"></option>
-              <option value="Eli Fox"></option>
-              <option value="Fiona Green"></option>
-              <option value="George Harris"></option>
-              <option value="Holly Irwin"></option>
-              <option value="Ian James"></option>
-              <option value="Jill Kelly"></option>
-
-            </datalist>
+            <!-- Use a dynamic Select instead of datalist -->
+            <Select v-model="newAppointment_Client">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a client" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="client in clients"
+                  :key="client.id"
+                  :value="client.id">
+                  {{ client.first_name }} {{ client.last_name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormField>
 
           <FormField v-slot="{ componentField }" name="therapist_name">
-              <FormLabel class="label">Select Therapist</FormLabel>
-              <input list="therapists" v-model=newAppointment_Therapist class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
-              <datalist id="therapists">
-                <option value="Anna Lee"></option>
-                <option value="Ben Wong"></option>
-                <option value="Chris Taylor"></option>
-              </datalist>
+            <FormLabel class="label">Select Therapist</FormLabel>
+            <!-- Use a dynamic Select for therapists -->
+            <Select v-model="newAppointment_Therapist">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a therapist" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="therapist in therapists"
+                  :key="therapist.id"
+                  :value="therapist.id">
+                  {{ therapist.first_name }} {{ therapist.last_name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormField>
         </div>
 
         <div class="row">
           <FormField v-slot="{ componentField }" name="date">
-          <FormLabel class="label">Select Date</FormLabel>
-              <Popover>
-                <PopoverTrigger as-child>
-                  <Button variant="outline" :class="cn('w-full justify-start text-left font-normal', 'text-muted-foreground')">
-                    <CalendarIcon class="mr-2 h-4 w-4" />
-                    {{ value ? appointmentDate.format(value.toDate(getLocalTimeZone())) : "Pick a date" }}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent class="calendar-popover">
-                  <div class="calendar-wrapper">
-                    <Calendar v-model="value" initial-focus />
-                  </div>
-                </PopoverContent>
-              </Popover>
+            <FormLabel class="label">Select Date</FormLabel>
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button variant="outline" :class="cn('w-full justify-start text-left font-normal', 'text-muted-foreground')">
+                  <CalendarIcon class="mr-2 h-4 w-4" />
+                  {{ value ? appointmentDate.format(value.toDate(getLocalTimeZone())) : "Pick a date" }}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="calendar-popover">
+                <div class="calendar-wrapper">
+                  <Calendar v-model="value" initial-focus />
+                </div>
+              </PopoverContent>
+            </Popover>
           </FormField>
 
           <FormField v-slot="{ componentField }" name="time">
             <FormLabel class="label">Select Time</FormLabel>
-            <input list="time" v-model=newAppointment_Time class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Select Time..."  />
-            <datalist id="time">
-              <option value="9:00AM"></option>
-              <option value="9:30AM"></option>
-              <option value="10:00AM"></option>
-              <option value="10:30AM"></option>
-              <option value="11:00AM"></option>
-              <option value="11:30AM"></option>
-              <option value="12:00PM"></option>
-              <option value="12:30PM"></option>
-              <option value="1:00PM"></option>
-              <option value="1:30PM"></option>
-              <option value="2:00PM"></option>
-              <option value="2:30PM"></option>
-              <option value="3:00PM"></option>
-              <option value="3:30PM"></option>
-              <option value="4:00PM"></option>
-              <option value="4:30PM"></option>
-              <option value="5:00PM"></option>
-              <option value="5:30PM"></option>
-            </datalist>
+            <!-- For time selection, you could continue to use a plain input -->
+            <Input type="text" v-model="newAppointment_Time" placeholder="Select Time..." />
           </FormField>
         </div>
 
         <FormField v-slot="{ componentField }" name="note">
-            <FormLabel class="label">Note</FormLabel>
-            <textarea class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Add a note for this appointment..."></textarea>
-          </FormField>
+          <FormLabel class="label">Note</FormLabel>
+          <textarea class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    placeholder="Add a note for this appointment..."></textarea>
+        </FormField>
 
-            <!-- Promos/Services -->
-              <hr class="mt-5 pb-2 border-t-2">
-             <Tabs default-value="service" class="w-[100%] pt-2" @update:modelValue="tabChanged">
-              <TabsList class="grid w-full grid-cols-2 w-[200px]">
-                <TabsTrigger value="service">Service</TabsTrigger>
-                <TabsTrigger value="promo">Promo</TabsTrigger>
-              </TabsList>
-
-              <!-- Service Tab -->
-              <TabsContent value="service">
-                <Card>
-                  <CardHeader>
-                    <CardDescription class="text-black">
-                      Select services the client wants to avail.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent class="space-y-2">
-                    <!-- Loop through selectedServices to add input -->
-                    <div v-for="(service, index) in selectedServices" :key="index" class="space-y-1">
-                      <input 
-                        v-model="selectedServices[index]" 
-                        list="services" 
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                        placeholder="Enter a service..."
-                      />
-                      <!-- Autocomplete options -->
-                      <datalist id="services">
-                        <option value="Service A"></option>
-                        <option value="Service B"></option>
-                        <option value="Service C"></option>
-                      </datalist>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <!-- Promo Tab -->
-              <TabsContent value="promo">
-                <Card>
-                  <CardHeader>
-                    <CardDescription class="text-black">
-                      Select promos the client wants to avail.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent class="space-y-2">
-
-                    <!-- Loop through selectedPromos to add input -->
-                    <div v-for="(promo, index) in selectedPromos" :key="index" class="space-y-1">
-                      <input 
-                        v-model="selectedPromos[index]" 
-                        list="promos" 
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                        placeholder="Enter a promo..."
-                      />
-                      <!-- Autocomplete options -->
-                      <datalist id="promos">
-                        <option value="Promo A"></option>
-                        <option value="Promo B"></option>
-                        <option value="Promo C"></option>
-                      </datalist>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              </Tabs>
-            <div class="mt-6 flex justify-end space-x-2">
-            <Button type="button" @click="closeNewAppointmentModal">Close</Button>
-            <Button v-if="activeTab === 'service'" type="button" @click="addService">Add More Services</Button>
-            <Button v-if="activeTab === 'promo'" type="button" @click="addPromo">Add More Promos</Button>
-            <Button type="submit">Submit</Button>
-          </div>   
+        <!-- Promos/Services Tabs (kept unchanged) -->
+        <hr class="mt-5 pb-2 border-t-2">
+        <Tabs default-value="service" class="w-[100%] pt-2" @update:modelValue="tabChanged">
+          <TabsList class="grid w-full grid-cols-2 w-[200px]">
+            <TabsTrigger value="service">Service</TabsTrigger>
+            <TabsTrigger value="promo">Promo</TabsTrigger>
+          </TabsList>
+          <TabsContent value="service">
+            <Card>
+              <CardHeader>
+                <CardDescription class="text-black">
+                  Select services the client wants to avail.
+                </CardDescription>
+              </CardHeader>
+              <CardContent class="space-y-2">
+                <div v-for="(service, index) in selectedServices" :key="index" class="space-y-1">
+                  <Input v-model="selectedServices[index]" placeholder="Enter a service..." />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="promo">
+            <Card>
+              <CardHeader>
+                <CardDescription class="text-black">
+                  Select promos the client wants to avail.
+                </CardDescription>
+              </CardHeader>
+              <CardContent class="space-y-2">
+                <div v-for="(promo, index) in selectedPromos" :key="index" class="space-y-1">
+                  <Input v-model="selectedPromos[index]" placeholder="Enter a promo..." />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+        <div class="mt-6 flex justify-end space-x-2">
+          <Button type="button" @click="closeNewAppointmentModal">Close</Button>
+          <Button v-if="activeTab === 'service'" type="button" @click="addService">Add More Services</Button>
+          <Button v-if="activeTab === 'promo'" type="button" @click="addPromo">Add More Promos</Button>
+          <Button type="submit">Submit</Button>
+        </div>   
       </form>
     </div>
-
-    
   </div>
 
   <!-- Popup to edit existing appointment -->
   <div v-if="isEditModalOpen" class="modal-overlay">
     <div class="modal-content">
       <h2 class="selected-appointment-title">Edit Existing Appointment</h2>
-
       <form @submit.prevent="submitExistingAppointmentForm">
         <div class="row">
           <FormField v-slot="{ componentField }" name="client_name">
             <FormLabel class="label">Select Client</FormLabel>
-            <input list="clients" v-model="selectedClientName" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search Client..." disabled/>
+            <!-- Display client name in a disabled Select -->
+            <Select v-model="selectedClientName" disabled>
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Client" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="client in clients"
+                  :key="client.id"
+                  :value="client.first_name + ' ' + client.last_name">
+                  {{ client.first_name }} {{ client.last_name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormField>
-
           <FormField v-slot="{ componentField }" name="therapist_name">
             <FormLabel class="label">Select Therapist</FormLabel>
-            <input list="therapists" v-model="editAppointment_Therapist" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Search therapist..." />
-            <datalist id="therapists">
-              <option value="Anna Lee"></option>
-              <option value="Ben Wong"></option>
-              <option value="Chris Taylor"></option>
-            </datalist>
+            <Select v-model="editAppointment_Therapist">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a therapist" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="therapist in therapists"
+                  :key="therapist.id"
+                  :value="therapist.id">
+                  {{ therapist.first_name }} {{ therapist.last_name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormField>
         </div>
-
         <div class="row">
           <FormField v-slot="{ componentField }" name="date">
-          <FormLabel class="label">Select Date</FormLabel>
-              <Popover>
-                <PopoverTrigger as-child>
-                  <Button variant="outline" :class="cn('w-full justify-start text-left font-normal', 'text-muted-foreground')">
-                    <CalendarIcon class="mr-2 h-4 w-4" />
-                    {{ value ? appointmentDate.format(value.toDate(getLocalTimeZone())) : "Pick a date"}} 
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent class="calendar-popover">
-                  <div class="calendar-wrapper">
-                    <Calendar v-model="value" :minDate="today" initial-focus />
-                  </div>
-                </PopoverContent>
-              </Popover>
+            <FormLabel class="label">Select Date</FormLabel>
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button variant="outline" :class="cn('w-full justify-start text-left font-normal', 'text-muted-foreground')">
+                  <CalendarIcon class="mr-2 h-4 w-4" />
+                  {{ value ? appointmentDate.format(value.toDate(getLocalTimeZone())) : "Pick a date" }} 
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="calendar-popover">
+                <div class="calendar-wrapper">
+                  <Calendar v-model="value" :minDate="today" initial-focus />
+                </div>
+              </PopoverContent>
+            </Popover>
           </FormField>
-
           <FormField v-slot="{ componentField }" name="time">
             <FormLabel class="label">Select Time</FormLabel>
-            <input list="time" v-model="editAppointment_Time" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Select Time..." />
-            <datalist id="time">
-              <option value="9:00AM"></option>
-              <option value="9:30AM"></option>
-              <option value="10:00AM"></option>
-              <option value="10:30AM"></option>
-              <option value="11:00AM"></option>
-              <option value="11:30AM"></option>
-              <option value="12:00PM"></option>
-              <option value="12:30PM"></option>
-              <option value="1:00PM"></option>
-              <option value="1:30PM"></option>
-              <option value="2:00PM"></option>
-              <option value="2:30PM"></option>
-              <option value="3:00PM"></option>
-              <option value="3:30PM"></option>
-              <option value="4:00PM"></option>
-              <option value="4:30PM"></option>
-              <option value="5:00PM"></option>
-              <option value="5:30PM"></option>
-            </datalist>
+            <Input type="text" v-model="editAppointment_Time" placeholder="Select Time..." />
           </FormField>
         </div>     
-
         <FormField v-slot="{ componentField }" name="note">
           <FormLabel class="label">Note</FormLabel>
-          <textarea class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Edit note..."></textarea>
+          <textarea class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    placeholder="Edit note..."></textarea>
         </FormField>
-        
         <hr class="mt-5 pb-2 border-t-2">
-             <Tabs default-value="service" class="w-[100%] pt-2" @update:modelValue="tabChanged">
-              <TabsList class="grid w-full grid-cols-2 w-[200px]">
-                <TabsTrigger value="service">Service</TabsTrigger>
-                <TabsTrigger value="promo">Promo</TabsTrigger>
-              </TabsList>
-
-              <!-- Service Tab -->
-              <TabsContent value="service">
-                <Card>
-                  <CardHeader>
-                    <CardDescription class="text-black">
-                      Select services the client wants to avail.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent class="space-y-2">
-                    <!-- Loop through selectedServices to add input -->
-                    <div v-for="(service, index) in selectedServices" :key="index" class="space-y-1">
-                      <input 
-                        v-model="selectedServices[index]" 
-                        list="services" 
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                        placeholder="Enter a service..."
-                      />
-                      <!-- Autocomplete options -->
-                      <datalist id="services">
-                        <option value="Service A"></option>
-                        <option value="Service B"></option>
-                        <option value="Service C"></option>
-                      </datalist>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <!-- Promo Tab -->
-              <TabsContent value="promo">
-                <Card>
-                  <CardHeader>
-                    <CardDescription class="text-black">
-                      Select promos the client wants to avail.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent class="space-y-2">
-
-                    <!-- Loop through selectedPromos to add input -->
-                    <div v-for="(promo, index) in selectedPromos" :key="index" class="space-y-1">
-                      <input 
-                        v-model="selectedPromos[index]" 
-                        list="promos" 
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                        placeholder="Enter a promo..."
-                      />
-                      <!-- Autocomplete options -->
-                      <datalist id="promos">
-                        <option value="Promo A"></option>
-                        <option value="Promo B"></option>
-                        <option value="Promo C"></option>
-                      </datalist>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              </Tabs>
-              <div class="mt-6 flex justify-end space-x-2">
-                <Button type="button" @click="closeEditAppointmentModal">Close</Button>
-                <Button v-if="activeTab === 'service'" type="button" @click="addService">Add More Services</Button>
-                <Button v-if="activeTab === 'promo'" type="button" @click="addPromo">Add More Promos</Button>
-                <Button type="submit">Submit</Button>
-            </div>  
+        <Tabs default-value="service" class="w-[100%] pt-2" @update:modelValue="tabChanged">
+          <TabsList class="grid w-full grid-cols-2 w-[200px]">
+            <TabsTrigger value="service">Service</TabsTrigger>
+            <TabsTrigger value="promo">Promo</TabsTrigger>
+          </TabsList>
+          <TabsContent value="service">
+            <Card>
+              <CardHeader>
+                <CardDescription class="text-black">
+                  Select services the client wants to avail.
+                </CardDescription>
+              </CardHeader>
+              <CardContent class="space-y-2">
+                <div v-for="(service, index) in selectedServices" :key="index" class="space-y-1">
+                  <Input v-model="selectedServices[index]" placeholder="Enter a service..." />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="promo">
+            <Card>
+              <CardHeader>
+                <CardDescription class="text-black">
+                  Select promos the client wants to avail.
+                </CardDescription>
+              </CardHeader>
+              <CardContent class="space-y-2">
+                <div v-for="(promo, index) in selectedPromos" :key="index" class="space-y-1">
+                  <Input v-model="selectedPromos[index]" placeholder="Enter a promo..." />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+        <div class="mt-6 flex justify-end space-x-2">
+          <Button type="button" @click="closeEditAppointmentModal">Close</Button>
+          <Button v-if="activeTab === 'service'" type="button" @click="addService">Add More Services</Button>
+          <Button v-if="activeTab === 'promo'" type="button" @click="addPromo">Add More Promos</Button>
+          <Button type="submit">Submit</Button>
+        </div>  
       </form>
     </div>
-
-    
   </div>
 </template>
 
+
 <script setup>
-import NavBar from '~/components/Navbar.vue';
-import { ref, computed } from 'vue';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent,  SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
-import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination';
+import NavBar from '~/components/Navbar.vue'
+import { ref, computed, onMounted } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table'
+import { Pagination, PaginationEllipsis, PaginationFirst, PaginationLast, PaginationList, PaginationListItem, PaginationNext, PaginationPrev } from '@/components/ui/pagination'
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { DateFormatter, getLocalTimeZone, maxDate, minDate } from '@internationalized/date'
-  
-  //default values when page is opened
-  const activeTab = ref('service')
-  const selectedFilter = ref('today')
+import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
 
-  //For pop ups
-  const isEditModalOpen = ref(false)
-  const isNewAppointmentModalOpen = ref(false);
+// -------- State and Reactive Variables --------
+const clients = ref([]);
+const therapists = ref([]);
 
-  //array for selected service/promo
-  const selectedServices = ref([''])
-  const selectedPromos = ref([''])
+// Filters and Tabs
+const activeTab = ref('service')
+const selectedFilter = ref('today')
 
-  // Search inputs
-  const searchClient = ref('');
-  const searchTherapist = ref('');
+// Modal States
+const isEditModalOpen = ref(false)
+const isNewAppointmentModalOpen = ref(false)
 
-  //ID, Name and type of chosen row from table
-  const selectedAppointmentId = ref(null); 
-  const selectedClientName = ref('');
-  const selectedTherapistName = ref('');
-  const selectedDate = ref('');
-  const selectedTime = ref('');
-  const servicespromos=ref('')
+// Dynamic Lists for Services/Promos
+const selectedServices = ref([''])
+const selectedPromos = ref([''])
 
-  //User input in adding new appointment
-  const newAppointment_Client = ref('')
-  const newAppointment_Therapist = ref('')
-  const appointmentDate = new DateFormatter('en-US', {
-    dateStyle: 'long',
-  })
-  const newAppointment_Time=ref('');
+// Search Inputs
+const searchClient = ref('')
+const searchTherapist = ref('')
 
-  //User input in editing existing appointment
-  const editAppointment_Therapist = ref('')
-  const editAppointment_Time=ref('');
+// Selected Appointment Details (for the table and editing)
+const selectedAppointmentId = ref(null)
+const selectedClientName = ref('')
+const selectedTherapistName = ref('')
+const selectedDate = ref('')
+const selectedTime = ref('')
+const servicespromos = ref('')
 
-  //For pagination
-  const currentPage = ref(1);
-  const itemsPerPage = ref(10);
+// New Appointment Form Inputs
+const newAppointment_Client = ref('')
+const newAppointment_Therapist = ref('')
+const newAppointment_Time = ref('')
+const appointmentDate = new DateFormatter('en-US', { dateStyle: 'long' })
 
-  //Placeholder for calendar value
-  const value = ref(null)
+// Edit Appointment Form Inputs
+const editAppointment_Therapist = ref('')
+const editAppointment_Time = ref('')
 
-  
-  //Sample data
-  const appointments = ref([
-  {
-    id: 1,
-    clientname: "Alice Johnson",
-    therapistname: "Anna Lee",
-    date: "December 20, 2024",
-    time: "11:00AM",
-    servicespromos: "Massage Therapy",
-  },
-  {
-    id: 2,
-    clientname: "Bob Brown",
-    therapistname: "Anna Lee",
-    date: "December 11, 2024",
-    time: "10:00AM",
-    servicespromos: "Acupuncture",
-  },
-  {
-    id: 3,
-    clientname: "Charlie Davis",
-    therapistname: "Ben Wong",
-    date: "November 21, 2024",
-    time: "9:00AM",
-    servicespromos: "Physical Therapy",
-  },
-  {
-    id: 4,
-    clientname: "Dana Evans",
-    therapistname: "Anna Lee",
-    date: "November 29, 2024",
-    time: "1:00PM",
-    servicespromos: "Chiropractic Care",
-  },
-  {
-    id: 5,
-    clientname: "Eli Fox",
-    therapistname: "Ben Wong",
-    date: "November 23, 2024",
-    time: "5:00PM",
-    servicespromos: "Massage Therapy",
-  },
-  {
-    id: 6,
-    clientname: "Fiona Green",
-    therapistname: "Chris Taylor",
-    date: "November 20, 2024",
-    time: "6:00PM",
-    servicespromos: "Reflexology",
-  },
-  {
-    id: 7,
-    clientname: "George Harris",
-    therapistname: "Chris Taylor",
-    date: "November 18, 2024",
-    time: "12:00PM",
-    servicespromos: "Reiki",
-  },
-  {
-    id: 8,
-    clientname: "Holly Irwin",
-    therapistname: "Chris Taylor",
-    date: "November 20, 2024",
-    time: "7:30PM",
-    servicespromos: "Hot Stone Massage",
-  },
-  {
-    id: 9,
-    clientname: "Ian James",
-    therapistname: "Ben Wong",
-    date: "November 7, 2024",
-    time: "1:00PM",
-    servicespromos: "Massage Therapy",
-  },
-  {
-    id: 10,
-    clientname: "Jill Kelly",
-    therapistname: "Ben Wong",
-    date: "November 7, 2024",
-    time: "1:00PM",
-    servicespromos: "Acupuncture",
-  },
-]);
+// For Pagination
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
-  //choosing an appointment from table
-  const selectAppointment = (appointment) => {
-    selectedAppointmentId.value = appointment.id;
-    selectedClientName.value = appointment.clientname;
-    selectedTherapistName.value = appointment.therapistname;
-    selectedDate.value = appointment.date;
-    selectedTime.value = appointment.time;
-    servicespromos.value = appointment.servicespromos;
-  };
+// Calendar placeholder value (for both new and edit)
+const value = ref(null)
 
-  //Options for filter
-  const filterOptions = computed(() => {
-  return [
-      { value: 'today', label: 'Today' },
-      { value: 'thisWeek', label: 'This Week' },
-      { value: 'thisMonth', label: 'This Month' },
-      { value: 'all', label: 'All' }
-        ];
-  });
+// -------- Fetching Data from the Database --------
+const { data: appointments, error, refresh } = await useFetch('/api/appointments')
 
-  //Convert to format that js can use (for comparison)
-  function parseDate(dateString) {
-    const [month, day, year] = dateString.split(' ');
-    return new Date(`${year}-${month}-${day}`);
-  }
+// -------- Computed Properties --------
 
-  //Filter logic
-  const filteredAppointments = computed(() => {
-  const currentDate = new Date();
-  return appointments.value.filter(appointment => {
-    
-    // Apply date filter
-    let passesDateFilter = true;
-    switch (selectedFilter.value) {
-      case 'today':
-        passesDateFilter = parseDate(appointment.date).toDateString() === currentDate.toDateString();
-        break;
-      case 'thisWeek':
-        const weekStart = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay()));
-        const weekEnd = new Date(currentDate.setDate(currentDate.getDate() + (6 - currentDate.getDay())));
-        passesDateFilter = parseDate(appointment.date) >= weekStart && parseDate(appointment.date) <= weekEnd;
-        break;
-      case 'thisMonth':
-        passesDateFilter = parseDate(appointment.date).getFullYear() === currentDate.getFullYear()
-          && parseDate(appointment.date).getMonth() === currentDate.getMonth();
-        break;
-    }
-
-// Apply client search
-const passesClientSearch = !searchClient.value.trim() || appointment.clientname.toLowerCase().includes(searchClient.value.toLowerCase());
-
-// Apply therapist search
-const passesTherapistSearch = !searchTherapist.value.trim() || appointment.therapistname.toLowerCase().includes(searchTherapist.value.toLowerCase());
-
-return passesDateFilter && passesClientSearch && passesTherapistSearch;
-});
-});
-
-  //For Pagination (not working yet)
-  const onPageChange = newPage => {
-    if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage;
-  };
-  
-  //Checks what tab is opened
-  const tabChanged = (value) => {
-  activeTab.value = value;
+//PAGINATION
+function handlePageChange(newPage) {
+  currentPage.value = newPage;
 }
 
-  //Make sure all inputs are filled up before exiting popup
-  const validateForm = () => {
+// Options for filter dropdown
+const filterOptions = computed(() => [
+  { value: 'today', label: 'Today' },
+  { value: 'thisWeek', label: 'This Week' },
+  { value: 'thisMonth', label: 'This Month' },
+  { value: 'all', label: 'All' }
+])
 
-    if(isNewAppointmentModalOpen.value === true){
-      return (
-        newAppointment_Client.value.trim() !== '' &&
-        newAppointment_Therapist.value.trim() !== '' &&
-        value.value !== null &&
-        newAppointment_Time.value.trim() !== '' &&
-        (selectedServices.value.some(service => service.trim() !== '') || selectedPromos.value.some(promo => promo.trim() !== ''))
-      )
+// Filtering logic (make sure your API response matches these field names)
+// If the fetched appointments array is not yet ready, return an empty array.
+const filteredAppointments = computed(() => {
+  const currentDate = new Date()
+  if (!appointments.value) return []
+
+  return appointments.value.filter(appointment => {
+    // Date filter (assuming appointment.date is in ISO format)
+    let passesDateFilter = true
+    const appointmentDateObj = new Date(appointment.date)
+    switch (selectedFilter.value) {
+      case 'today':
+        passesDateFilter = appointmentDateObj.toDateString() === currentDate.toDateString()
+        break
+      case 'thisWeek': {
+        const startOfWeek = new Date(currentDate)
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay())
+        const endOfWeek = new Date(currentDate)
+        endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()))
+        passesDateFilter = appointmentDateObj >= startOfWeek && appointmentDateObj <= endOfWeek
+        break
       }
-      else if (isEditModalOpen.value === true){
-        return (
-        editAppointment_Therapist.value.trim() !== '' &&
-        editAppointment_Time.value.trim() !== '' &&
-        value.value !== null &&
-        (selectedServices.value.some(service => service.trim() !== '') || selectedPromos.value.some(promo => promo.trim() !== ''))
-      )
-      }
+      case 'thisMonth':
+        passesDateFilter =
+          appointmentDateObj.getFullYear() === currentDate.getFullYear() &&
+          appointmentDateObj.getMonth() === currentDate.getMonth()
+        break
+      default:
+        passesDateFilter = true
     }
 
-  // Function for form submission (NEW)
-  const submitAppointmentForm = () => {
-    if (validateForm()) {
-      //Add db logic    
+    // Client and therapist text search filters
+    const passesClientSearch =
+      !searchClient.value.trim() ||
+      appointment.clientname.toLowerCase().includes(searchClient.value.toLowerCase())
+    const passesTherapistSearch =
+      !searchTherapist.value.trim() ||
+      appointment.therapistname.toLowerCase().includes(searchTherapist.value.toLowerCase())
 
-      //Reset values
-      newAppointment_Client.value = '';
-      newAppointment_Therapist.value = '';
-      newAppointment_Time.value = '';
-      value.value='';
-      selectedServices.value = [''];
-      selectedPromos.value=['']
-      
-      alert('Successfully booked an appointment!');
+    return passesDateFilter && passesClientSearch && passesTherapistSearch
+  })
+})
 
-      // Close modal after submission
+// -------- Functions --------
+
+// When a user clicks on an appointment row, fill in the detail panel for editing.
+const selectAppointment = (appointment) => {
+  selectedAppointmentId.value = appointment.id
+  selectedClientName.value = appointment.clientname
+  selectedTherapistName.value = appointment.therapistname
+  selectedDate.value = appointment.date
+  selectedTime.value = appointment.time
+  servicespromos.value = appointment.servicespromos
+}
+
+// Pagination function (if you implement slicing on the backend or via computed slicing)
+const onPageChange = (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages.value) currentPage.value = newPage
+}
+
+// Tab change handler
+const tabChanged = (value) => {
+  activeTab.value = value
+}
+
+// Validate form inputs before submission (both for new and edit forms)
+const validateForm = () => {
+  if (isNewAppointmentModalOpen.value) {
+    return (
+      newAppointment_Client.value.trim() !== '' &&
+      newAppointment_Therapist.value.trim() !== '' &&
+      value.value !== null &&
+      newAppointment_Time.value.trim() !== '' &&
+      (selectedServices.value.some((s) => s.trim() !== '') ||
+        selectedPromos.value.some((p) => p.trim() !== ''))
+    )
+  } else if (isEditModalOpen.value) {
+    return (
+      editAppointment_Therapist.value.trim() !== '' &&
+      editAppointment_Time.value.trim() !== '' &&
+      value.value !== null &&
+      (selectedServices.value.some((s) => s.trim() !== '') ||
+        selectedPromos.value.some((p) => p.trim() !== ''))
+    )
+  }
+  return false
+}
+
+// Create a new appointment by posting data to your API
+const submitAppointmentForm = async () => {
+  if (validateForm()) {
+    const newAppointment = {
+      client: newAppointment_Client.value,
+      therapist: newAppointment_Therapist.value,
+      date: value.value, // ensure the date is in the expected format (e.g., ISO string)
+      time: newAppointment_Time.value,
+      servicespromos: selectedServices.value.join(', ') // adjust as needed
+    }
+    const { error } = await useFetch('/api/appointments', {
+      method: 'POST',
+      body: newAppointment
+    })
+    if (error.value) {
+      alert('Failed to book appointment.')
+    } else {
+      alert('Successfully booked an appointment!')
+      // Refresh the appointments list after insertion
+      await refresh()
+      // Reset form values
+      newAppointment_Client.value = ''
+      newAppointment_Therapist.value = ''
+      newAppointment_Time.value = ''
+      value.value = null
+      selectedServices.value = ['']
+      selectedPromos.value = ['']
       isNewAppointmentModalOpen.value = false
-    } else {  
-      alert('Fill all necessary information first.');
     }
+  } else {
+    alert('Fill all necessary information first.')
   }
+}
 
-  // Function for form submission (EXISTING)
-  const submitExistingAppointmentForm = () => {
-    if (validateForm()) {
-      //Add db logic    
-
-      //Reset values
-      selectedClientName.value = '';
-      editAppointment_Therapist.value = '';
-      editAppointment_Time.value = '';
-      value.value='';
-      selectedServices.value = [''];
-      selectedPromos.value=['']
-
-      alert('Successfully edited the appointment!');
-
-      // Close modal after submission
-      isEditModalOpen = false
-    } else {  
-      alert('Fill all necessary information first.');
+// Edit an existing appointment by sending an update to your API
+const submitExistingAppointmentForm = async () => {
+  if (validateForm()) {
+    const updatedAppointment = {
+      id: selectedAppointmentId.value,
+      therapist: editAppointment_Therapist.value,
+      time: editAppointment_Time.value,
+      date: value.value,
+      servicespromos: selectedServices.value.join(', ')
     }
-
-  };
-
-  const closeEditAppointmentModal = () => {
-    selectedServices.value = [''];
-    selectedPromos.value=['']
-    isEditModalOpen.value=false
+    const { error } = await useFetch(`/api/appointment/appointment`, {
+      method: 'PUT',
+      body: updatedAppointment
+    })
+    if (error.value) {
+      alert('Failed to update appointment.')
+    } else {
+      alert('Successfully edited the appointment!')
+      await refresh()
+      selectedClientName.value = ''
+      editAppointment_Therapist.value = ''
+      editAppointment_Time.value = ''
+      value.value = null
+      selectedServices.value = ['']
+      selectedPromos.value = ['']
+      isEditModalOpen.value = false
+    }
+  } else {
+    alert('Fill all necessary information first.')
   }
+}
 
-  const closeNewAppointmentModal = () => {
-    selectedServices.value = [''];
-    selectedPromos.value=['']
-    isNewAppointmentModalOpen.value=false
-  }
+// Modal closing functions
+const closeEditAppointmentModal = () => {
+  selectedServices.value = ['']
+  selectedPromos.value = ['']
+  isEditModalOpen.value = false
+}
 
-// Function to add a new service input
-function addService() {
+const closeNewAppointmentModal = () => {
+  selectedServices.value = ['']
+  selectedPromos.value = ['']
+  isNewAppointmentModalOpen.value = false
+}
+
+// Add more service or promo inputs dynamically
+const addService = () => {
   selectedServices.value.push('')
 }
 
-// Function to add a new promo input
-function addPromo() {
+const addPromo = () => {
   selectedPromos.value.push('')
 }
-  
+
+
+// Fetch clients and therapists from the API on mount
+onMounted(async () => {
+  const { data: clientsData } = await useFetch('/api/appointment/clients/clients')
+  console.log('Clients Data:', clientsData.value)
+  clients.value = clientsData.value || []
+
+  const { data: therapistsData } = await useFetch('/api/appointment/therapists/therapists')
+  console.log('Therapists Data:', therapistsData.value)
+  therapists.value = therapistsData.value || []
+})
+
+
+
 </script>
+
 
 
 <style scoped>

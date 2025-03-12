@@ -449,15 +449,20 @@ const selectedServiceId = ref('');
 const selectedServiceName = ref('');
 const selectedServicePrice = ref(0);
 const selectedServiceCommission = ref(0);
+const selectedServiceDescription = ref('');
 
 const selectedPromoId = ref('');
 const selectedPromoName = ref('');
 const selectedPromoPrice = ref(0);
 const selectedPromoCommission = ref(0);
+const selectedPromoDescription = ref('');
+
 
 const newServiceName = ref('');
 const newServicePrice = ref('');
 const newServiceCommission = ref('');
+const newServiceCommission = ref('');
+
 
 const newPromoName = ref('');
 const newPromoPrice = ref('');
