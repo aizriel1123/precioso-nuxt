@@ -220,10 +220,6 @@
                 <span>₱{{ subtotal.toFixed(2) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Tax</span>
-                <span>₱{{ tax.toFixed(2) }}</span>
-              </div>
-              <div class="flex justify-between">
                 <span>Discount</span>
                 <span>₱{{ discount.toFixed(2) }}</span>
               </div>
@@ -259,7 +255,6 @@
               </li>
             </ul>
             <p>Subtotal: ₱{{ subtotal.toFixed(2) }}</p>
-            <p>Tax: ₱{{ tax.toFixed(2) }}</p>
             <p>Discount: ₱{{ discount.toFixed(2) }}</p>
             <p v-if="notesInput" class="mt-2">Notes: {{ notesInput }}</p>
             <p class="font-bold">Total: ₱{{ total.toFixed(2) }}</p>
@@ -368,7 +363,6 @@ const filteredClients = computed(() => {
 const subtotal = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
 )
-const tax = computed(() => subtotal.value * 0.1)
 const discount = computed(() => {
   if (selectedPromoDiscount.value) {
     const promo = promoDiscounts.value.find(p => p.id === selectedPromoDiscount.value)
@@ -376,7 +370,7 @@ const discount = computed(() => {
   }
   return customDiscountValue.value ? (subtotal.value * Number(customDiscountValue.value) / 100) : 0
 })
-const total = computed(() => subtotal.value + tax.value - discount.value)
+const total = computed(() => subtotal.value - discount.value)
 
 // Cart operations
 function addToCart(product) {

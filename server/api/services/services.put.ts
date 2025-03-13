@@ -2,9 +2,9 @@ import prisma from '~/lib/prisma';
 
 export default defineEventHandler(async (event) => {
   // Read all data from the request body including id
+  console.log("You have edited-in");
   const body = await readBody(event);
   const { id, name, price, commission, type } = body;
-
   if (!id || !name || price == null || commission == null || !type) {
     throw createError({
       statusCode: 400,
@@ -37,6 +37,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Update the service with the new values and proper foreign key references
+    alert('BUT DOES IT GET TO HERE')
     const updatedService = await prisma.service.update({
       where: { id: parseInt(id, 10) },
       data: {

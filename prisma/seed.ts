@@ -489,6 +489,166 @@ const commissionRate = [
   },
 ];
 
+// const promoFlood = [
+//   {
+//     promo: "RF + Lipo Cavi (1 session)",
+//     price: 1499,
+//     status_id: 2,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + Lipo Cavi (buy 1 take 1)",
+//     price: 2499,
+//     status_id: 2,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + Lipo Cavi (10 sessions)",
+//     price: 9999,
+//     status_id: 2,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + IIPO Cavi + Body Sculpting (1 session)",
+//     price: 3499,
+//     status_id: 1,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + IIPO Cavi + Body Sculpting (buy 1 take 1)",
+//     price: 5999,
+//     status_id: 1,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + IIPO Cavi + Body Sculpting (4+1 sessions)",
+//     price: 12999,
+//     status_id: 1,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (1 session)",
+//     price: 3999,
+//     status_id: 2,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (buy 1 take 1)",
+//     price: 7999,
+//     status_id: 2,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (4+1 sessions)",
+//     price: 17999,
+//     status_id: 2,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift (1 session)",
+//     price: 2499,
+//     status_id: 1,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift (buy 1 take 1)",
+//     price: 3499,
+//     status_id: 1,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift (2+1 sessions)",
+//     price: 5499,
+//     status_id: 1,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting (1 session)",
+//     price: 4999,
+//     status_id: 1,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting (buy 1 take 1)",
+//     price: 7999,
+//     status_id: 1,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting (4+1 sessions)",
+//     price: 17499,
+//     status_id: 1,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting + Meso (1 session)",
+//     price: 5499,
+//     status_id: 1,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting + Meso (buy 1 take 1)",
+//     price: 9999,
+//     status_id: 1,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Exilift + Body Sculpting + Meso (4+2 sessions)",
+//     price: 25999,
+//     status_id: 1,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Sculpting (2 Areas) (1 session)",
+//     price: 3999,
+//     status_id: 2,
+//     commission_rate_id: 2,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Sculpting (2 Areas) (buy 1 take 1)",
+//     price: 5999,
+//     status_id: 2,
+//     commission_rate_id: 3,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+//   {
+//     promo: "Sculpting (2 Areas) (4+2 sessions)",
+//     price: 12499,
+//     status_id: 2,
+//     commission_rate_id: 4,
+//     description: "Skimming/Firming/Contouring (Body Area)",
+//   },
+// ];
+
+// const serviceFlood = [
+//   {
+//     name: "Service Name",
+//     price: Price,
+//     commission_rate_id: 1{0} or 2{5} or 3{10} or 4{15},
+//     service_type_id: ,
+//     description: "Description of Service",
+//   },
+// ];
+
 async function createSuppliers() {
   try {
     await Promise.all(
@@ -662,37 +822,37 @@ const seed = async () => {
 
 
   // Seed clients with gender lookup
-  // for (const client of clientsFlood) {
-  //   const genderRecord = await prisma.gender.findUnique({
-  //     where: {
-  //       gender: client.gender,
-  //     },
-  //   });
+  for (const client of clientsFlood) {
+    const genderRecord = await prisma.gender.findUnique({
+      where: {
+        id: client.gender_id,
+      },
+    });
 
-  //   if (!genderRecord) {
-  //     console.error(`Gender "${client.gender}" not found for client ${client.first_name} ${client.last_name}.`);
-  //     continue;
-  //   }
+    if (!genderRecord) {
+      console.error(`Gender "${client.gender_id}" not found for client ${client.first_name} ${client.last_name}.`);
+      continue;
+    }
 
-  //   await prisma.client.upsert({
-  //     where: {
-  //       contact_info: client.contact_info,
-  //     },
-  //     update: {
-  //       first_name: client.first_name,
-  //       last_name: client.last_name,
-  //       dob: client.dob,
-  //       gender_id: genderRecord.id,
-  //     },
-  //     create: {
-  //       first_name: client.first_name,
-  //       last_name: client.last_name,
-  //       dob: client.dob,
-  //       gender_id: genderRecord.id,
-  //       contact_info: client.contact_info,
-  //     },
-  //   });
-  // }
+    await prisma.client.upsert({
+      where: {
+        contact_info: client.contact_info,
+      },
+      update: {
+        first_name: client.first_name,
+        last_name: client.last_name,
+        dob: client.dob,
+        gender_id: genderRecord.id,
+      },
+      create: {
+        first_name: client.first_name,
+        last_name: client.last_name,
+        dob: client.dob,
+        gender_id: genderRecord.id,
+        contact_info: client.contact_info,
+      },
+    });
+  }
 
   // Seed therapists
   for (const therapist of therapistsFlood) {
