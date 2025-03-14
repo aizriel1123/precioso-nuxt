@@ -489,165 +489,214 @@ const commissionRate = [
   },
 ];
 
-// const promoFlood = [
-//   {
-//     promo: "RF + Lipo Cavi (1 session)",
-//     price: 1499,
-//     status_id: 2,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + Lipo Cavi (buy 1 take 1)",
-//     price: 2499,
-//     status_id: 2,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + Lipo Cavi (10 sessions)",
-//     price: 9999,
-//     status_id: 2,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + IIPO Cavi + Body Sculpting (1 session)",
-//     price: 3499,
-//     status_id: 1,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + IIPO Cavi + Body Sculpting (buy 1 take 1)",
-//     price: 5999,
-//     status_id: 1,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + IIPO Cavi + Body Sculpting (4+1 sessions)",
-//     price: 12999,
-//     status_id: 1,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (1 session)",
-//     price: 3999,
-//     status_id: 2,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (buy 1 take 1)",
-//     price: 7999,
-//     status_id: 2,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "RF + Lipo Cavi + Body Sculpting + Meso (4+1 sessions)",
-//     price: 17999,
-//     status_id: 2,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift (1 session)",
-//     price: 2499,
-//     status_id: 1,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift (buy 1 take 1)",
-//     price: 3499,
-//     status_id: 1,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift (2+1 sessions)",
-//     price: 5499,
-//     status_id: 1,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting (1 session)",
-//     price: 4999,
-//     status_id: 1,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting (buy 1 take 1)",
-//     price: 7999,
-//     status_id: 1,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting (4+1 sessions)",
-//     price: 17499,
-//     status_id: 1,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting + Meso (1 session)",
-//     price: 5499,
-//     status_id: 1,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting + Meso (buy 1 take 1)",
-//     price: 9999,
-//     status_id: 1,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Exilift + Body Sculpting + Meso (4+2 sessions)",
-//     price: 25999,
-//     status_id: 1,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Sculpting (2 Areas) (1 session)",
-//     price: 3999,
-//     status_id: 2,
-//     commission_rate_id: 2,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Sculpting (2 Areas) (buy 1 take 1)",
-//     price: 5999,
-//     status_id: 2,
-//     commission_rate_id: 3,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-//   {
-//     promo: "Sculpting (2 Areas) (4+2 sessions)",
-//     price: 12499,
-//     status_id: 2,
-//     commission_rate_id: 4,
-//     description: "Skimming/Firming/Contouring (Body Area)",
-//   },
-// ];
+const promoFlood = [
+  {
+    promo: "RF + Lipo Cavi (1 session)",
+    price: 1499,
+    status_id: 2,
+    commission_rate_id: 2,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  {
+    promo: "RF + Lipo Cavi (buy 1 take 1)",
+    price: 2499,
+    status_id: 2,
+    commission_rate_id: 3,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  {
+    promo: "RF + Lipo Cavi (10 sessions)",
+    price: 9999,
+    status_id: 2,
+    commission_rate_id: 4,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  {
+    promo: "RF + IIPO Cavi + Body Sculpting (1 session)",
+    price: 3499,
+    status_id: 1,
+    commission_rate_id: 2,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  {
+    promo: "RF + IIPO Cavi + Body Sculpting (buy 1 take 1)",
+    price: 5999,
+    status_id: 1,
+    commission_rate_id: 3,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  {
+    promo: "RF + IIPO Cavi + Body Sculpting (4+1 sessions)",
+    price: 12999,
+    status_id: 1,
+    commission_rate_id: 4,
+    description: "Skimming/Firming/Contouring (Body Area)",
+  },
+  // {
+  //   promo: "RF + Lipo Cavi + Body Sculpting + Meso (1 session)",
+  //   price: 3999,
+  //   status_id: 2,
+  //   commission_rate_id: 2,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "RF + Lipo Cavi + Body Sculpting + Meso (buy 1 take 1)",
+  //   price: 7999,
+  //   status_id: 2,
+  //   commission_rate_id: 3,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "RF + Lipo Cavi + Body Sculpting + Meso (4+1 sessions)",
+  //   price: 17999,
+  //   status_id: 2,
+  //   commission_rate_id: 4,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift (1 session)",
+  //   price: 2499,
+  //   status_id: 1,
+  //   commission_rate_id: 2,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift (buy 1 take 1)",
+  //   price: 3499,
+  //   status_id: 1,
+  //   commission_rate_id: 3,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift (2+1 sessions)",
+  //   price: 5499,
+  //   status_id: 1,
+  //   commission_rate_id: 4,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting (1 session)",
+  //   price: 4999,
+  //   status_id: 1,
+  //   commission_rate_id: 2,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting (buy 1 take 1)",
+  //   price: 7999,
+  //   status_id: 1,
+  //   commission_rate_id: 3,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting (4+1 sessions)",
+  //   price: 17499,
+  //   status_id: 1,
+  //   commission_rate_id: 4,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting + Meso (1 session)",
+  //   price: 5499,
+  //   status_id: 1,
+  //   commission_rate_id: 2,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting + Meso (buy 1 take 1)",
+  //   price: 9999,
+  //   status_id: 1,
+  //   commission_rate_id: 3,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Exilift + Body Sculpting + Meso (4+2 sessions)",
+  //   price: 25999,
+  //   status_id: 1,
+  //   commission_rate_id: 4,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Sculpting (2 Areas) (1 session)",
+  //   price: 3999,
+  //   status_id: 2,
+  //   commission_rate_id: 2,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Sculpting (2 Areas) (buy 1 take 1)",
+  //   price: 5999,
+  //   status_id: 2,
+  //   commission_rate_id: 3,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+  // {
+  //   promo: "Sculpting (2 Areas) (4+2 sessions)",
+  //   price: 12499,
+  //   status_id: 2,
+  //   commission_rate_id: 4,
+  //   description: "Skimming/Firming/Contouring (Body Area)",
+  // },
+];
 
-// const serviceFlood = [
-//   {
-//     name: "Service Name",
-//     price: Price,
-//     commission_rate_id: 1{0} or 2{5} or 3{10} or 4{15},
-//     service_type_id: ,
-//     description: "Description of Service",
-//   },
-// ];
+const serviceFlood = [
+  {
+    name: "Facial with Chemical Peel",
+    price: 999,
+    commission_rate_id: 2, // 5%
+    service_type_id: 1,
+    description: "Facial Cleaning",
+  },
+  {
+    name: "Facial with Carbon Peel",
+    price: 1500,
+    commission_rate_id: 3, // 10%
+    service_type_id: 1,
+    description: "Facial Cleaning",
+  },
+  {
+    name: "RF Face",
+    price: 750,
+    commission_rate_id: 2, // 5%
+    service_type_id: 1,
+    description: "Firming and Contouring Services",
+  },
+  {
+    name: "Hifu Vmax",
+    price: 999,
+    commission_rate_id: 3, // 10%
+    service_type_id: 1,
+    description: "Firming and Contouring Services",
+  },
+  {
+    name: "Hifu Radar",
+    price: 1500,
+    commission_rate_id: 4, // 15%
+    service_type_id: 1,
+    description: "Firming and Contouring Services",
+  },
+  {
+    name: "Dioide Laser",
+    price: 2500,
+    commission_rate_id: 4, // 15%
+    service_type_id: 1,
+    description: "Pigmentation Therapy",
+  },
+  {
+    name: "Pico Laser",
+    price: 3500,
+    commission_rate_id: 4, // 15%
+    service_type_id: 1,
+    description: "Pigmentation Therapy",
+  },
+  {
+    name: "Dermapen with facial",
+    price: 2500,
+    commission_rate_id: 3, // 10%
+    service_type_id: 1,
+    description: "Deep Scars Treatment",
+  },
+];
 
 async function createSuppliers() {
   try {
@@ -822,14 +871,9 @@ const seed = async () => {
     }
   }
   
-  
   // Run the function
   createProduct();
   
-  
-
-
-
   // Seed clients with gender lookup
   for (const client of clientsFlood) {
     const genderRecord = await prisma.gender.findUnique({
@@ -882,6 +926,92 @@ const seed = async () => {
       });
     }
   }
+  //Seed Promos
+  for (const promo of promoFlood) {
+    const promoStatusRecord = await prisma.promoStatus.findUnique({
+      where: { 
+        id: promo.status_id
+      },
+    });
+    
+    if (!promoStatusRecord) {
+      console.error(`Promo status "${promo.status_id}" not found for promo "${promo.promo}".`);
+      continue;
+    }
+
+    const promoCommissionRate = await prisma.commissionRate.findUnique({
+      where: { 
+        id: promo.commission_rate_id
+      },
+    });
+
+    if(!promoCommissionRate) {
+      console.error(`❌ Commission rate "${promo.commission_rate_id}" not found for promo "${promo.promo}".`);
+      return;
+    }
+
+    await prisma.promo.upsert({
+      where: {
+        promo: promo.promo,
+      },
+      update: {
+        price: promo.price,
+        status_id: promoStatusRecord.id,
+        commission_rate_id: promoCommissionRate.id,
+        description: promo.description,
+      },
+      create: {
+        promo: promo.promo,
+        price: promo.price,
+        status_id: promoStatusRecord.id,
+        commission_rate_id: promoCommissionRate.id,
+        description: promo.description,
+      },
+    })
+  }
+  // Seed Service
+  for (const service of serviceFlood) {
+    const serviceTypeRecord = await prisma.serviceType.findUnique({
+      where: {
+        id: service.service_type_id
+      },
+    });
+
+    if(!serviceTypeRecord) {
+      console.error(`Service type "${service.service_type_id}" not found for service "${service.name}".`);
+      continue;
+    }
+      
+      const serviceCommissionRate = await prisma.commissionRate.findUnique({
+        where: { 
+          id: service.commission_rate_id 
+        },
+      });
+
+      if(!serviceCommissionRate) {
+        console.error(`❌ Commission rate "${service.commission_rate_id}" not found for service "${service.name}".`);
+        return;
+      }
+
+      await prisma.service.upsert({
+        where: {
+          name: service.name,
+        },
+        update: {
+          price: service.price,
+          commission_rate_id: serviceCommissionRate.id,
+          service_type_id: serviceTypeRecord.id,
+          description: service.description,
+        },
+        create: {
+          name: service.name,
+          price: service.price,
+          commission_rate_id: serviceCommissionRate.id,
+          service_type_id: serviceTypeRecord.id,
+          description: service.description,
+        },
+      });
+    }
   // Seed account types
   for (const type of [{ id: 0, type: "0" }, { id: 1, type: "1" }]) {
     await prisma.accountType.upsert({
@@ -925,6 +1055,3 @@ seed()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-
-  

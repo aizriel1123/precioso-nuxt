@@ -111,8 +111,8 @@ model ProductsSold {
 
 model Promo {
   id                 Int                @id @default(autoincrement())
-  promo              String             @db.VarChar(255)
-  price              Decimal            @db.Decimal(6, 2)
+  promo              String             @unique @db.VarChar(255)
+  price              Decimal            @db.Decimal(8, 2)
   status_id          Int
   commission_rate_id Int
   description        String             @db.Text
@@ -157,7 +157,7 @@ model PromoTransaction {
 
 model Service {
   id                 Int                  @id @default(autoincrement())
-  name               String               @db.VarChar(100)
+  name               String               @unique @db.VarChar(100)
   price              Decimal?             @db.Decimal(10, 2)
   commission_rate_id Int
   service_type_id    Int
