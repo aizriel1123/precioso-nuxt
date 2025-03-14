@@ -1,4 +1,3 @@
-
 <template>
   <NavBar />
   <div class="center-components">
@@ -54,7 +53,9 @@
                 <TableHead v-if="selectedTab === 'service'"
                   >Commission</TableHead
                 >
-                <TableHead v-if="selectedTab === 'service'">Description</TableHead >
+                <TableHead v-if="selectedTab === 'service'"
+                  >Description</TableHead
+                >
                   
 
                 <TableHead v-if="selectedTab === 'promo'">Promo ID</TableHead>
@@ -438,21 +439,6 @@
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="new_service_description">
-          <FormItem>
-            <FormLabel>Description</FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter Description"
-                v-bind="componentField"
-                v-model="selectedServiceDescri"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
         <div class="action-buttons">
           <Button
             variant="ghost"
@@ -469,9 +455,8 @@
     </div>
     <!-- Promo edit section remains unchanged if not relevant -->
   </div>
-
-    <!-- Popup to edit promos -->
-    <div v-if="isEditModalOpen" class="modal-overlay">
+  <!-- Popup to edit promos -->
+  <div v-if="isEditModalOpen" class="modal-overlay">
     <div v-if="selectedTab === 'promo'" class="modal-content">
       <h2 class="selected-product-title">Edit Promos</h2>
       <form @submit.prevent="editGoods">
@@ -564,7 +549,6 @@
     </div>
     <!-- Promo edit section remains unchanged if not relevant -->
   </div>
-
   <!-- Popup to Add New Service -->
   <div v-if="isServiceModalOpen" class="modal-overlay">
     <div class="modal-content">
@@ -982,14 +966,12 @@ const selectGoods = (item) => {
     selectedServiceName.value = item.name;
     selectedServicePrice.value = item.price;
     selectedServiceCommission.value = item.commission;
-    selectedServiceDescription.value=item.description
     editServiceCommission.value = item.commission_rate_id;
-  } else if (selectedTab.value==="promo") {
+  } else {
     selectedPromoId.value = item.id;
     selectedPromoName.value = item.promo;
     selectedPromoPrice.value = item.price;
     selectedPromoCommission.value = item.commission;
-    selectedPromoDescription.value=item.description;
   }
 };
 
@@ -1007,23 +989,19 @@ const closeEditModal = () => {
 };
 
 const editGoods = async () => {
-  alert('editGoods')
   try {
     if (selectedTab.value === "service") {
-      alert('Bad Ending')
       const response = await fetch(`/api/services/services`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: selectedServiceName.value,
           price: selectedServicePrice.value,
-          commission: selectedServiceCommission.value, // Use the updated ref
-          description: selectedServiceDescription.value
+          commission: editServiceCommission.value, // Use the updated ref
         }),
       });
       if (!response.ok) throw new Error("Failed to update service");
     } else {
-      alert('editGoods2')
       const response = await fetch(`/api/promos/promos`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -1031,7 +1009,6 @@ const editGoods = async () => {
           name: selectedPromoName.value,
           price: selectedPromoPrice.value,
           commission: selectedPromoCommission.value,
-          description: selectedPromoDescription.value
         }),
       });
       if (!response.ok) throw new Error("Failed to update promo");
@@ -1041,8 +1018,6 @@ const editGoods = async () => {
   } catch (err) {
     console.error("Error updating item:", err);
   }
-  fetchData()
-  fetchCommissionRates()
 };
 
 const deleteItem = async () => {
@@ -1054,7 +1029,7 @@ const deleteItem = async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: selectedServiceId.value }),
       });
-      if (!response.ok) throw new Error("u to delete service");
+      if (!response.ok) throw new Error("Failed to delete service");
       selectedServiceId.value = "";
       selectedServiceName.value = "";
       selectedServicePrice.value = 0;

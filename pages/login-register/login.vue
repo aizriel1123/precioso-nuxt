@@ -72,6 +72,8 @@
 </template>
 
 <style scoped>
+
+
   .form-container {
     display: flex;
     justify-content: center;
