@@ -363,13 +363,13 @@
               @click="openEditModal"
               >Edit Data</Button
             >
-            <Button
+            <!-- <Button
               variant="ghost"
               class="button"
               type="button"
               @click="deleteItem"
               >Delete</Button
-            >
+            > -->
           </div>
         </form>
       </div>
@@ -525,6 +525,31 @@
                 v-bind="componentField"
                 v-model="selectedPromoDescription"
               />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="new_promo_status">
+          <FormItem>
+            <FormLabel>Promo Status</FormLabel>
+            <FormControl>
+              <Select v-model="selectedPromoStatus">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Promo Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="status in promoStatus"
+                      :key="status.id"
+                      :value="status.id"
+                    >
+                      {{ status.status }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -1025,39 +1050,43 @@ const editGoods = async () => {
   } catch (err) {
     console.error("Error updating item:", err);
   }
+  fetchData();
+  fetchCommissionRates();
+  fetchPromoStatus();
 };
 
-const deleteItem = async () => {
-  if (!confirm("Are you sure you want to delete this item?")) return;
-  try {
-    if (selectedTab.value === "service" && selectedServiceId.value) {
-      const response = await fetch("/api/services/services", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedServiceId.value }),
-      });
-      if (!response.ok) throw new Error("Failed to delete service");
-      selectedServiceId.value = "";
-      selectedServiceName.value = "";
-      selectedServicePrice.value = 0;
-      selectedServiceCommission.value = 0;
-    } else if (selectedTab.value === "promo" && selectedPromoId.value) {
-      const response = await fetch("/api/promos/promos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedPromoId.value }),
-      });
-      if (!response.ok) throw new Error("Failed to delete promo");
-      selectedPromoId.value = "";
-      selectedPromoName.value = "";
-      selectedPromoPrice.value = 0;
-      selectedPromoCommission.value = 0;
-    }
-    await fetchData();
-  } catch (err) {
-    console.error("Error deleting item:", err);
-  }
-};
+// const deleteItem = async () => {
+//   if (!confirm("Are you sure you want to delete this item?")) return;
+//   try {
+//     if (selectedTab.value === "service" && selectedServiceId.value) {
+//       const response = await fetch("/api/services/services", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ id: selectedServiceId.value }),
+//       });
+//       if (!response.ok) throw new Error("Failed to delete service");
+//       selectedServiceId.value = "";
+//       selectedServiceName.value = "";
+//       selectedServicePrice.value = 0;
+//       selectedServiceCommission.value = 0;
+//     } else if (selectedTab.value === "promo" && selectedPromoId.value) {
+//       const response = await fetch("/api/promos/promos", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ id: selectedPromoId.value }),
+//       });
+//       if (!response.ok) throw new Error("Failed to delete promo");
+//       selectedPromoId.value = "";
+//       selectedPromoName.value = "";
+//       selectedPromoPrice.value = 0;
+//       selectedPromoCommission.value = 0;
+//     }
+//     await fetchData();
+//   } catch (err) {
+//     console.error("Error deleting item:", err);
+//   }
+  
+// };
 
 // --- Popup Functions for Adding New Items ---
 const openServiceModal = () => {
@@ -1098,6 +1127,9 @@ const addNewService = async () => {
   } catch (err) {
     console.error("Error adding service:", err);
   }
+  fetchData();
+  fetchCommissionRates();
+  fetchPromoStatus();
 };
 
 const openPromoModal = () => {

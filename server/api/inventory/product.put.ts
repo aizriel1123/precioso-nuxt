@@ -41,7 +41,11 @@ export default defineEventHandler(async (event) => {
         name: body.update_product_name,
         cost: Number(body.update_product_cost),
         sell: Number(body.update_selling_price),
-        commission: Number(body.update_product_commission_rate),
+        CommissionRate: {
+          connect: {
+            id: body.update_product_commission_rate,
+          },
+        },
         critical_level: Number(body.update_product_warning_level),
         ProductType: {
           connect: {

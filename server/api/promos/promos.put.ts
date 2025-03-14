@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         promo: name,
         price: parseFloat(price),
         commission_rate_id: parseInt(commission),
-        // status_id: parseInt(status),
+        status_id: parseInt(status),
         description: description,
       }
     });

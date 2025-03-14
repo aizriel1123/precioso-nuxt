@@ -51,6 +51,7 @@ model CommissionRate {
   rate    Decimal   @unique @db.Decimal(4, 2)
   Promo   Promo[]
   Service Service[]
+  Product Product[]
 }
 
 model Defect {
@@ -77,18 +78,19 @@ model ModeOfPayment {
 }
 
 model Product {
-  id              Int              @id @default(autoincrement())
-  name            String           @db.VarChar(50)
-  cost            Decimal          @db.Decimal(6, 2)
-  commission      Decimal          @db.Decimal(6, 2)
-  sell            Decimal          @default(1) @db.Decimal(6, 2)
-  product_type_id Int
-  critical_level  Int?
-  Defect          Defect[]
-  ProductType     ProductType      @relation(fields: [product_type_id], references: [id], onUpdate: Restrict)
-  ProductsSold    ProductsSold[]
-  StockinProduct  StockinProduct[]
-  Stockin         Stockin[]
+  id                 Int              @id @default(autoincrement())
+  name               String           @db.VarChar(50)
+  cost               Decimal          @db.Decimal(6, 2)
+  sell               Decimal          @default(1) @db.Decimal(6, 2)
+  product_type_id    Int
+  commission_rate_id Int
+  critical_level     Int?
+  Defect             Defect[]
+  ProductType        ProductType      @relation(fields: [product_type_id], references: [id], onUpdate: Restrict)
+  CommissionRate     CommissionRate   @relation(fields: [commission_rate_id], references: [id], onUpdate: Restrict)
+  ProductsSold       ProductsSold[]
+  StockinProduct     StockinProduct[]
+  Stockin            Stockin[]
 }
 
 model ProductType {

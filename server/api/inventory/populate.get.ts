@@ -8,13 +8,17 @@ export default defineEventHandler(async (event) => {
         id: true,
         name: true,
         cost: true,
-        commission: true,
         sell: true,            // Include the selling price
         critical_level: true,
         ProductType: {
           select: { type: true }
         },
         // Get supplier info from Stockin
+        CommissionRate: {
+          select: {
+            rate: true,
+          },
+        },
         Stockin: {
           select: {
             Supplier: {
@@ -48,7 +52,7 @@ export default defineEventHandler(async (event) => {
         name: product.name,
         // Convert Decimals to string (or parseFloat if you prefer numeric)
         cost: product.cost.toString(),
-        commission: product.commission.toString(),
+        commission: product.CommissionRate.rate.toString(),
         // We'll call it `sellingPrice` on the front end
         sellingPrice: product.sell.toString(),
         critical_level: product.critical_level ?? 0,

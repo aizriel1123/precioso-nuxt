@@ -188,8 +188,18 @@
             <FormItem>
               <FormLabel>Supplier Name</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Supplier Name" v-bind="componentField" v-model="selectedSupplier"
-                  disabled />
+                <Select v-bind="componentField" v-model="selectedSupplier" required>
+                  <SelectTrigger class="dropdown-trigger">
+                    <SelectValue placeholder="Select Supplier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem v-for="supplier in supplier_names" :key="supplier.id" :value="supplier.supplier_name">
+                        {{ supplier.supplier_name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItem>
           </FormField>
@@ -208,8 +218,22 @@
             <FormItem>
               <FormLabel>Commission Rate</FormLabel>
               <FormControl>
-                <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField"
-                  v-model="selectedCommissionRate" disabled />
+                <Select v-bind="componentField" v-model="selectedCommissionRate">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Commission Rate" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="rate in commissionRates"
+                        :key="rate.id"
+                        :value="rate.id"
+                      >
+                        {{ rate.rate }}%
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItem>
           </FormField>
@@ -329,14 +353,19 @@
             <FormLabel>Commission</FormLabel>
             <FormControl>
               <Select v-bind="componentField" v-model="selectedCommissionRate">
-                <SelectTrigger class="dropdown-trigger">
+                <SelectTrigger>
                   <SelectValue placeholder="Select Commission Rate" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">0%</SelectItem>
-                  <SelectItem value="5">5%</SelectItem>
-                  <SelectItem value="10">10%</SelectItem>
-                  <SelectItem value="15">15%</SelectItem>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="rate in commissionRates"
+                      :key="rate.id"
+                      :value="rate.id"
+                    >
+                      {{ rate.rate }}%
+                    </SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </FormControl>
@@ -498,10 +527,15 @@
                   <SelectValue placeholder="Select Commission Rate" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">0%</SelectItem>
-                  <SelectItem value="5">5%</SelectItem>
-                  <SelectItem value="10">10%</SelectItem>
-                  <SelectItem value="15">15%</SelectItem>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="rate in commissionRates"
+                      :key="rate.id"
+                      :value="rate.id"
+                    >
+                      {{ rate.rate }}%
+                    </SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </FormControl>
@@ -886,6 +920,23 @@ async function fetchProductTypes() {
 //   }
 // }
 // fetchCommissionRates()
+const fetchCommissionRates = async () => {
+  console.log("Testing2")
+  try {
+    const { data, error } = await useFetch("/api/commissionrates");
+    if (error.value) {
+      console.error("Error fetching commission rates:", error.value);
+    } else {
+      commissionRates.value = data.value;
+      console.log("Commission rates:", commissionRates.value);
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+};
+fetchCommissionRates()
+
+
 // To fetch product details
 async function fetchProductDetails() {
   try {

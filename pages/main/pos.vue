@@ -24,20 +24,6 @@
 
         <!-- Reservation, Client, and Therapist Selection -->
         <div class="relative flex space-x-5 items-center">
-          <Select v-model="selectedReservationId" class="w-[180px]">
-            <SelectTrigger>
-              <SelectValue placeholder="Select Reservation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="res in reservations"
-                :key="res.id"
-                :value="res.id"
-              >
-                {{ res.clientName }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
 
           <!-- Client Search Section -->
           <div class="relative w-[600px]">

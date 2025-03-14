@@ -67,9 +67,9 @@ const productData = [
   {
     name: "Glutamine Prime & Life",
     cost: 15.00,
-    commission: 2.00,
+    commission_rate_id: 2,
     sell: 20.00,
-    product_type: "Supplement",
+    product_type_id: 28,
     critical_level: 5,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -77,9 +77,9 @@ const productData = [
   {
     name: "Glass Skin Cream",
     cost: 8.00,
-    commission: 1.50,
+    commission_rate_id: 1,
     sell: 12.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 8,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -87,9 +87,9 @@ const productData = [
   {
     name: "Melasma Cream",
     cost: 10.00,
-    commission: 1.80,
+    commission_rate_id: 1,
     sell: 15.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 6,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -97,9 +97,9 @@ const productData = [
   {
     name: "Day Cream 2in1",
     cost: 9.00,
-    commission: 1.60,
+    commission_rate_id: 1,
     sell: 13.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 7,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -107,9 +107,9 @@ const productData = [
   {
     name: "Day Cream 5in1",
     cost: 12.00,
-    commission: 2.00,
+    commission_rate_id: 2,
     sell: 17.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 6,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -117,9 +117,9 @@ const productData = [
   {
     name: "U-vest (Sunblock)",
     cost: 14.00,
-    commission: 2.20,
+    commission_rate_id: 2,
     sell: 19.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 5,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -127,9 +127,9 @@ const productData = [
   {
     name: "Bleaching Cream",
     cost: 11.00,
-    commission: 1.90,
+    commission_rate_id: 2,
     sell: 16.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 6,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -137,9 +137,9 @@ const productData = [
   {
     name: "Collagen Cream (Co2)",
     cost: 18.00,
-    commission: 2.50,
+    commission_rate_id: 3,
     sell: 24.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 4,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -147,9 +147,9 @@ const productData = [
   {
     name: "Collagen Cream",
     cost: 16.00,
-    commission: 2.30,
+    commission_rate_id: 3,
     sell: 22.00,
-    product_type: "Cream",
+    product_type_id: 1,
     critical_level: 4,
     stockin: 10,
     supplier_id: 1, // supplier id for this product
@@ -766,11 +766,20 @@ const seed = async () => {
       await Promise.all(
         productData.map(async (product) => {
           const productTypeRecord = await prisma.productType.findUnique({
-            where: { type: product.product_type },
+            where: { id: product.product_type_id },
           });
   
           if (!productTypeRecord) {
-            console.error(`❌ Product type "${product.product_type}" not found for product "${product.name}".`);
+            console.error(`❌ Product type "${product.product_type_id}" not found for product "${product.name}".`);
+            return;
+          }
+
+          const productCommissionRate = await prisma.commissionRate.findUnique({
+            where: { id: product.commission_rate_id },
+          });
+
+          if(!productCommissionRate) {
+            console.error(`❌ Commission rate "${product.commission_rate_id}" not found for product "${product.name}".`);
             return;
           }
           
@@ -784,7 +793,7 @@ const seed = async () => {
               data: {
                 name: product.name,
                 cost: product.cost,
-                commission: product.commission,
+                commission_rate_id: productCommissionRate.id,
                 sell: product.sell,
                 product_type_id: productTypeRecord.id,
                 critical_level: product.critical_level,

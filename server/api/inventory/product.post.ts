@@ -19,17 +19,17 @@ export default defineEventHandler(async (event) => {
           where: { type: String(body.product_type) }, // expects a string (e.g. "Serum")
           create: { type: String(body.product_type) }
         }
-      }
+      },
+      CommissionRate: {
+        connect: {
+          id: parseInt(body.commission)
+        },
+      },
     };
 
     // Include sell if provided
     if (body.selling_price !== null && body.selling_price !== undefined) {
       data.sell = new Prisma.Decimal(String(body.selling_price));
-    }
-    
-    // Include commission if provided
-    if (body.commission !== null && body.commission !== undefined) {
-      data.commission = new Prisma.Decimal(String(body.commission));
     }
 
     // Create the Product
