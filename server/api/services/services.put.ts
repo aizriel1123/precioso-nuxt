@@ -18,11 +18,12 @@ export default defineEventHandler(async (event) => {
 
     // Find or create the commission rate record
     let commissionRate = await prisma.commissionRate.findFirst({
-      where: { rate: commissionRateValue }
+      where: { id: commissionRateValue }
     });
     if (!commissionRate) {
-      commissionRate = await prisma.commissionRate.create({
-        data: { rate: commissionRateValue }
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid Commission Rate'
       });
     }
 
@@ -37,7 +38,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // Update the service with the new values and proper foreign key references
-    alert('BUT DOES IT GET TO HERE')
     const updatedService = await prisma.service.update({
       where: { id: parseInt(id, 10) },
       data: {

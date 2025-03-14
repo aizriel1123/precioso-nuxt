@@ -329,29 +329,40 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-background">
     <NavBar/>
-    <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-2xl font-bold">All Suppliers</h1>
-      <div class="flex gap-4">
-        <Input 
-          v-model="searchTerm"
-          placeholder="Find supplier" 
-          class="w-64" 
-        />
-        <Select v-model="sortOrder">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="id-asc">ID: Ascending</SelectItem>
-            <SelectItem value="id-desc">ID: Descending</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
-        <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
-      </div>  
+    <div class="flex flex-col gap-6 mt-8 mb-8">
+      <!-- Title -->
+      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Suppliers</h1>
+
+      <!-- Search, Filter (Left) & Buttons (Right) -->
+      <div class="flex justify-between items-center">
+        <!-- Left: Search & Filter -->
+        <div class="flex gap-4">
+          <Input 
+            v-model="searchTerm"
+            placeholder="Find supplier" 
+            class="w-64" 
+          />
+          <Select v-model="sortOrder">
+            <SelectTrigger class="w-48">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="id-asc">ID: Ascending</SelectItem>
+              <SelectItem value="id-desc">ID: Descending</SelectItem>
+              <SelectItem value="name-asc">Name: A to Z</SelectItem>
+              <SelectItem value="name-desc">Name: Z to A</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <!-- Right: Buttons -->
+        <div class="flex gap-4">
+          <Button @click="showNewSupplierDialog = true">Add New Supplier</Button>
+          <Button variant="destructive" @click="deleteSupplier" v-if="selectedSupplier">Delete Supplier</Button>
+        </div>
+      </div>
     </div>
+
 
     <div class="grid grid-cols-3 gap-6">
       <!-- Suppliers Table -->

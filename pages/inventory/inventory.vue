@@ -323,16 +323,26 @@
           </FormItem>
         </FormField>
 
+        <!-- Commission Rate -->
         <FormField v-slot="{ componentField }" name="edited_commission_rate">
           <FormItem>
-            <FormLabel>Commission Rate</FormLabel>
+            <FormLabel>Commission</FormLabel>
             <FormControl>
-              <Input type="number" min="0" placeholder="Enter Commision Rate" v-bind="componentField"
-                v-model="selectedCommissionRate" />
+              <Select v-bind="componentField" v-model="selectedCommissionRate">
+                <SelectTrigger class="dropdown-trigger">
+                  <SelectValue placeholder="Select Commission Rate" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">0%</SelectItem>
+                  <SelectItem value="5">5%</SelectItem>
+                  <SelectItem value="10">10%</SelectItem>
+                  <SelectItem value="15">15%</SelectItem>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItem>
         </FormField>
-
+        
         <div class="modal-action-buttons">
           <Button variant="ghost" type="button" @click="isEditModalOpen = false">Cancel</Button>
           <Button type="submit">Edit Product</Button>
@@ -483,12 +493,22 @@
           <FormItem>
             <FormLabel>Commission Rate (%)</FormLabel>
             <FormControl>
-              <Input type="number" min="0" placeholder="Enter Commission Rate" v-bind="componentField"
-                v-model="NP_CommissionRate" required />
+              <Select v-bind="componentField" v-model="NP_CommissionRate" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Commission Rate" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">0%</SelectItem>
+                  <SelectItem value="5">5%</SelectItem>
+                  <SelectItem value="10">10%</SelectItem>
+                  <SelectItem value="15">15%</SelectItem>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
+
 
         <!-- Modal Action Buttons -->
         <div class="modal-action-buttons">
@@ -535,6 +555,7 @@ const selectedType = ref('all'); //default
 //Variable for Drop Down Variables
 const supplier_names = ref([]);
 const product_types = ref([]);
+const commissionRates = ref([]);
 //For pagination (may delete later)
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
@@ -752,11 +773,14 @@ const addNewType = form.handleSubmit(async (values) => {
 // Define the function to handle the form submission
 const editExistingProduct = form.handleSubmit(async (values) => {
   // Add the selectedProductId to the body
-  if (values.edited_product_cost || selectedCost.value > values.edited_selling_price || selectedSellingPrice.value) {
-    alert('Updated values invalid.')
-  }
-  if (values.edited_product_warning_level || selectedCritical.value > values.edited_product_stock || selectedStock.value) {
-    alert('Updated values invalid.')
+  if (values.edited_product_cost >  values.edited_selling_price) {
+    alert('Updated product cost invalid.')
+  } else if (values.edited_product_warning_level > values.edited_product_stock) {
+    alert('Updated critical value invalid.')
+  } else if (selectedCost.value > selectedSellingPrice.value) {
+    alert('Updated product cost invalid.')
+  } else if (selectedCritical.value > selectedStock.value) {
+    alert('Updated critical value invalid.')
   } else {
     const updatedValues = {
     // ...values,                      // Spread the existing values
@@ -844,8 +868,24 @@ async function fetchProductTypes() {
     return {};
   }
 }
-
-
+// Fill up commission rates dropdown
+// async function fetchCommissionRates() {
+//   try {
+//     const response = await $fetch('/api/inventory/commissionRates');
+//     // Ensure proper data structure
+//     commissionRates.value = response.data.map(pt => ({
+//       id: pt.id,
+//       type: pt.type
+//     }));
+//     console.log("Mapped Commission Rates:", commissionRates.value);
+//     return response;
+//   } catch (error) {
+//     console.error('Error fetching product types:', error);
+//     commissionRates.value = [];
+//     return {};
+//   }
+// }
+// fetchCommissionRates()
 // To fetch product details
 async function fetchProductDetails() {
   try {

@@ -257,25 +257,32 @@ onMounted(() => {
   
   <div class="min-h-screen bg-background">
     <NavBar/>
-    <div class="flex justify-between items-center mt-8 mb-8">
-      <h1 class="text-2xl font-bold">All Therapists</h1>
-      <div class="flex gap-4">
-        <Input 
-          v-model="searchTerm"
-          placeholder="Search therapist" 
-          class="w-64" 
-        />
-        <Select v-model="sortOrder">
-          <SelectTrigger class="w-48">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="id-asc">ID: Ascending</SelectItem>
-            <SelectItem value="id-desc">ID: Descending</SelectItem>
-            <SelectItem value="name-asc">Name: A to Z</SelectItem>
-            <SelectItem value="name-desc">Name: Z to A</SelectItem>
-          </SelectContent>
-        </Select>
+    <div class="mt-8 mb-8">
+      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl">Therapists</h1>
+
+      <div class="flex justify-between items-center mt-6">
+        <!-- Left Section: Search Bar & Filter -->
+        <div class="flex gap-4">
+          <Input 
+            v-model="searchTerm"
+            placeholder="Search therapist" 
+            class="w-64" 
+          />
+          <Select v-model="sortOrder">
+            <SelectTrigger class="w-48">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="id-asc">ID: Ascending</SelectItem>
+              <SelectItem value="id-desc">ID: Descending</SelectItem>
+              <SelectItem value="name-asc">Name: A to Z</SelectItem>
+              <SelectItem value="name-desc">Name: Z to A</SelectItem>
+            </SelectContent>
+          </Select>
+          
+        </div>
+
+        <!-- Right Section: Add Button -->
         <Button @click="showNewTherapistDialog = true">Add New Therapist</Button>
       </div>
     </div>

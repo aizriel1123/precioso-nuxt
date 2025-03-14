@@ -1,9 +1,8 @@
 import prisma from '~/lib/prisma';
 
 export default defineEventHandler(async (event) => {
-  const { id } = event.context.params;
   const body = await readBody(event);
-  const { name, price, commission, status, description } = body;
+  const { id, name, price, commission, status, description } = body;
 
   if (!id || !name || price == null || commission == null || !status || !description) {
     throw createError({
@@ -19,7 +18,7 @@ export default defineEventHandler(async (event) => {
         promo: name,
         price: parseFloat(price),
         commission_rate_id: parseInt(commission),
-        status_id: parseInt(status),
+        // status_id: parseInt(status),
         description: description,
       }
     });

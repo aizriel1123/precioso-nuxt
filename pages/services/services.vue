@@ -454,9 +454,6 @@
       </form>
     </div>
     <!-- Promo edit section remains unchanged if not relevant -->
-  </div>
-  <!-- Popup to edit promos -->
-  <div v-if="isEditModalOpen" class="modal-overlay">
     <div v-if="selectedTab === 'promo'" class="modal-content">
       <h2 class="selected-product-title">Edit Promos</h2>
       <form @submit.prevent="editGoods">
@@ -547,8 +544,8 @@
         </div>
       </form>
     </div>
-    <!-- Promo edit section remains unchanged if not relevant -->
   </div>
+
   <!-- Popup to Add New Service -->
   <div v-if="isServiceModalOpen" class="modal-overlay">
     <div class="modal-content">
@@ -712,6 +709,7 @@
           </FormItem>
         </FormField>
 
+        <!-- Promo Status Select -->
         <div>
           <Select v-model="newPromoStatus">
             <SelectTrigger>
@@ -804,6 +802,7 @@ const selectedPromoName = ref("");
 const selectedPromoPrice = ref(0);
 const selectedPromoCommission = ref(0);
 const selectedPromoDescription = ref("");
+const selectedPromoStatus = ref("");
 
 const newServiceName = ref("");
 const newServicePrice = ref("");
@@ -906,6 +905,7 @@ const fetchData = async () => {
         price: promo.price,
         commission: promo.CommissionRate ? promo.CommissionRate.rate : 0,
         description: promo.description,
+        status: promo.PromoStatus.status,
       }));
     }
   } catch (err) {
@@ -957,6 +957,7 @@ watch(selectedTab, () => {
 onMounted(() => {
   fetchData();
   fetchCommissionRates();
+  fetchPromoStatus();
 });
 
 // --- Selection and Edit Functions ---
@@ -966,12 +967,13 @@ const selectGoods = (item) => {
     selectedServiceName.value = item.name;
     selectedServicePrice.value = item.price;
     selectedServiceCommission.value = item.commission;
-    editServiceCommission.value = item.commission_rate_id;
+    // editServiceCommission.value = item.commission_rate_id;
   } else {
     selectedPromoId.value = item.id;
     selectedPromoName.value = item.promo;
     selectedPromoPrice.value = item.price;
     selectedPromoCommission.value = item.commission;
+    selectedPromoStatus.value = item.status;
   }
 };
 
@@ -995,9 +997,11 @@ const editGoods = async () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          type: "Default Service", // CHANGE TO VARIABLE
+          id: selectedServiceId.value,
           name: selectedServiceName.value,
           price: selectedServicePrice.value,
-          commission: editServiceCommission.value, // Use the updated ref
+          commission: selectedServiceCommission.value, // Use the updated ref
         }),
       });
       if (!response.ok) throw new Error("Failed to update service");
@@ -1006,9 +1010,12 @@ const editGoods = async () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: selectedPromoId.value,
           name: selectedPromoName.value,
           price: selectedPromoPrice.value,
           commission: selectedPromoCommission.value,
+          description: selectedPromoDescription.value,
+          status: selectedPromoStatus.value,
         }),
       });
       if (!response.ok) throw new Error("Failed to update promo");
